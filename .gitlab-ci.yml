@@ -14,12 +14,10 @@ testing:
   stage: test
   script:
     - echo "This is the test stage"
+    - cd mt-package
     - poetry run pytest
     - pytest --junitxml=report.xml
-  artifacts:
-    when: always
-    reports:
-      junit: /builds/tingyu/python-devop/tests/report.xml
+
 
 publishing:
   stage: publish
@@ -30,3 +28,7 @@ publishing:
     - poetry config http-basic.gitlab gitlab-ci-token "$CI_JOB_TOKEN"
     - poetry publish -r gitlab --build
     - echo "Publishing done!"
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
