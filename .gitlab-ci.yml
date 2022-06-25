@@ -14,12 +14,10 @@ testing:
   stage: test
   script:
     - echo "This is the test stage"
+    - cd mt-package
     - poetry run pytest
     - pytest --junitxml=report.xml
-  artifacts:
-    when: always
-    reports:
-      junit: /builds/tingyu/python-devop/tests/report.xml
+
 
 publishing:
   stage: publish
