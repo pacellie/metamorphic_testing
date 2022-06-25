@@ -1,0 +1,32 @@
+default:
+  image: python:3.9
+
+stages:
+  - test
+  - publish
+
+before_script:
+  - pip install poetry
+  - poetry install
+  - source `poetry env info --path`/bin/activate
+
+testing:
+  stage: test
+  script:
+    - echo "This is the test stage"
+    - poetry run pytest
+    - pytest --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: /builds/tingyu/python-devop/tests/report.xml
+
+publishing:
+  stage: publish
+  needs: [testing]
+  script:
+    - echo "This is the build stage"
+    - poetry config repositories.gitlab https://gitlab.lrz.de/api/v4/projects/$CI_PROJECT_ID/packages/pypi
+    - poetry config http-basic.gitlab gitlab-ci-token "$CI_JOB_TOKEN"
+    - poetry publish -r gitlab --build
+    - echo "Publishing done!"
