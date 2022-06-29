@@ -1,6 +1,7 @@
 """
 Helper functions for manipulating the values that get from `@mt_given`.
 """
+from typing import Callable, Type
 from hypothesis import given
 import hypothesis.strategies as st
 from hypothesis.strategies import SearchStrategy
@@ -13,7 +14,7 @@ import mt_seed as ms
 
 def _poor_logging(relation_instance: mr.MtRelation) -> None:
     """
-    Temporarily logging for having a look at the test outputs.
+    Temporary logging for having a look at the test outputs.
     Since logging by `print` is not wanted, this should be changed later.
     """
     print(
@@ -39,14 +40,20 @@ def _get_input_seeds(seed: ms.MtSeed, transformer: mt.MtTransformer) -> tuple[Se
     return original_input, transformed_input
 
 
-def mt_given(*, seed: ms.MtSeed, transformer: mt.MtTransformer, function: mf.MtFunction, relation: mr.MtRelation):
+def mt_given(
+        *,
+        seed: ms.MtSeed,
+        transformer: mt.MtTransformer,
+        function: Type[mf.MtFunction],
+        relation: Type[mr.MtRelation]
+) -> Callable:
     """
     A decorator built on top of `@given` to accept the keyword-only arguments.
     Arranges the arguments, reformat them to a `dict`,
     and unpack the `dict` into the parameters of `wrapper` function.
     """
 
-    def inner_given(func: type):  # TODO: What is the type for a function?
+    def inner_given(func: Callable) -> Callable:
         original_input, transformed_input = _get_input_seeds(
             seed,
             transformer,
@@ -60,7 +67,7 @@ def mt_given(*, seed: ms.MtSeed, transformer: mt.MtTransformer, function: mf.MtF
             "function": st.sampled_from([function()]),
             "relation": st.sampled_from([_relation_instance := relation()]),
         })
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> None:
             try:
                 func(*args, **kwargs)
             # If the test fails, catch the `AssertionError` and do poor logging.

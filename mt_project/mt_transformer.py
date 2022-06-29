@@ -10,26 +10,25 @@ from hypothesis.strategies import SearchStrategy
 
 
 class MtTransformer(ABC):
-    def __init__(self, *, n: int = None):
+    def __init__(self, *, n: int = None) -> None:
         """
         `n` is used to define how many times
         the `original_input` applies to the transformer.
         """
         if n is None:
             n = 1  # default: transform 1 time
-
         self.n = n
 
-    def __call__(self, original_input: SearchStrategy):
+    def __call__(self, original_input: SearchStrategy) -> Any:
         return self.transformer(original_input)
 
     @staticmethod
     @abstractmethod
-    def transformer(original_input: Any):
+    def transformer(original_input: Any) -> Any:
         ...
 
 
 class SineTransformer(MtTransformer):
     @staticmethod
-    def transformer(original_input: Any):
+    def transformer(original_input: Any) -> Any:  # Maybe there is something more specific than `Any`
         return original_input + 2 * pi

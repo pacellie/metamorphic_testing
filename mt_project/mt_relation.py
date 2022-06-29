@@ -1,20 +1,21 @@
 """
 Defines the relation between `original_output` and `transformed_output`.
 """
-from typing import Any
+from __future__ import annotations
+from typing import Any, Union
 from pytest import approx
 from abc import ABC, abstractmethod
 
 
 class MtRelation(ABC):
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Stores the instance attributes for logging.
         """
         self.original_output: Any = None
         self.transformed_output: Any = None
 
-    def __call__(self, **kwargs):
+    def __call__(self, **kwargs) -> Union[MtRelation, bool]:
         """
         Unpacks the `dict` values from `@given`.
         Applies the function to each input and gets the outputs for relation checking.
@@ -26,11 +27,11 @@ class MtRelation(ABC):
 
     @staticmethod
     @abstractmethod
-    def check_relation(original_output: Any, transformed_output: Any):
+    def check_relation(original_output: Any, transformed_output: Any) -> bool:
         ...
 
 
 class FloatEqual(MtRelation):
     @staticmethod
-    def check_relation(original_output: Any, transformed_output: Any):
+    def check_relation(original_output: Any, transformed_output: Any) -> bool:
         return original_output == approx(transformed_output)

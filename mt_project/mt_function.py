@@ -7,16 +7,16 @@ from typing import Any
 
 
 class MtFunction(ABC):
-    def __call__(self, given_input: Any):
+    def __call__(self, given_input: Any) -> Any:
         return self.function(given_input)
 
     @staticmethod
     @abstractmethod
-    def function(given_input: Any):
+    def function(given_input: Any) -> Any:
         ...
 
 
 class SineFunction(MtFunction):
     @staticmethod
-    def function(given_input: Any):
+    def function(given_input: Any) -> Any:
         return sin(given_input)
