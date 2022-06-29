@@ -41,3 +41,4 @@ publishing:
     - echo "Publishing done!"
   only:
     - main
+  when: manual

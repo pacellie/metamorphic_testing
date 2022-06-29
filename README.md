@@ -11,6 +11,12 @@
     * Run some services only on specific branches (e.g. only publish on the main branch)
     * Specify a JUnit output file to get failing tests and coverage info
 
+## Publishing a New Version
+- Increase the version number in pyproject.toml following the suggestions on https://semver.org/
+- Push into your branch, then create a merge request into main
+- Wait for the pipelines to finish, then let someone merge your PR
+- After it's merged and the tests have run through again, go to CI/CD > Pipelines, then press the button to publish. This step has to be done manually so that you cannot publish on accident.
+
 ## License
 [MIT License](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/blob/main/LICENSE)
 
