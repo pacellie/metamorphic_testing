@@ -1,4 +1,4 @@
-from mt_package import __version__
+from metamorphic_test import __version__
 
 
 def test_version():
