@@ -8,7 +8,7 @@ stages:
 before_script:
   - pip install poetry
   - export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
-  - poetry install
+  - poetry install --no-ansi --no-interaction
   - source `poetry env info --path`/bin/activate
 
 testing:
