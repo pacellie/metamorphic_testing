@@ -27,7 +27,5 @@ publishing:
     - poetry config http-basic.gitlab gitlab-ci-token "$CI_JOB_TOKEN"
     - poetry publish -r gitlab --build
     - echo "Publishing done!"
-
-workflow:
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "web"'
+  only:
+    - main
