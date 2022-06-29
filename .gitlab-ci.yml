@@ -56,6 +56,8 @@ code_quality:
     stage: test
     artifacts:
         paths: [gl-code-quality-report.json]
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 prospector:
     stage: linter
@@ -66,7 +68,7 @@ prospector:
         changes:
             - metamorphic_test/**/*
             - tests/**/*
-    allow_failure: true  # maybe remove later
+#    allow_failure: true  # maybe remove later
 
 publishing:
     stage: publish
