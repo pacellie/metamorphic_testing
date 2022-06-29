@@ -16,6 +16,12 @@ testing:
     - echo "This is the test stage"
     - poetry run pytest
     - pytest --junitxml=report.xml
+  artifacts:
+    when: always
+    paths:
+      - report.xml
+    reports:
+      junit: report.xml
 
 
 publishing:
