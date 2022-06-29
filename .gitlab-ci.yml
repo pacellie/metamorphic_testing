@@ -14,6 +14,7 @@ testing:
   stage: test
   script:
     - echo "This is the test stage"
+    - export PATH="$HOME/.poetry/bin:$PATH"
     - poetry run pytest
     - coverage run -m pytest --junitxml=report.xml
     - coverage report
