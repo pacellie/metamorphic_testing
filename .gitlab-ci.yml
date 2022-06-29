@@ -5,6 +5,9 @@ stages:
   - test
   - publish
 
+variables:
+  LANG: C.UTF-8
+
 before_script:
   - pip install poetry
   - export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
