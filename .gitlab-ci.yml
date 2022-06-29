@@ -19,10 +19,10 @@ pytest:
   script:
     - echo "This is the pytest test stage"
     - pytest --junitxml=report.xml
-    artifacts:
-      when: always
-      reports:
-        junit: report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
 
 coverage:
   stage: test
@@ -43,7 +43,7 @@ coverage:
 
 publishing:
   stage: publish
-  needs: [testing]
+#  needs: [testing]
   script:
     - echo "This is the build stage"
     - poetry config repositories.gitlab https://gitlab.lrz.de/api/v4/projects/$CI_PROJECT_ID/packages/pypi
