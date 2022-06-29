@@ -1,35 +1,41 @@
 default:
   image: python:3.8
-
-stages:
-  - test
-  - publish
+  before_script:  # poetry virtual env initialization
+    - pip install poetry
+    - export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+    - poetry install --no-ansi --no-interaction
+    - source `poetry env info --path`/bin/activate
 
 variables:
   LANG: C.UTF-8
 
-before_script:
-  - pip install poetry
-  - export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
-  - poetry install --no-ansi --no-interaction
-  - source `poetry env info --path`/bin/activate
+stages:
+  - test
+  - linter
+  - publish
 
-testing:
+pytest:
   stage: test
   script:
-    - echo "This is the test stage"
-    - poetry run pytest
-    - coverage run -m pytest --junitxml=report.xml
+    - echo "This is the pytest test stage"
+    - pytest --junitxml=report.xml
+    artifacts:
+      when: always
+      reports:
+        junit: report.xml
+
+coverage:
+  stage: test
+  script:
+    - echo "This is coverage test stage"
+#    - coverage run -m pytest --junitxml=report.xml
+    - coverage run -m pytest
     - coverage report
     - coverage xml
-    - prospector -w mypy -w bandit
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     when: always
-    paths:
-      - report.xml
     reports:
-      junit: report.xml
       coverage_report:
         coverage_format: cobertura
         path: coverage.xml
