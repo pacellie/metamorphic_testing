@@ -22,6 +22,7 @@ testing:
     - coverage run -m pytest --junitxml=report.xml
     - coverage report
     - coverage xml
+    - prospector -w mypy -w bandit
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     when: always
