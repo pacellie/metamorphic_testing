@@ -43,7 +43,7 @@ coverage:
 
 publishing:
   stage: publish
-  needs: [testing]
+  # needs: [testing]
   script:
     - echo "This is the build stage"
     - poetry config repositories.gitlab https://gitlab.lrz.de/api/v4/projects/$CI_PROJECT_ID/packages/pypi
