@@ -1,11 +1,12 @@
 [tool.poetry]
-name = "mt-package"
+name = "metamorphic_test"
 version = "0.1.1"
 description = ""
-authors = ["Iris <irisritalu@gmail.com>"]
+authors = ["Python Practicum TUM 2022"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+hypothesis = "^6.48.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
