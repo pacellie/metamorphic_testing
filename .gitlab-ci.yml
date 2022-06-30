@@ -27,15 +27,11 @@ pytest:
         when: always
         reports:
             junit: report.xml
-#    only:
-#        changes:
-#            - metamorphic_test/**/*
-#            - tests/**/*
 
 coverage:
     stage: test
     script:
-        - echo "This is coverage test stage"
+        - echo "This is the coverage test stage"
         - coverage run -m pytest
         - coverage report
         - coverage xml
@@ -47,10 +43,6 @@ coverage:
             coverage_report:
                 coverage_format: cobertura
                 path: coverage.xml
-#    only:
-#        changes:
-#            - metamorphic_test/**/*
-#            - tests/**/*
 
 code_quality:
     stage: test
@@ -62,13 +54,8 @@ code_quality:
 prospector:
     stage: linter
     script:
-        - echo "This is prospector linter stage"
+        - echo "This is the prospector linter stage"
         - prospector -w mypy -w bandit
-#    only:
-#        changes:
-#            - metamorphic_test/**/*
-#            - tests/**/*
-#    allow_failure: true  # maybe remove later
 
 publishing:
     stage: publish
