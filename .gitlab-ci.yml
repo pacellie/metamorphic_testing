@@ -17,22 +17,11 @@ include:
 variables:
     LANG: C.UTF-8
 
-pytest:
-    stage: test
-    script:
-        - echo "This is the pytest test stage"
-        - pytest --junitxml=report.xml
-    artifacts:
-        name: "$CI_JOB_NAME"
-        when: always
-        reports:
-            junit: report.xml
-
 coverage:
     stage: test
     script:
         - echo "This is the coverage test stage"
-        - coverage run -m pytest
+        - coverage run -m pytest --junitxml=report.xml
         - coverage report
         - coverage xml
     coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
@@ -40,6 +29,7 @@ coverage:
         name: "$CI_JOB_NAME"
         when: always
         reports:
+            junit: report.xml
             coverage_report:
                 coverage_format: cobertura
                 path: coverage.xml
@@ -59,7 +49,7 @@ prospector:
 
 publishing:
     stage: publish
-    needs: [pytest, prospector]
+    needs: [coverage, prospector]
     script:
         - echo "This is the publish stage"
         - poetry config repositories.gitlab https://gitlab.lrz.de/api/v4/projects/$CI_PROJECT_ID/packages/pypi
