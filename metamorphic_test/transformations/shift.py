@@ -1,9 +1,10 @@
 from metamorphic_test.transformation import MetamorphicTransformation
 
 
-def shift(by: float) -> MetamorphicTransformation[float]:
+class Shift(MetamorphicTransformation[complex, complex]):
     """A metamorphic transformation that shifts a float by the multiple of a given amount."""
-    class Shift(MetamorphicTransformation[float]):
-        def transform(self, anchor: float, multiple: int) -> float:
-            return anchor + by * multiple
-    return Shift()
+    def __init__(self, by: float):
+        self.by = by
+
+    def transform(self, anchor: complex, multiple: int = 1) -> complex:
+        return anchor + self.by * multiple
