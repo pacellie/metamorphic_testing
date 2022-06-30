@@ -72,7 +72,7 @@ prospector:
 
 publishing:
     stage: publish
-    needs: [prospector]
+    needs: [pytest, prospector]
     script:
         - echo "This is the publish stage"
         - poetry config repositories.gitlab https://gitlab.lrz.de/api/v4/projects/$CI_PROJECT_ID/packages/pypi
