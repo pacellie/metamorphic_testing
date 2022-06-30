@@ -2,7 +2,7 @@
 # see https://stackoverflow.com/a/33533514/4306257
 from __future__ import annotations
 from abc import ABCMeta, abstractmethod
-from typing import Generic, List, Literal, TypeVar, Union, Any, Dict
+from typing import Generic, List, Literal, TypeVar, Any, Dict
 from functools import wraps
 
 
@@ -13,11 +13,13 @@ T = TypeVar('T')
 
 
 class MetamorphicTransformation(Generic[F, T], metaclass=ABCMeta):
-    """A generalized metamorphic transformation. It can transform a value (from type F to type T)."""
+    """
+    A generalized metamorphic transformation.
+    It can transform a value (from type F to type T).
+    """
     @abstractmethod
     def transform(self, anchor: F) -> T:
         """Transform the given value. Might take more parameters in implementations."""
-        ...
     
     def chain(
         self,
@@ -35,11 +37,17 @@ class MetamorphicTransformation(Generic[F, T], metaclass=ABCMeta):
             def transform(
                 self,
                 anchor: B,
-                inner: Dict[(Literal['args'] | Literal['kwargs']), (List | Dict[str, Any])] = {},
-                *args, **kwargs
+                *args,
+                inner: Dict[
+                    (Literal['args'] | Literal['kwargs']),
+                    (List | Dict[str, Any])] = None,
+                **kwargs
             ) -> T:
+                if inner is None:
+                    inner = {}
                 if not set(inner.keys()).issubset({'args', 'kwargs'}):
-                    raise ValueError("inner can only contain keys 'args' and 'kwargs'")  # pragma: no cover
+                    raise ValueError(
+                        "inner can only contain keys 'args' and 'kwargs'")  # pragma: no cover
                 inner_transformed = with_t.transform(anchor, *inner["args"], **inner["kwargs"])
                 return original.transform(inner_transformed, *args, **kwargs)
         return ChainedTransformation()
