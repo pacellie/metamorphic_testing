@@ -6,7 +6,8 @@ authors = ["Python Practicum TUM 2022"]
 
 [tool.poetry.scripts]
 cov = "scripts.cov:html_coverage"
-lint = "scripts.lint:lint"
+install-hook = "scripts.install_hook:install_hook"
+lint = "prospector.run:main"
 
 [tool.poetry.dependencies]
 python = "=3.8,<3.11"
@@ -20,7 +21,7 @@ prospector = {extras = ["with_mypy", "with_bandit"], version = "^1.7.7"}
 numpy = "^1.23.0"
 pandas = "^1.4.3"
 pandas-stubs = "^1.4.3"
-sklearn = "^0.0"
+sklearn = "^1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
