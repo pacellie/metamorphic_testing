@@ -10,7 +10,7 @@ install-hook = "scripts.install_hook:install_hook"
 lint = "prospector.run:main"
 
 [tool.poetry.dependencies]
-python = "=3.8,<3.11"
+python = ">=3.8,<3.11"
 hypothesis = "^6.48.1"
 pytest = "^7.1.2"
 

@@ -283,6 +283,7 @@ numpy = [
     {version = ">=1.18.5", markers = "platform_machine != \"aarch64\" and platform_machine != \"arm64\" and python_version < \"3.10\""},
     {version = ">=1.19.2", markers = "platform_machine == \"aarch64\" and python_version < \"3.10\""},
     {version = ">=1.20.0", markers = "platform_machine == \"arm64\" and python_version < \"3.10\""},
+    {version = ">=1.21.0", markers = "python_version >= \"3.10\""},
 ]
 python-dateutil = ">=2.8.1"
 pytz = ">=2020.1"
@@ -719,8 +720,8 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "=3.8,<3.11"
-content-hash = "ed48ef6229b9873237b70651c201e10989a51769cf569bb51e7379b93d459be4"
+python-versions = ">=3.8,<3.11"
+content-hash = "b69a79318de4db21e23f5277365ea8f2b29acf8f5f7c86392dd643a401b06ccb"
 
 [metadata.files]
 astroid = [

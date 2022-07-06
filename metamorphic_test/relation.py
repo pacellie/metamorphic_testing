@@ -96,10 +96,10 @@ def relate(r: MetamorphicRelation):
     Usage: @relate(float_equal())
     """
     def decorator(fun):
-        def inner(anchor, transformed):
+        def related(anchor, transformed):
             r.relate_check(
                 fun(anchor),
                 fun(transformed)
             )
-        return inner
+        return related
     return decorator
