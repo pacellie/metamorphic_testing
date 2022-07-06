@@ -11,6 +11,13 @@
     * Run some services only on specific branches (e.g. only publish on the main branch)
     * Specify a JUnit output file to get failing tests and coverage info
 
+
+## Available poetry Scripts
+- `poetry install`: Install all dependencies
+- `poetry run pytest`: Run tests
+- `poetry run cov`: Run tests with coverage and show results
+- `poetry run lint`: Run linters
+
 ## Publishing a New Version
 - Increase the version number in pyproject.toml following the suggestions on https://semver.org/
 - Push into your branch, then create a merge request into main
