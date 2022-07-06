@@ -11,7 +11,7 @@ lint = "prospector.run:main"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
-hypothesis = "=6.48.1" # 6.49.1 seems to change something which breaks the code
+hypothesis = "^6.49.1"
 pytest = "^7.1.2"
 
 [tool.poetry.dev-dependencies]

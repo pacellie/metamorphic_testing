@@ -3,7 +3,6 @@
 from __future__ import annotations
 from abc import ABCMeta, abstractmethod
 from typing import Generic, List, Literal, TypeVar, Any, Dict
-from functools import wraps
 
 
 B = TypeVar('B')
@@ -80,7 +79,6 @@ def transform(t: MetamorphicTransformation[F, T]):
     Usage: @transform(shift(1))
     """
     def decorator(fun):
-        @wraps(fun)
         def transformed(anchor: F, *args, **kwargs) -> T:
             transformed = t.transform(anchor, *args, **kwargs)
             return fun(anchor, transformed)
