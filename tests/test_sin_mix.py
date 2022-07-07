@@ -23,7 +23,7 @@ def point_mirror(x):
 
 
 @relation(point_mirror)
-def check_relation(first, second):
+def check_negation_relation(first, second):
     return first == -second
 
 

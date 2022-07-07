@@ -1,11 +1,10 @@
 from dataclasses import dataclass, field
-from typing import Callable, Any, Tuple
+from typing import Callable, Any, Tuple, Optional
 
 
 @dataclass
 class Suite:
-    name: str = None
-    transformation: Callable[[Any], Any] = None
-    parametrized: list[Tuple[str, list]] = field(default_factory=list)  # e.g. [("n", [1,2,3]), ("c", [0])]
-    relation: Callable[[Any, Any], bool] = None
-
+    name: Optional[str] = None
+    transformation: Optional[Callable[[Any], Any]] = None
+    parametrized: list[Tuple[str, list]] = field(default_factory=list)
+    relation: Optional[Callable[[Any, Any], bool]] = None
