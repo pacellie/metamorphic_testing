@@ -1,9 +1,10 @@
-from .transformation import transform
-from .relation import relate
-
+from .decorator import transformation, relation, sut, name, parametrized
 
 __version__ = '0.1.0'
 __all__ = [
-    'transform',
-    'relate',
+    'transformation',
+    'relation',
+    'sut',
+    'name',
+    'parametrized',
 ]
