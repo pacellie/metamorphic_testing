@@ -49,7 +49,7 @@ def relation(transformation_function):
     return deco_relation
 
 
-def suite_key(func, key, anchor, **para_dict):
+def suite_key(func, key, anchor, /, **para_dict):
     def execute(**kwargs):
         first = kwargs[next(iter(kwargs))]  # retrieve the first arg
         test_function = func
@@ -78,7 +78,7 @@ def sut(x):
                 for k, v in para_dict.items():
                     para_dict[k] = st.sampled_from(v)
 
-                suite_key(func=func, key=s, anchor=x, **para_dict)
+                suite_key(func, s, x, **para_dict)
 
         return execute_all
 
