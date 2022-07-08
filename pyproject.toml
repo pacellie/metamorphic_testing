@@ -13,6 +13,10 @@ pytest = "^7.1.2"
 mypy = "^0.961"
 pytest-cov = "^3.0.0"
 prospector = {extras = ["with_mypy", "with_bandit"], version = "^1.7.7"}
+librosa = "^0.9.2"
+torch = "^1.12.0"
+torchaudio = "^0.12.0"
+torchvision = "^0.13.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
