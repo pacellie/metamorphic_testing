@@ -1,10 +1,12 @@
-from .decorator import transformation, relation, sut, name, parametrized
+from .decorator import transformation, relation, metamorphic, name, parametrized
+from .generator import randint
 
 __version__ = '0.1.0'
 __all__ = [
     'transformation',
     'relation',
-    'sut',
+    'metamorphic',
     'name',
     'parametrized',
+    'randint',
 ]

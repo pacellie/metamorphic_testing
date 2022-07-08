@@ -1,10 +1,9 @@
-from dataclasses import dataclass, field
-from typing import Callable, Any, Tuple, Optional, List
+from dataclasses import dataclass
+from typing import Callable, Any, Optional
 
 
 @dataclass
 class Suite:
     name: Optional[str] = None
     transformation: Optional[Callable[[Any], Any]] = None
-    parametrized: List[Tuple[str, List]] = field(default_factory=list)
     relation: Optional[Callable[[Any, Any], bool]] = None

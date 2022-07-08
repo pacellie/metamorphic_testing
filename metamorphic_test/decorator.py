@@ -1,85 +1,60 @@
 from collections import defaultdict
-from functools import wraps
-from hypothesis import given
-import hypothesis.strategies as st
 from .suite import Suite
 
-suite: defaultdict = defaultdict(Suite)
+
+suites: defaultdict = defaultdict(Suite)
 
 
 def name(custom_name):
-    def deco_name(func):
-        suite[func.__name__].name = custom_name
-        return func
-
-    return deco_name
-
-
-def parametrized(*args):
-    def deco_parametrized(func):
-        suite[func.__name__].parametrized.append(args)
-        return func
-
-    return deco_parametrized
+    def wrapper(transform):
+        suites[transform.__name__].name = custom_name
+        return transform
+    return wrapper
 
 
-def transformation(func):
-    suite[func.__name__].transformation = func
-    return func
+def parametrized(arg, generator):
+    def wrapper(transform):
+        def parametrized_transform(*args, **kwargs):
+            kwargs[arg] = generator() if callable(generator) else generator
+            return transform(*args, **kwargs)
+        return parametrized_transform
+    return wrapper
 
 
-def relation(transformation_function):
-    def deco_relation(func):
-        found_mapping_transformation = False
-        for s in suite:
-            if suite[s].transformation == transformation_function:
-                suite[s].relation = func
-                found_mapping_transformation = True
-        if not found_mapping_transformation:
-            raise TypeError(f"cannot find the corresponding transformation function "
-                            f"{transformation_function.__name__} "
-                            f"for the relation function {func.__name__}")
-
-        @wraps(func)
-        def wrapper_relation(*args, **kwargs):  # first, second args of relation
-            return func(*args, **kwargs)
-
-        return wrapper_relation
-
-    return deco_relation
+def transformation(transform):
+    suites[transform.__name__].transform = transform
+    return transform
 
 
-def suite_key(func, key, anchor, /, **para_dict):
-    def execute(**kwargs):
-        first = kwargs[next(iter(kwargs))]  # retrieve the first arg
-        test_function = func
-        transformation_function = suite[key].transformation
-        relation_function = suite[key].relation
-        original_output = test_function(first)
-        transformed_output = test_function(transformation_function(**kwargs))
-        result = relation_function(original_output, transformed_output)
-        assert result
+def relation(transform):
+    def wrapper(relation):
+        found_transform = False
 
-    return given(x=anchor, **para_dict)(execute)()
+        for suite in suites:
+            if suites[suite].transform == transform:
+                suites[suite].relation = relation
+                found_transform = True
+
+        if not found_transform:
+            raise TypeError(f"cannot find the corresponding transformation "
+                            f"{transform.__name__} "
+                            f"for the relation {relation.__name__}")
+
+        return relation
+    return wrapper
 
 
-def sut(x):
-    def deco_sut(func):
-        def execute_all():
-            print(f"\n[testing function] {func.__name__}")
-            for i, s in enumerate(suite, 1):  # run each test
-                print(f"{i} [execute] {suite[s].name}" if suite[s].name
-                      else f"{i} [execute] {s}")
-                print(f"{i} [transformation] {suite[s].transformation.__name__}")
-                print(f"{i} [relation] {suite[s].relation.__name__}")
+def metamorphic(sut):
+    def execute(x):
+        for suite in suites:
+            transform = suites[suite].transform
+            relation = suites[suite].relation
 
-                # para_dict: stores the args in @parametrized
-                para_dict = dict(suite[s].parametrized)
-                for k, v in para_dict.items():
-                    para_dict[k] = st.sampled_from(v)
+            name = suites[suite].name if suites[suite].name else suite
+            print(f"[running suite '{name}']"
+                  f"\n\tinput: {x} "
+                  f"\n\ttransform: {transform.__name__} "
+                  f"\n\trelation: {relation.__name__}")
 
-                suite_key(func, s, x, **para_dict)
-
-        return execute_all
-
-    return deco_sut
+            assert relation(sut(x), sut(transform(x)))
+    return execute
