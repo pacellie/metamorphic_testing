@@ -1,18 +1,14 @@
-import inspect
 from collections import defaultdict
-from functools import wraps
+from functools import wraps, partial
+
 from .suite import Suite
 
 suites: defaultdict = defaultdict(lambda: defaultdict(Suite))
 
 
-def module(func):
-    return inspect.getmodule(func)
-
-
 def name(custom_name):
     def wrapper(transform):
-        suites[module(transform)][transform.__name__].name = custom_name
+        suites[transform.__module__][transform.__name__].name = custom_name
         return transform
 
     return wrapper
@@ -31,7 +27,7 @@ def parametrized(arg, generator):
 
 
 def transformation(transform):
-    suites[module(transform)][transform.__name__].transform = transform
+    suites[transform.__module__][transform.__name__].transform = transform
     return transform
 
 
@@ -40,9 +36,9 @@ def relation(*transforms):  # transformation functions
         for transform in transforms:
             found_transform = False
 
-            for suite in suites[module(relation)]:
-                if suites[module(relation)][suite].transform == transform:
-                    suites[module(relation)][suite].relation = relation
+            for suite in suites[relation.__module__]:
+                if suites[relation.__module__][suite].transform == transform:
+                    suites[relation.__module__][suite].relation = relation
                     found_transform = True
 
             if not found_transform:
@@ -55,15 +51,18 @@ def relation(*transforms):  # transformation functions
     return wrapper
 
 
-def metamorphic(sut):
+def metamorphic(test=None, *, relation=None):
+    if test is None:  # metamorphic was called with arguments
+        return partial(metamorphic, relation=relation)
+
     def execute(x):
         print(f"{suites=}")
-        for suite in suites[module(sut)]:
-            transform = suites[module(sut)][suite].transform
-            relation = suites[module(sut)][suite].relation
+        for suite in suites[test.__module__]:
+            transform = suites[test.__module__][suite].transform
+            relation = suites[test.__module__][suite].relation
 
-            name = suites[module(sut)][suite].name \
-                if suites[module(sut)][suite].name \
+            name = suites[test.__module__][suite].name \
+                if suites[test.__module__][suite].name \
                 else suite
 
             print(f"[running suite '{name}']"
@@ -71,6 +70,6 @@ def metamorphic(sut):
                   f"\n\ttransform: {transform.__name__} "
                   f"\n\trelation: {relation.__name__}")
 
-            assert relation(sut(x), sut(transform(x)))
+            assert relation(test(x), test(transform(x)))
 
     return execute
