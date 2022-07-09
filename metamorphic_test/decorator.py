@@ -1,6 +1,5 @@
 from collections import defaultdict
 from functools import wraps, partial
-
 from .suite import Suite
 
 suites: defaultdict = defaultdict(lambda: defaultdict(Suite))
@@ -51,29 +50,27 @@ def relation(*transforms):  # transformation functions
     return wrapper
 
 
-def metamorphic(_func=None, *, relation=None):
-    def wrapper(test):
-        def execute(x):
-            for suite in suites[test.__module__]:
-                transform_ = suites[test.__module__][suite].transform
-                relation_ = suites[test.__module__][suite].relation
+def metamorphic(test=None, *, relation=None):
+    if test is None:  # metamorphic was called with arguments
+        return partial(metamorphic, relation=relation)
 
-                if relation and relation != relation_:
-                    continue
+    def execute(x):
+        for suite in suites[test.__module__]:
+            transform_ = suites[test.__module__][suite].transform
+            relation_ = suites[test.__module__][suite].relation
 
-                name = suites[test.__module__][suite].name \
-                    if suites[test.__module__][suite].name \
-                    else suite
+            if relation and relation != relation_:
+                continue
 
-                print(f"[running suite '{name}']"
-                      f"\n\tinput: {x} "
-                      f"\n\ttransform: {transform_.__name__} "
-                      f"\n\trelation: {relation_.__name__}")
+            name = suites[test.__module__][suite].name \
+                if suites[test.__module__][suite].name \
+                else suite
 
-                assert relation_(test(x), test(transform_(x)))
+            print(f"[running suite '{name}']"
+                  f"\n\tinput: {x} "
+                  f"\n\ttransform: {transform_.__name__} "
+                  f"\n\trelation: {relation_.__name__}")
 
-        return execute
-    if _func is None:  # metamorphic was called with arguments
-        return wrapper
-    else:
-        return wrapper(_func)
+            assert relation_(test(x), test(transform_(x)))
+
+    return execute
