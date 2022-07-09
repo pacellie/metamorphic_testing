@@ -14,7 +14,12 @@ def shift(x, n, c):
     return x + 2 * n * math.pi + c
 
 
-@relation(shift)
+@transformation
+def do_nothing(x):
+    return x
+
+
+@relation(shift, do_nothing)
 def approximately(x, y):
     return x == pytest.approx(y)
 

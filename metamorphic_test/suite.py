@@ -5,5 +5,5 @@ from typing import Callable, Any, Optional
 @dataclass
 class Suite:
     name: Optional[str] = None
-    transformation: Optional[Callable[[Any], Any]] = None
+    transform: Optional[Callable[[Any], Any]] = None
     relation: Optional[Callable[[Any, Any], bool]] = None

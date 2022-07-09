@@ -1,7 +1,6 @@
 import inspect
 from collections import defaultdict
 from functools import wraps
-
 from .suite import Suite
 
 suites: defaultdict = defaultdict(lambda: defaultdict(Suite))
@@ -36,19 +35,20 @@ def transformation(transform):
     return transform
 
 
-def relation(transform):
+def relation(*transforms):  # transformation functions
     def wrapper(relation):
-        found_transform = False
+        for transform in transforms:
+            found_transform = False
 
-        for suite in suites[module(relation)]:
-            if suites[module(relation)][suite].transform == transform:
-                suites[module(relation)][suite].relation = relation
-                found_transform = True
+            for suite in suites[module(relation)]:
+                if suites[module(relation)][suite].transform == transform:
+                    suites[module(relation)][suite].relation = relation
+                    found_transform = True
 
-        if not found_transform:
-            raise TypeError(f"cannot find the corresponding transformation "
-                            f"{transform.__name__} "
-                            f"for the relation {relation.__name__}")
+            if not found_transform:
+                raise TypeError(f"cannot find the corresponding transformation "
+                                f"{transform.__name__} "
+                                f"for the relation {relation.__name__}")
 
         return relation
 
