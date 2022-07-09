@@ -51,25 +51,29 @@ def relation(*transforms):  # transformation functions
     return wrapper
 
 
-def metamorphic(test=None, *, relation=None):
-    if test is None:  # metamorphic was called with arguments
-        return partial(metamorphic, relation=relation)
+def metamorphic(_func=None, *, relation=None):
+    def wrapper(test):
+        def execute(x):
+            for suite in suites[test.__module__]:
+                transform_ = suites[test.__module__][suite].transform
+                relation_ = suites[test.__module__][suite].relation
 
-    def execute(x):
-        print(f"{suites=}")
-        for suite in suites[test.__module__]:
-            transform = suites[test.__module__][suite].transform
-            relation = suites[test.__module__][suite].relation
+                if relation and relation != relation_:
+                    continue
 
-            name = suites[test.__module__][suite].name \
-                if suites[test.__module__][suite].name \
-                else suite
+                name = suites[test.__module__][suite].name \
+                    if suites[test.__module__][suite].name \
+                    else suite
 
-            print(f"[running suite '{name}']"
-                  f"\n\tinput: {x} "
-                  f"\n\ttransform: {transform.__name__} "
-                  f"\n\trelation: {relation.__name__}")
+                print(f"[running suite '{name}']"
+                      f"\n\tinput: {x} "
+                      f"\n\ttransform: {transform_.__name__} "
+                      f"\n\trelation: {relation_.__name__}")
 
-            assert relation(test(x), test(transform(x)))
+                assert relation_(test(x), test(transform_(x)))
 
-    return execute
+        return execute
+    if _func is None:  # metamorphic was called with arguments
+        return wrapper
+    else:
+        return wrapper(_func)

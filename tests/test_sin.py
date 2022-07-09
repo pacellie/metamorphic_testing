@@ -35,6 +35,6 @@ def approximately_negate(x, y):
 
 
 @pytest.mark.parametrize('x', range(-10, 10))
-@metamorphic
+@metamorphic(relation=approximately_negate)
 def test(x):
     return math.sin(x)
