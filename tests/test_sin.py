@@ -1,6 +1,6 @@
 import math
 import pytest
-from metamorphic_test import transformation, relation, metamorphic, name, parametrized, randint
+from metamorphic_test import transformation, relation, metamorphic, name, randomized, randint
 
 
 # The order of parametrized is not important, but the parametrized decorators
@@ -8,8 +8,8 @@ from metamorphic_test import transformation, relation, metamorphic, name, parame
 # '0' or thunks, functions of the form lambda: value, e.g. 'randint(1, 10)'
 @transformation
 @name('custom suite name')
-@parametrized('n', randint(1, 10))
-@parametrized('c', 0)
+@randomized('n', randint(1, 10))
+@randomized('c', 0)
 def shift(x, n, c):
     return x + 2 * n * math.pi + c
 

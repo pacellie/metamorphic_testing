@@ -13,7 +13,7 @@ def name(custom_name):
     return wrapper
 
 
-def parametrized(arg, generator):
+def randomized(arg, generator):
     def wrapper(transform):
         @wraps(transform)
         def parametrized_transform(*args, **kwargs):
