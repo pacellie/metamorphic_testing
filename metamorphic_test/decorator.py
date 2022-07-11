@@ -1,16 +1,25 @@
 from collections import defaultdict
 from functools import wraps, partial
 from .suite import Suite
+import inspect
 
 suites: defaultdict = defaultdict(lambda: defaultdict(Suite))
 
+def metamorphic(metamorphic_name):
+    suite = Suite(name=metamorphic_name)
+    frame = inspect.stack()[1]
+    module = inspect.getmodule(frame[0])
+    print(module)
+    suites[module][metamorphic_name] = suite
+    return metamorphic_name
 
-def name(custom_name):
-    def wrapper(transform):
-        suites[transform.__module__][transform.__name__].name = custom_name
-        return transform
 
-    return wrapper
+# def name(custom_name):
+#     def wrapper(transform):
+#         suites[transform.__module__][transform.__name__].name = custom_name
+#         return transform
+#
+#     return wrapper
 
 
 def randomized(arg, generator):
@@ -25,35 +34,23 @@ def randomized(arg, generator):
     return wrapper
 
 
-def transformation(transform):
-    suites[transform.__module__][transform.__name__].transform = transform
-    return transform
-
-
-def relation(*transforms):  # transformation functions
-    def wrapper(relation):
-        for transform in transforms:
-            found_transform = False
-
-            for suite in suites[relation.__module__]:
-                if suites[relation.__module__][suite].transform == transform:
-                    suites[relation.__module__][suite].relation = relation
-                    found_transform = True
-
-            if not found_transform:
-                raise TypeError(f"cannot find the corresponding transformation "
-                                f"{transform.__name__} "
-                                f"for the relation {relation.__name__}")
-
-        return relation
-
+def transformation(metamorphic_name):
+    def wrapper(transform):
+        suites[transform.__module__][metamorphic_name].transform = transform
+        return transform
     return wrapper
 
 
-def metamorphic(test=None, *, relation=None):
-    if test is None:  # metamorphic was called with arguments
-        return partial(metamorphic, relation=relation)
 
+def relation(metamorphic_name):
+    def wrapper(relation):
+        suites[relation.__module__][metamorphic_name].relation = relation
+        return relation
+    return wrapper
+
+
+def system(test):
+    print("kguiiutr")
     def execute(x):
         for suite in suites[test.__module__]:
             transform_ = suites[test.__module__][suite].transform
