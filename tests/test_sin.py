@@ -1,38 +1,45 @@
 import math
 import pytest
-from metamorphic_test import transformation, relation, metamorphic, system, randomized, randint
+from metamorphic_test import (
+    transformation,
+    relation,
+    metamorphic,
+    system,
+    randomized,
+    randint,
+    approximately
+)
+
+A = metamorphic('A', relation=approximately)
+B = metamorphic('B')
+C = metamorphic('C')
+D = metamorphic('D')
 
 
-A = metamorphic('A')
-
-# The order of parametrized is not important, but the parametrized decorators
-# must be closest to the function definition. Parametrized works with values, e.g.
+# The order of randomized is not important, but the randomized decorators
+# must be closest to the function definition. Randomized works with values, e.g.
 # '0' or thunks, functions of the form lambda: value, e.g. 'randint(1, 10)'
 @transformation(A)
+@transformation(C, priority=1)
 @randomized('n', randint(1, 10))
 @randomized('c', 0)
 def shift(x, n, c):
     return x + 2 * n * math.pi + c
 
 
+@transformation(B)
+@transformation(C, priority=0)
+def negate(x):
+    return -x
 
 
-@relation(A)
-def approximately(x, y):
-    return x == pytest.approx(y)
+@relation(B)
+@relation(C)
+def approximately_negate(x, y):
+    return approximately(-x, y)
 
 
-# @transformation
-# def negate(x):
-#     return -x
-#
-#
-# @relation(negate)
-# def approximately_negate(x, y):
-#     return -x == pytest.approx(y)
-
-
-@pytest.mark.parametrize('x', range(-10, 10))
+@pytest.mark.parametrize('x', range(-1, 1))
 @system
 def test(x):
     return math.sin(x)
