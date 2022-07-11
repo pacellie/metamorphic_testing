@@ -1,6 +1,10 @@
 # Team MT – Metamorphic Testing Framework
 
 
+## Individual Contributor Setup
+- Run `poetry install` to install all requirements.
+- Run `poetry run install-hook` to install a Git pre-commit hook which performs linting before you commit.
+
 ## CI / CD Setup Steps
 - People working on enabling CI / CD related features need access to the repository settings in GitLab so that they can enable runners.
 - You need a standard Linux server instance to enable an own runner, as the LRZ doesn't provide one.
@@ -10,6 +14,14 @@
     * Group them up by "services"
     * Run some services only on specific branches (e.g. only publish on the main branch)
     * Specify a JUnit output file to get failing tests and coverage info
+
+
+## Available poetry Scripts
+- `poetry install`: Install all dependencies
+- `poetry run pytest`: Run tests
+- `poetry run cov`: Run tests with coverage and show results
+- `poetry run lint`: Run linters. Equivalent to `poetry run prospector`.
+- `poetry run install-hook`: Install Git pre-commit hook to lint before committing
 
 ## Publishing a New Version
 - Increase the version number in pyproject.toml following the suggestions on https://semver.org/
