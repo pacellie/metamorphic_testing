@@ -46,7 +46,7 @@ def write_audio(audio, sr, file_name, dir_path):
 
 
 def transform(source_audio, source_sample_rate, n_out_puts=5,
-              out_dir="audio_examples/transformed_audios"):
+              out_dir="audio_examples/transformed_audios", verbose=False):
     if isinstance(source_audio, torch.Tensor):
         source_audio = source_audio.numpy()
     source_audio = source_audio.reshape((-1,))  # only for mono audio
@@ -55,22 +55,23 @@ def transform(source_audio, source_sample_rate, n_out_puts=5,
         aug_audio = augment(source_audio, source_sample_rate)
         follow_up_audio_list.append(torch.from_numpy(aug_audio).reshape(1, -1))
         write_audio(aug_audio, source_sample_rate, f"augmented_audio_{idx + 1}.wav", out_dir)
-    if out_dir:
-        print(f"{n_out_puts} augmented audio files are written to {out_dir}!!!")
-    else:
-        print("No files written as out_dir is None!!!")
+    if verbose:
+        if out_dir:
+            print(f"{n_out_puts} augmented audio files are written to {out_dir}!!!")
+        else:
+            print("No files written as out_dir is None!!!")
     return follow_up_audio_list
 
 
 followup_inputs = transform(input_, 16000)
 
-output = model(input_)
-print(output.shape)
-followup_outputs = [model(inp) for inp in followup_inputs]
-for o in followup_outputs:
-    print(o.shape)
+output = model(input_).squeeze(0)  # output shape: 136 x 999
+followup_outputs = [model(inp).squeeze(0) for inp in followup_inputs]  # op shape : 136 x 999
 
-for i, example in enumerate(followup_outputs):
-    print(i)
-    print(decoder(example.cpu()))  # todo: need to fix dimensionality error
-    print("\n\n")
+# look at the recognized texts for original and followup inputs
+print("\n\n")
+for i, example in enumerate([output] + followup_outputs):
+    if i == 0:
+        print(f"Original Speech2Text: '{decoder(example.cpu())}'\n")
+    else:
+        print(f"Augmented Speech2Text_{i}: '{decoder(example.cpu())}'\n")
