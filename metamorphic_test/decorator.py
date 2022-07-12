@@ -1,0 +1,52 @@
+from collections import defaultdict
+from functools import wraps
+from .metamorphic import MetamorphicTest
+import inspect
+from .transforms import identity
+from .relations import equality
+
+suites: defaultdict = defaultdict(lambda: defaultdict(MetamorphicTest))
+
+
+def metamorphic(name, transform=identity, relation=equality):
+    suite = MetamorphicTest(name=name, transforms=[(transform, 0)], relation=relation)
+    frame = inspect.stack()[1]
+    module = inspect.getmodule(frame[0])
+    suites[module.__name__][name] = suite
+    return name
+
+
+def randomized(arg, generator):
+    def wrapper(transform):
+        @wraps(transform)
+        def parametrized_transform(*args, **kwargs):
+            kwargs[arg] = generator() if callable(generator) else generator
+            return transform(*args, **kwargs)
+
+        return parametrized_transform
+
+    return wrapper
+
+
+def transformation(metamorphic_name, priority=0):
+    def wrapper(transform):
+        suites[transform.__module__][metamorphic_name].transforms.append((transform, priority))
+        return transform
+
+    return wrapper
+
+
+def relation(metamorphic_name):
+    def wrapper(relation):
+        suites[relation.__module__][metamorphic_name].relation = relation
+        return relation
+
+    return wrapper
+
+
+def system(test):
+    def execute(x):
+        for suite in suites[test.__module__]:
+            suites[test.__module__][suite].execute(x, test)
+
+    return execute
