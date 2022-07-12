@@ -13,8 +13,8 @@ class MetamorphicTest:
     # x: the actual input
     # system: the system under test
     # Idea: given tansformations (t1, 0), (t2, 0), (t3, 1), (t4, 2) which have been registered
-    #       in any order we want to apply them either in order t4, t3, t2, t1 or t4, t3, t1, t2.
-    #       In other words: higher priority means first, same priority means random order.
+    #       in any order we want to apply them either in order t4, t3, t2, t1 or t4, t3, t1,
+    #       t2. In other words: higher priority means first, same priority means random order.
     # (1) shuffle all transforms
     # (2) sort the transforms by priority
     # Note: (1) + (2) implements the idea above
