@@ -45,7 +45,7 @@ prospector:
     stage: linter
     script:
         - echo "This is the prospector linter stage"
-        - prospector -w mypy -w bandit
+        - poetry run lint
 
 publishing:
     stage: publish

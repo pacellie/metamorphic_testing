@@ -1,6 +1,10 @@
 # Team MT – Metamorphic Testing Framework
 
 
+## Individual Contributor Setup
+- Run `poetry install` to install all requirements.
+- Run `poetry run install-hook` to install a Git pre-commit hook which performs linting before you commit.
+
 ## CI / CD Setup Steps
 - People working on enabling CI / CD related features need access to the repository settings in GitLab so that they can enable runners.
 - You need a standard Linux server instance to enable an own runner, as the LRZ doesn't provide one.
@@ -10,6 +14,26 @@
     * Group them up by "services"
     * Run some services only on specific branches (e.g. only publish on the main branch)
     * Specify a JUnit output file to get failing tests and coverage info
+
+
+## Available poetry Scripts
+- `poetry install`: Install all dependencies
+- `poetry run pytest`: Run tests
+- `poetry run cov`: Run tests with coverage and show results
+- `poetry run lint`: Run linters. Equivalent to `poetry run prospector`. This will automatically check with mypy, pylint, bandit and some other tools.
+- `poetry run install-hook`: Install Git pre-commit hook to lint before committing
+
+
+## Linting in VSCode
+- You can have Visual Studio Code check your linting automatically by adding the following to `.vscode/settings.json` (which is .gitignore-d):
+    ```json
+    "python.linting.mypyEnabled": false,
+    "python.linting.enabled": true,
+    "python.linting.prospectorEnabled": true
+    ```
+
+This way you should see linting and typing errors directly in your editor, which is way more convenient.
+
 
 ## Publishing a New Version
 - Increase the version number in pyproject.toml following the suggestions on https://semver.org/
