@@ -29,12 +29,12 @@ input_ = prepare_model_input(read_batch(batches[0]),
                              device=device)
 
 augment = Compose([
-    AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.7),
+    AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.3),
     # AddGaussianSNR(min_snr_in_db=12, max_snr_in_db=35, p=0.3),
-    AddBackgroundNoise(sounds_path=["audio_examples/background_noises"], p=0.9),
-    LoudnessNormalization(p=0.5),
-    TimeStretch(min_rate=1, max_rate=1.5, p=0.8, leave_length_unchanged=True),
-    PitchShift(min_semitones=-3, max_semitones=+3, p=0.9),
+    AddBackgroundNoise(sounds_path=["audio_examples/background_noises"], p=0.7),
+    # LoudnessNormalization(p=0.5),
+    # TimeStretch(min_rate=1, max_rate=1.5, p=0.8, leave_length_unchanged=True),
+    PitchShift(min_semitones=-2, max_semitones=+2, p=0.5),
 ], shuffle=True)
 
 
