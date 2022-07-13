@@ -1,5 +1,5 @@
 from collections import defaultdict
-from functools import wraps
+from functools import wraps, partial
 from .metamorphic import MetamorphicTest
 import inspect
 from .transforms import identity
@@ -44,14 +44,22 @@ def relation(name):
     return wrapper
 
 
-def system(test):
-    def execute(*args):
-        for suite in suites[test.__module__]:
-            suites[test.__module__][suite].execute(test, *args)
+def system(flag=None, *, name=None):
+    def wrapper(test):
+        def execute(*args):
+            for suite in suites[test.__module__]:
+                if name and suite != name:
+                    continue
 
-    # Creates a fake function that calls to the 'execute' function
-    # with the exactly same signature as 'test'.
-    sig = str(inspect.signature(test))
-    func_def = f'lambda {sig[1:-1]}: execute{sig}'
-    func = eval(func_def, {'execute': execute})
-    return wraps(test)(func)
+                suites[test.__module__][suite].execute(test, *args)
+
+        # Creates a fake function that calls to the 'execute' function
+        # with the exactly same signature as 'test'.
+        sig = str(inspect.signature(test))
+        func_def = f'lambda {sig[1:-1]}: execute{sig}'
+        func = eval(func_def, {'execute': execute})
+        return wraps(test)(func)
+
+    if flag is None:
+        return wrapper
+    return wrapper(flag)
