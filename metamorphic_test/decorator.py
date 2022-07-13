@@ -8,7 +8,7 @@ from .relations import equality
 suites: defaultdict = defaultdict(lambda: defaultdict(MetamorphicTest))
 
 
-def metamorphic(name, transform=identity, relation=equality):
+def metamorphic(name, *, transform=identity, relation=equality):
     suite = MetamorphicTest(name=name, transforms=[(transform, 0)], relation=relation)
     frame = inspect.stack()[1]
     module = inspect.getmodule(frame[0])
@@ -28,17 +28,17 @@ def randomized(arg, generator):
     return wrapper
 
 
-def transformation(metamorphic_name, priority=0):
+def transformation(name, *, priority=0):
     def wrapper(transform):
-        suites[transform.__module__][metamorphic_name].transforms.append((transform, priority))
+        suites[transform.__module__][name].transforms.append((transform, priority))
         return transform
 
     return wrapper
 
 
-def relation(metamorphic_name):
+def relation(name):
     def wrapper(relation):
-        suites[relation.__module__][metamorphic_name].relation = relation
+        suites[relation.__module__][name].relation = relation
         return relation
 
     return wrapper
