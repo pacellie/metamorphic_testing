@@ -19,12 +19,12 @@ def swap(x, y):
 @given(floats(allow_nan=False, allow_infinity=False),
        floats(allow_nan=False, allow_infinity=False))
 @system
-def test_given(x, y):
+def test_add_given(x, y):
     return x + y
 
 
 @pytest.mark.parametrize('x', [0, 1])
 @pytest.mark.parametrize('y', [2, 3])
 @system
-def test_pytest(x, y):
+def test_add_pytest(x, y):
     return x + y
