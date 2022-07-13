@@ -19,7 +19,6 @@ def shift(x, n, c):
     return x + 2 * n * math.pi + c
 
 
-
 @pytest.mark.parametrize('x', range(-1, 1))
 @system
 def test(x):

@@ -45,8 +45,13 @@ def relation(metamorphic_name):
 
 
 def system(test):
-    def execute(x):
+    def execute(*args):
         for suite in suites[test.__module__]:
-            suites[test.__module__][suite].execute(x, test)
+            suites[test.__module__][suite].execute(test, *args)
 
-    return execute
+    # Creates a fake function that calls to the 'execute' function
+    # with the exactly same signature as 'test'.
+    sig = str(inspect.signature(test))
+    func_def = f'lambda {sig[1:-1]}: execute{sig}'
+    func = eval(func_def, {'execute': execute})
+    return wraps(test)(func)

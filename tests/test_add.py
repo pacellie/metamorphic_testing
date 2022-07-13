@@ -1,5 +1,6 @@
+import pytest
 from hypothesis import given
-from hypothesis.strategies import tuples, floats
+from hypothesis.strategies import floats
 from metamorphic_test import (
     transformation,
     metamorphic,
@@ -11,12 +12,19 @@ A = metamorphic('A', relation=equality)
 
 
 @transformation(A)
-def swap(xy):
-    return (xy[1], xy[0])
+def swap(x, y):
+    return y, x
 
 
-@given(tuples(floats(allow_nan=False, allow_infinity=False),
-              floats(allow_nan=False, allow_infinity=False)))
+@given(floats(allow_nan=False, allow_infinity=False),
+       floats(allow_nan=False, allow_infinity=False))
 @system
-def test(xy):
-    return xy[0] + xy[1]
+def test_given(x, y):
+    return x + y
+
+
+@pytest.mark.parametrize('x', [0, 1])
+@pytest.mark.parametrize('y', [2, 3])
+@system
+def test_pytest(x, y):
+    return x + y

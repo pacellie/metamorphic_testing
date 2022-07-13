@@ -1,2 +1,2 @@
-def identity(x):
+def identity(*x):
     return x
