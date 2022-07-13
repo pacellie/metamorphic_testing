@@ -36,9 +36,10 @@ def transformation(name, *, priority=0):
     return wrapper
 
 
-def relation(name):
+def relation(*names):
     def wrapper(relation):
-        suites[relation.__module__][name].relation = relation
+        for name in names:
+            suites[relation.__module__][name].relation = relation
         return relation
 
     return wrapper

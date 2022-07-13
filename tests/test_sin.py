@@ -33,13 +33,12 @@ def negate(x):
     return -x
 
 
-@relation(B)
-@relation(C)
+@relation(B, C)
 def approximately_negate(x, y):
     return approximately(-x, y)
 
 
 @pytest.mark.parametrize('x', range(-1, 1))
-@system(name=A)
+@system
 def test_sin(x):
     return math.sin(x)
