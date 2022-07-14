@@ -12,14 +12,15 @@ class PrioritizedTransform:
     priority: int = 0
 
 
+Relation = Callable[[Any, Any], bool]
+
 @dataclass
 class MetamorphicTest:
     name: Optional[str] = None
-    # list of (transform, priority) pairs
     transforms: List[PrioritizedTransform] = field(
         default_factory=lambda: []
     )
-    relation: Optional[Callable[[Any, Any], bool]] = None
+    relation: Optional[Relation] = None
 
 
     def add_transform(self, transform, priority=0):
@@ -38,6 +39,7 @@ class MetamorphicTest:
         # https://coralogix.com/blog/python-logging-best-practices-tips/
         logger = logging.getLogger(__name__)
         logger.info(msg)
+
 
     # x: the actual input
     # system: the system under test
@@ -71,22 +73,22 @@ class MetamorphicTest:
             else:
                 y = p_transform.transform(*y)
 
-        transforms = [
-            p_transform.transform.__name__ for p_transform in self.transforms
-        ]
-
         system_x = system(*x)
         if len(x) == 1:
             system_y = system(y)
         else:
             system_y = system(*y)
 
+        transform_names = [
+            p_transform.transform.__name__ for p_transform in self.transforms
+        ]
+
         self._log_info(f"\n[running suite '{self.name}']"
               f"\n\tinput x: {x[0] if len(x) == 1 else x} "
               f"\n\tinput y: {y} "
               f"\n\toutput x: {system_x} "
               f"\n\toutput y: {system_y} "
-              f"\n\ttransform: {transforms} "
+              f"\n\ttransform: {', '.join(transform_names)} "
               f"\n\trelation: {self.relation.__name__}")
 
         assert self.relation(system_x, system_y)
