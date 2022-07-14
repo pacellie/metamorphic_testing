@@ -37,11 +37,11 @@ class Suite:
         """Get the metamorphic test for the module of the given function and name."""
         return self.tests[f"{function_in_module.__module__}.{name}"]
 
-    def transformation(self, name, transform, *, priority):
-        self._get_test(transform, name).transforms.append((transform, priority))
+    def transformation(self, name, transform, *, priority=0):
+        self._get_test(transform, name).add_transform(transform, priority)
 
     def relation(self, name, relation):
-        self._get_test(relation, name).relation = relation
+        self._get_test(relation, name).set_relation(relation)
 
     def execute(self, name, test_function, *args):
         assert name is not None

@@ -11,6 +11,14 @@ class MetamorphicTest:
     relation: Optional[Callable[[Any, Any], bool]] = None
 
 
+    def add_transform(self, transform, priority=0):
+        self.transforms.append((transform, priority))
+    
+    def set_relation(self, relation):
+        if self.relation:
+            raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
+        self.relation = relation
+
     # x: the actual input
     # system: the system under test
     # Idea: given tansformations (t1, 0), (t2, 0), (t3, 1), (t4, 2) which have been registered

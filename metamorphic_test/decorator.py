@@ -1,5 +1,4 @@
 from .transforms import identity
-from .relations import equality
 from .suite import Suite
 from .helper import change_signature
 
@@ -19,7 +18,7 @@ suite = Suite()
 # (2) retrieve the module of the caller of this function
 # (3) register the test in the global suites variable
 # (4) return the name as a handle to the caller
-def metamorphic(name, *, transform=identity, relation=equality):
+def metamorphic(name, *, transform=identity, relation=None):
     suite.metamorphic(name, transform=transform, relation=relation)
     return name
 
