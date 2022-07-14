@@ -13,6 +13,7 @@ lint = "prospector.run:main"
 python = ">=3.8,<3.11"
 hypothesis = "^6.49.1"
 pytest = "^7.1.2"
+wrapt = "^1.14.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.961"

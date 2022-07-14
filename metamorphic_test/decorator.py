@@ -1,13 +1,14 @@
-from collections import defaultdict
 from functools import wraps
-from .metamorphic import MetamorphicTest
-import inspect
 from .transforms import identity
 from .relations import equality
+from .suite import Suite
+from .helper import change_signature
+
 
 # global two level dictionary which maps module names to test names to the actual test instance
 # e.g. suites['test_sin']['A'] retrieves test 'A' from the file 'test_sin'.
-suites: defaultdict = defaultdict(lambda: defaultdict(MetamorphicTest))
+suite = Suite()
+
 
 # name: name of the metamorphic test
 # transform: optional transformation function
@@ -17,14 +18,8 @@ suites: defaultdict = defaultdict(lambda: defaultdict(MetamorphicTest))
 # (2) retrieve the module of the caller of this function
 # (3) register the test in the global suites variable
 # (4) return the name as a handle to the caller
-def metamorphic(name, transform=identity, relation=equality):
-    suite = MetamorphicTest(name=name, transforms=[(transform, 0)], relation=relation)
-
-    frame = inspect.stack()[1]
-    module = inspect.getmodule(frame[0])
-
-    suites[module.__name__][name] = suite
-
+def metamorphic(name, *, transform=identity, relation=equality):
+    suite.metamorphic(name, transform=transform, relation=relation)
     return name
 
 
@@ -36,11 +31,11 @@ def metamorphic(name, transform=identity, relation=equality):
 def randomized(arg, generator):
     def wrapper(transform):
         @wraps(transform)
-        def parametrized_transform(*args, **kwargs):
+        def randomized_transform(*args, **kwargs):
             kwargs[arg] = generator() if callable(generator) else generator
             return transform(*args, **kwargs)
 
-        return parametrized_transform
+        return randomized_transform
 
     return wrapper
 
@@ -51,9 +46,9 @@ def randomized(arg, generator):
 # update the metamorphic test in the global suites variable by appending the
 # (transform, priority) pair to the already present transformations of the given
 # metamorphic test
-def transformation(metamorphic_name, priority=0):
+def transformation(name, *, priority=0):
     def wrapper(transform):
-        suites[transform.__module__][metamorphic_name].transforms.append((transform, priority))
+        suite.transformation(name, transform, priority=priority)
         return transform
 
     return wrapper
@@ -63,9 +58,10 @@ def transformation(metamorphic_name, priority=0):
 # relation: relation function we are wrapping
 # update the metamorphic test in the global suites variable by setting the relation
 # of the given metamorphic test
-def relation(metamorphic_name):
+def relation(*names):
     def wrapper(relation):
-        suites[relation.__module__][metamorphic_name].relation = relation
+        for name in names:
+            suite.relation(name, relation)
         return relation
 
     return wrapper
@@ -75,9 +71,16 @@ def relation(metamorphic_name):
 # x: the actual input
 # execute all the tests of this module in the global suites variable by delegating
 # the the execute function of the MetamorphicTest class
-def system(test):
-    def execute(x):
-        for suite in suites[test.__module__]:
-            suites[test.__module__][suite].execute(x, test)
+def system(flag=None, *, name=None):
+    def wrapper(test):
+        @change_signature(test)
+        def execute(*args, **kwargs):
+            if kwargs:  # to be compatible with both given and pytest
+                args = tuple(kwargs.values())
+            suite.execute(name, test, *args)
 
-    return execute
+        return execute
+
+    if flag is None:
+        return wrapper
+    return wrapper(flag)
