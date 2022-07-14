@@ -1,17 +1,19 @@
-from collections import defaultdict
 from functools import wraps
 import inspect
 import logging
-from types import FunctionType
+from typing import Dict, Hashable
 
 from .metamorphic import MetamorphicTest
+
+
+TestID = Hashable  # only guarantee made for outside use
 
 
 class Suite:
     logger = logging.getLogger(__name__)
 
     def __init__(self):
-        self.tests = defaultdict(MetamorphicTest)
+        self.tests: Dict[TestID, MetamorphicTest] = {}
 
     @staticmethod
     def get_caller_module():
@@ -28,32 +30,32 @@ class Suite:
 
         return wrapper
 
-    def metamorphic(self, name, *, transform, relation):
+    def metamorphic(self, name) -> TestID:
+        """
+        Register a metamorphic test.
+        Returns an identifier to later add relations / transforms to it if needed.
+        """
         module = self.get_caller_module()
-        test = MetamorphicTest(name=name,
-                               relation=relation)
-        test.add_transform(transform)
+        test_id = f"{module}.{name}"
+        if test_id in self.tests:
+            raise ValueError(f"Test {test_id} already exists.")
+        self.tests[test_id] = MetamorphicTest(name=name)
+        return test_id
 
-        self.tests[f"{module}.{name}"] = test
+    def add_transform(self, test_id: TestID, transform, *, priority=0):
+        self.tests[test_id].add_transform(transform, priority)
 
-    def _get_test(self, function_in_module: FunctionType, name: str) -> MetamorphicTest:
-        """Get the metamorphic test for the module of the given function and name."""
-        return self.tests[f"{function_in_module.__module__}.{name}"]
+    def set_relation(self, test_id: TestID, relation):
+        self.tests[test_id].set_relation(relation)
 
-    def transformation(self, name, transform, *, priority=0):
-        self._get_test(transform, name).add_transform(transform, priority)
-
-    def relation(self, name, relation):
-        self._get_test(relation, name).set_relation(relation)
-
-    def execute(self, name, test_function, *args):
-        assert name is not None
+    def execute(self, test_id, test_function, *args):
+        assert test_id is not None, "Use execute_all"
         self.logger.debug(
-            "Executing %name in %(test_function)",
-            name=name,
+            "Executing %test_id in %(test_function)",
+            test_id=test_id,
             test_function=test_function.__module__
         )
-        self._get_test(test_function, name).execute(test_function, *args)
+        self.tests[test_id].execute(test_function, *args)
 
     def _belongs_to(self, test_id: str, module_name: str) -> bool:
         """Check if the given test belongs to the given module."""

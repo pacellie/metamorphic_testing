@@ -3,8 +3,6 @@ import logging
 import random
 from typing import Callable, Any, Optional, List
 
-from metamorphic_test.transforms import identity
-
 
 @dataclass
 class PrioritizedTransform:
@@ -24,8 +22,7 @@ class MetamorphicTest:
 
 
     def add_transform(self, transform, priority=0):
-        if transform is not identity:
-            self.transforms.append(PrioritizedTransform(transform, priority))
+        self.transforms.append(PrioritizedTransform(transform, priority))
     
     def set_relation(self, relation):
         if self.relation:
@@ -54,7 +51,9 @@ class MetamorphicTest:
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
         if not self.relation:
-            raise ValueError("No relation registered, cannot execute test.")
+            raise ValueError(
+                f"No relation registered on {self.name}, cannot execute test."
+            )
 
         random.shuffle(self.transforms)
 

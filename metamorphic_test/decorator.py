@@ -1,4 +1,3 @@
-from .transforms import identity
 from .suite import Suite
 from .helper import change_signature
 
@@ -18,9 +17,13 @@ suite = Suite()
 # (2) retrieve the module of the caller of this function
 # (3) register the test in the global suites variable
 # (4) return the name as a handle to the caller
-def metamorphic(name, *, transform=identity, relation=None):
-    suite.metamorphic(name, transform=transform, relation=relation)
-    return name
+def metamorphic(name, *, transform=None, relation=None):
+    test_id = suite.metamorphic(name)
+    if transform is not None:
+        suite.add_transform(test_id, transform, priority=0)
+    if relation is not None:
+        suite.set_relation(test_id, relation)
+    return test_id
 
 
 # arg: the name of a parameter
@@ -41,9 +44,9 @@ def randomized(arg, generator):
 # update the metamorphic test in the global suites variable by appending the
 # (transform, priority) pair to the already present transformations of the given
 # metamorphic test
-def transformation(name, *, priority=0):
+def transformation(test_id, *, priority=0):
     def wrapper(transform):
-        suite.transformation(name, transform, priority=priority)
+        suite.add_transform(test_id, transform, priority=priority)
         return transform
 
     return wrapper
@@ -53,10 +56,10 @@ def transformation(name, *, priority=0):
 # relation: relation function we are wrapping
 # update the metamorphic test in the global suites variable by setting the relation
 # of the given metamorphic test
-def relation(*names):
+def relation(*test_ids):
     def wrapper(relation):
-        for name in names:
-            suite.relation(name, relation)
+        for test_id in test_ids:
+            suite.set_relation(test_id, relation)
         return relation
 
     return wrapper
