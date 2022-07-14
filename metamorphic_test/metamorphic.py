@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
-from typing import Callable, Any, Optional, List
+import logging
 import random
+from typing import Callable, Any, Optional, List
 
 from metamorphic_test.transforms import identity
 
@@ -29,6 +30,14 @@ class MetamorphicTest:
         if self.relation:
             raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
         self.relation = relation
+    
+    def _log_info(self, msg: str):
+        # https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/ indicates
+        # that getting the logger in module_level is a bad idea, hence inside the function.
+        # Weirdly that contradicts this, which recommend module-logging:
+        # https://coralogix.com/blog/python-logging-best-practices-tips/
+        logger = logging.getLogger(__name__)
+        logger.info(msg)
 
     # x: the actual input
     # system: the system under test
@@ -72,7 +81,7 @@ class MetamorphicTest:
         else:
             system_y = system(*y)
 
-        print(f"\n[running suite '{self.name}']"
+        self._log_info(f"\n[running suite '{self.name}']"
               f"\n\tinput x: {x[0] if len(x) == 1 else x} "
               f"\n\tinput y: {y} "
               f"\n\toutput x: {system_x} "

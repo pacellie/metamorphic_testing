@@ -1,12 +1,15 @@
-import inspect
 from collections import defaultdict
 from functools import wraps
+import inspect
+import logging
 from types import FunctionType
 
 from .metamorphic import MetamorphicTest
 
 
 class Suite:
+    logger = logging.getLogger(__name__)
+
     def __init__(self):
         self.tests = defaultdict(MetamorphicTest)
 
@@ -45,6 +48,11 @@ class Suite:
 
     def execute(self, name, test_function, *args):
         assert name is not None
+        self.logger.debug(
+            "Executing %name in %(test_function)",
+            name=name,
+            test_function=test_function.__module__
+        )
         self._get_test(test_function, name).execute(test_function, *args)
 
     def _belongs_to(self, test_id: str, module_name: str) -> bool:
@@ -52,6 +60,14 @@ class Suite:
         return test_id.startswith(f"{module_name}.")
 
     def execute_all(self, test_function, *args):
+        self.logger.debug(
+            "Executing all tests in %(test_function)",
+            test_function=test_function.__module__
+        )
         for full_name, m_test in self.tests.items():
             if self._belongs_to(full_name, test_function.__module__):
+                self.logger.debug(
+                    "Executing %(full_name)",
+                    full_name=full_name
+                )
                 m_test.execute(test_function, *args)
