@@ -1,8 +1,8 @@
 from functools import wraps
-import inspect
 from .transforms import identity
 from .relations import equality
 from .suite import Suite
+from .helper import change_signature
 
 suite = Suite()
 
@@ -43,15 +43,13 @@ def relation(*names):
 
 def system(flag=None, *, name=None):
     def wrapper(test):
-        def execute(*args):
+        @change_signature(test)
+        def execute(*args, **kwargs):
+            if kwargs:  # to be compatible with both given and pytest
+                args = tuple(kwargs.values())
             suite.execute(name, test, *args)
 
-        # Creates a fake function that calls to the 'execute' function
-        # with the exactly same signature as 'test'.
-        sig = str(inspect.signature(test))
-        func_def = f'lambda {sig[1:-1]}: execute{sig}'
-        func = eval(func_def, {'execute': execute})
-        return wraps(test)(func)
+        return execute
 
     if flag is None:
         return wrapper

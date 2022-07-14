@@ -39,6 +39,6 @@ def approximately_negate(x, y):
 
 
 @pytest.mark.parametrize('x', range(-1, 1))
-@system(name=A)
+@system
 def test_sin(x):
     return math.sin(x)

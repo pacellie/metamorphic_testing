@@ -8,6 +8,7 @@ authors = ["Python Practicum TUM 2022"]
 python = "^3.8"
 hypothesis = "^6.48.1"
 pytest = "^7.1.2"
+wrapt = "^1.14.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.961"
