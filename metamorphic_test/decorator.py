@@ -4,8 +4,10 @@ from .suite import Suite
 from .helper import change_signature
 
 
-# global two level dictionary which maps module names to test names to the actual test instance
-# e.g. suites['test_sin']['A'] retrieves test 'A' from the file 'test_sin'.
+# A Suite maps module names with test names to the actual test instance
+# Transformations and Relations can be registered as well as System under Tests.
+# This needs to be a global, because there's no other way to register them in
+# the proposed MT syntax our customer wants to use.
 suite = Suite()
 
 
