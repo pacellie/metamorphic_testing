@@ -52,16 +52,25 @@ class MetamorphicTest:
             key=lambda tp: tp.priority,
             reverse=True
         )
-        y = x[0] if len(x) == 1 else x
+        if len(x) == 1:
+            y = x[0]  # TODO: This is a bit weird
+        else:
+            y = x
         for p_transform in prio_sorted_transforms:
-            y = p_transform.transform(y) if len(x) == 1 else p_transform.transform(*y)
+            if len(x) == 1:
+                y = p_transform.transform(y)
+            else:
+                y = p_transform.transform(*y)
 
         transforms = [
             p_transform.transform.__name__ for p_transform in self.transforms
         ]
 
         system_x = system(*x)
-        system_y = system(y) if len(x) == 1 else system(*y)
+        if len(x) == 1:
+            system_y = system(y)
+        else:
+            system_y = system(*y)
 
         print(f"\n[running suite '{self.name}']"
               f"\n\tinput x: {x[0] if len(x) == 1 else x} "
