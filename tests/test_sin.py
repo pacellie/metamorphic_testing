@@ -39,6 +39,7 @@ def negate(x):
     return -x
 
 
+# Register the 'approximately_negate' relation for test B and test C.
 @relation(B, C)
 def approximately_negate(x, y):
     return approximately(-x, y)
@@ -46,6 +47,7 @@ def approximately_negate(x, y):
 
 # Parametrize the input, in this case: -1, 0
 @pytest.mark.parametrize('x', range(-1, 1))
+# Mark this function as the system under test
 @system(name=A)
 def test_sin(x):
     return math.sin(x)
