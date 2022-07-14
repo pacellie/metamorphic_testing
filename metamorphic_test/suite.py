@@ -7,7 +7,7 @@ from .metamorphic import MetamorphicTest
 
 class Suite:
     def __init__(self):
-        self.suite = defaultdict(lambda: defaultdict(MetamorphicTest))
+        self.tests = defaultdict(MetamorphicTest)
 
     @staticmethod
     def get_caller_module():
@@ -30,17 +30,19 @@ class Suite:
                                transforms=[(transform, 0)],
                                relation=relation)
 
-        self.suite[module][name] = test
+        self.tests[f"{module}.{name}"] = test
 
     def transformation(self, name, transform, *, priority):
-        self.suite[transform.__module__][name].transforms.append((transform, priority))
+        self.tests[f"{transform.__module__}.{name}"].transforms.append((transform, priority))
 
     def relation(self, name, relation):
-        self.suite[relation.__module__][name].relation = relation
+        self.tests[f"{relation.__module__}.{name}"].relation = relation
 
-    def execute(self, name, test, *args):
-        for s in self.suite[test.__module__]:
-            if name and s != name:
-                continue
+    def execute(self, name, test_function, *args):
+        assert name is not None
+        self.tests[f"{test_function.__module__}.{name}"].execute(test_function, *args)
 
-            self.suite[test.__module__][s].execute(test, *args)
+    def execute_all(self, test_function, *args):
+        for full_name, m_test in self.tests.items():
+            if full_name.startswith(f"{test_function.__module__}."):
+                m_test.execute(test_function, *args)

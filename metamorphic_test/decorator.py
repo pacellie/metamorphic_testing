@@ -73,7 +73,10 @@ def system(flag=None, *, name=None):
         def execute(*args, **kwargs):
             if kwargs:  # to be compatible with both given and pytest
                 args = tuple(kwargs.values())
-            suite.execute(name, test, *args)
+            if name is None:
+                suite.execute_all(test, *args)
+            else:
+                suite.execute(name, test, *args)
 
         return execute
 

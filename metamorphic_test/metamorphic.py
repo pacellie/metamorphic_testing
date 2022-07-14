@@ -23,6 +23,12 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
+        if not self.transforms:
+            raise ValueError(
+                f"No transforms registered for test {self.name}, cannot execute test.")
+        if not self.relation:
+            raise ValueError("No relation registered, cannot execute test.")
+
         random.shuffle(self.transforms)
 
         y = x[0] if len(x) == 1 else x
