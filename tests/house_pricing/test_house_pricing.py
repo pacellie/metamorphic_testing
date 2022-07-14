@@ -10,7 +10,7 @@ from metamorphic_test import (
 )
 from metamorphic_test.relations import becomes_larger, approximately, or_
 
-from tests.house_pricing.house_pricing import (  # type: ignore
+from tests.house_pricing.house_pricing import (
     HousingPricePredictor,
     get_housing_data,
     get_training_and_test_set,
