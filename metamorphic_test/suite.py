@@ -1,11 +1,14 @@
 import inspect
 from collections import defaultdict
 from functools import wraps
+import logging
 
 from .metamorphic import MetamorphicTest
 
 
 class Suite:
+    logger = logging.getLogger(__name__)
+
     def __init__(self):
         self.suite = defaultdict(lambda: defaultdict(MetamorphicTest))
 
@@ -39,6 +42,8 @@ class Suite:
         self.suite[relation.__module__][name].relation = relation
 
     def execute(self, name, test, *args):
+        which_names = f"test with name {name}" if name else "all tests"
+        self.logger.debug(f"\nExecuting {which_names} inside {test.__module__}")
         for s in self.suite[test.__module__]:
             if name and s != name:
                 continue

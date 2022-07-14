@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Callable, Any, Optional, List, Tuple
 import random
-
+import logging
+import sys
 
 @dataclass
 class MetamorphicTest:
@@ -23,6 +24,12 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
+        logger = logging.getLogger(__name__)
+        # https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/ indicates
+        # that getting the logger in module_level is a bad idea, hence inside the function.
+        # Weirdly that contradicts this, which recommend module-logging:
+        # https://coralogix.com/blog/python-logging-best-practices-tips/
+
         random.shuffle(self.transforms)
 
         y = x[0] if len(x) == 1 else x
@@ -39,7 +46,7 @@ class MetamorphicTest:
         system_x = system(*x)
         system_y = system(y) if len(x) == 1 else system(*y)
 
-        print(f"\n[running suite '{self.name}']"
+        logger.info(f"\n[running suite '{self.name}']"
               f"\n\tinput x: {x[0] if len(x) == 1 else x} "
               f"\n\tinput y: {y} "
               f"\n\toutput x: {system_x} "
