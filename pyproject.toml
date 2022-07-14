@@ -4,10 +4,16 @@ version = "0.1.3"
 description = ""
 authors = ["Python Practicum TUM 2022"]
 
+[tool.poetry.scripts]
+cov = "scripts.cov:html_coverage"
+install-hook = "scripts.install_hook:install_hook"
+lint = "prospector.run:main"
+
 [tool.poetry.dependencies]
-python = "=3.8,<3.11"
-hypothesis = "^6.48.1"
+python = ">=3.8,<3.11"
+hypothesis = "^6.49.1"
 pytest = "^7.1.2"
+wrapt = "^1.14.1"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.961"
