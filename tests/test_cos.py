@@ -6,8 +6,8 @@ from metamorphic_test import (
     system,
     randomized,
     randint,
-    approximately
 )
+from metamorphic_test.relations import approximately
 
 A = metamorphic('A', relation=approximately)
 

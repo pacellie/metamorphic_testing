@@ -7,8 +7,9 @@ from metamorphic_test import (
     system,
     randomized,
     randint,
-    approximately
 )
+from metamorphic_test.relations import approximately
+
 
 # Register a new metamorphic test by specifying it's name and optionally
 # a transform and a relation.

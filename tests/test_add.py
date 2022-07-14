@@ -4,9 +4,10 @@ from hypothesis.strategies import floats
 from metamorphic_test import (
     transformation,
     metamorphic,
-    system,
-    equality
+    system,    
 )
+from metamorphic_test.relations import equality
+
 
 A = metamorphic('A', relation=equality)
 

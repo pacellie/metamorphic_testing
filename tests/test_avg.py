@@ -3,8 +3,8 @@ from metamorphic_test import (
     transformation,
     metamorphic,
     system,
-    equality
 )
+from metamorphic_test.relations import equality
 
 A = metamorphic('A', relation=equality)
 
