@@ -3,9 +3,9 @@ import warnings
 
 import torch
 from glob import glob
-from audiomentations import Compose, AddGaussianNoise, TimeStretch, PitchShift, \
-    AddBackgroundNoise, LoudnessNormalization
-import soundfile
+from audiomentations import Compose, AddGaussianNoise  # type: ignore
+from audiomentations import PitchShift, AddBackgroundNoise  # type: ignore
+import soundfile  # type: ignore
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
