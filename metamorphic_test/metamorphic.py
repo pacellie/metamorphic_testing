@@ -47,15 +47,15 @@ class MetamorphicTest:
 
         random.shuffle(self.transforms)
 
+        if len(x) == 1:
+            y = x[0]  # TODO: This is a bit weird
+        else:
+            y = x
         prio_sorted_transforms = sorted(
             self.transforms,
             key=lambda tp: tp.priority,
             reverse=True
         )
-        if len(x) == 1:
-            y = x[0]  # TODO: This is a bit weird
-        else:
-            y = x
         for p_transform in prio_sorted_transforms:
             if len(x) == 1:
                 y = p_transform.transform(y)
