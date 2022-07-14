@@ -1,18 +1,29 @@
 from dataclasses import dataclass, field
-from typing import Callable, Any, Optional, List, Tuple
+from typing import Callable, Any, Optional, List
 import random
+
+from metamorphic_test.transforms import identity
+
+
+@dataclass
+class PrioritizedTransform:
+    transform: Callable[[Any], Any]
+    priority: int = 0
 
 
 @dataclass
 class MetamorphicTest:
     name: Optional[str] = None
     # list of (transform, priority) pairs
-    transforms: List[Tuple[Callable[[Any], Any], int]] = field(default_factory=list)
+    transforms: List[PrioritizedTransform] = field(
+        default_factory=lambda: []
+    )
     relation: Optional[Callable[[Any, Any], bool]] = None
 
 
     def add_transform(self, transform, priority=0):
-        self.transforms.append((transform, priority))
+        if transform is not identity:
+            self.transforms.append(PrioritizedTransform(transform, priority))
     
     def set_relation(self, relation):
         if self.relation:
@@ -31,23 +42,22 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
-        if not self.transforms:
-            raise ValueError(
-                f"No transforms registered for test {self.name}, cannot execute test.")
         if not self.relation:
             raise ValueError("No relation registered, cannot execute test.")
 
         random.shuffle(self.transforms)
 
+        prio_sorted_transforms = sorted(
+            self.transforms,
+            key=lambda tp: tp.priority,
+            reverse=True
+        )
         y = x[0] if len(x) == 1 else x
-        for transform, _ in sorted(self.transforms, key=lambda tp: tp[1], reverse=True):
-            if transform.__name__ == 'identity':
-                continue
-            y = transform(y) if len(x) == 1 else transform(*y)
+        for p_transform in prio_sorted_transforms:
+            y = p_transform.transform(y) if len(x) == 1 else p_transform.transform(*y)
 
         transforms = [
-            transform.__name__ for transform, _ in self.transforms
-            if transform.__name__ != 'identity'
+            p_transform.transform.__name__ for p_transform in self.transforms
         ]
 
         system_x = system(*x)

@@ -28,8 +28,8 @@ class Suite:
     def metamorphic(self, name, *, transform, relation):
         module = self.get_caller_module()
         test = MetamorphicTest(name=name,
-                               transforms=[(transform, 0)],
                                relation=relation)
+        test.add_transform(transform)
 
         self.tests[f"{module}.{name}"] = test
 
