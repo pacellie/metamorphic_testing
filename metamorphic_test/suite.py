@@ -1,5 +1,7 @@
 import inspect
 from collections import defaultdict
+from functools import wraps
+
 from .metamorphic import MetamorphicTest
 
 
@@ -12,6 +14,15 @@ class Suite:
         frame = inspect.stack()[3]
         module = inspect.getmodule(frame[0])
         return module.__name__
+
+    @staticmethod
+    def randomized_generator(transform, arg, generator):
+        @wraps(transform)
+        def wrapper(*args, **kwargs):
+            kwargs[arg] = generator() if callable(generator) else generator
+            return transform(*args, **kwargs)
+
+        return wrapper
 
     def metamorphic(self, name, *, transform, relation):
         module = self.get_caller_module()

@@ -1,4 +1,3 @@
-from functools import wraps
 from .transforms import identity
 from .relations import equality
 from .suite import Suite
@@ -30,12 +29,7 @@ def metamorphic(name, *, transform=identity, relation=equality):
 # overriding the value of arg in the given kwargs
 def randomized(arg, generator):
     def wrapper(transform):
-        @wraps(transform)
-        def randomized_transform(*args, **kwargs):
-            kwargs[arg] = generator() if callable(generator) else generator
-            return transform(*args, **kwargs)
-
-        return randomized_transform
+        return suite.randomized_generator(transform, arg, generator)
 
     return wrapper
 
