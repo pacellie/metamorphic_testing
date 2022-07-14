@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
-import logging
 import random
 from typing import Callable, Any, Optional, List
+
+from .logger import logger
 
 
 @dataclass
@@ -30,11 +31,6 @@ class MetamorphicTest:
         self.relation = relation
     
     def _log_info(self, msg: str):
-        # https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/ indicates
-        # that getting the logger in module_level is a bad idea, hence inside the function.
-        # Weirdly that contradicts this, which recommend module-logging:
-        # https://coralogix.com/blog/python-logging-best-practices-tips/
-        logger = logging.getLogger(__name__)
         logger.info(msg)
 
 

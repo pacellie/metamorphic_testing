@@ -1,17 +1,15 @@
 from functools import wraps
 import inspect
-import logging
 from typing import Dict, Hashable
 
 from .metamorphic import MetamorphicTest
+from .logger import logger
 
 
 TestID = Hashable  # only guarantee made for outside use
 
 
 class Suite:
-    logger = logging.getLogger(__name__)
-
     def __init__(self):
         self.tests: Dict[TestID, MetamorphicTest] = {}
 
@@ -50,7 +48,7 @@ class Suite:
 
     def execute(self, test_id, test_function, *args):
         assert test_id is not None, "Use execute_all"
-        self.logger.debug(
+        logger.debug(
             "Executing %test_id in %(test_function)",
             test_id=test_id,
             test_function=test_function.__module__
@@ -62,13 +60,13 @@ class Suite:
         return test_id.startswith(f"{module_name}.")
 
     def execute_all(self, test_function, *args):
-        self.logger.debug(
+        logger.debug(
             "Executing all tests in %(test_function)",
             test_function=test_function.__module__
         )
         for full_name, m_test in self.tests.items():
             if self._belongs_to(full_name, test_function.__module__):
-                self.logger.debug(
+                logger.debug(
                     "Executing %(full_name)",
                     full_name=full_name
                 )
