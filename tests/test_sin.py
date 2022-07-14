@@ -5,9 +5,10 @@ from metamorphic_test import (
     relation,
     metamorphic,
     system,
+    fixed,
     randomized,
-    randint,
 )
+from metamorphic_test.generators import RandInt
 from metamorphic_test.relations import approximately
 
 
@@ -26,8 +27,8 @@ D = metamorphic('D')
 # The order of randomized is not important, but the randomized decorators
 # must be closest to the function definition. Randomized works with values, e.g.
 # '0' or thunks, functions of the form lambda: value, e.g. 'randint(1, 10)'
-@randomized('n', randint(1, 10))
-@randomized('c', 0)
+@randomized('n', RandInt(1, 10))
+@fixed('c', 0)
 def shift(x, n, c):
     return x + 2 * n * math.pi + c
 

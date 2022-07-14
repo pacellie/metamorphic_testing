@@ -3,6 +3,7 @@ import inspect
 from typing import Dict, Hashable
 
 from .metamorphic import MetamorphicTest
+from .generator import MetamorphicGenerator
 from .logger import logger
 
 
@@ -20,10 +21,19 @@ class Suite:
         return module.__name__
 
     @staticmethod
-    def randomized_generator(transform, arg, generator):
+    def fixed_generator(transform, arg, value):
         @wraps(transform)
         def wrapper(*args, **kwargs):
-            kwargs[arg] = generator() if callable(generator) else generator
+            kwargs[arg] = value
+            return transform(*args, **kwargs)
+
+        return wrapper
+
+    @staticmethod
+    def randomized_generator(transform, arg, generator: MetamorphicGenerator):
+        @wraps(transform)
+        def wrapper(*args, **kwargs):
+            kwargs[arg] = generator.generate()
             return transform(*args, **kwargs)
 
         return wrapper

@@ -1,5 +1,4 @@
-from .decorator import transformation, relation, metamorphic, randomized, system
-from .generator import randint
+from .decorator import transformation, relation, metamorphic, fixed, randomized, system
 
 __version__ = '0.1.0'
 __all__ = [
@@ -7,6 +6,6 @@ __all__ = [
     'relation',
     'metamorphic',
     'system',
+    'fixed',
     'randomized',
-    'randint',
 ]
