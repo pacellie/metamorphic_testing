@@ -18,7 +18,7 @@
 
 ## Available poetry Scripts
 - `poetry install`: Install all dependencies
-- `poetry run pytest`: Run tests
+- `poetry run pytest --capture=tee-sys`: Run tests (with outputs)
 - `poetry run cov`: Run tests with coverage and show results
 - `poetry run lint`: Run linters. Equivalent to `poetry run prospector`. This will automatically check with mypy, pylint, bandit and some other tools.
 - `poetry run install-hook`: Install Git pre-commit hook to lint before committing
