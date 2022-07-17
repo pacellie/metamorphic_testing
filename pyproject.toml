@@ -25,6 +25,9 @@ numpy = "^1.23.0"
 pandas = "^1.4.3"
 pandas-stubs = "^1.4.3"
 sklearn = "^0.0"
+torchvision = "^0.13.0"
+torch = "^1.12.0"
+albumentations = "^1.2.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
