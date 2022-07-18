@@ -21,71 +21,69 @@ from metamorphic_test import (
 )
 
 # register the metamorphic testcases for speech recognition
-# with_gaussian_noise = metamorphic('with_gaussian_noise', relation=equality)
-# with_background_noise = metamorphic('with_background_noise', relation=equality)
+with_gaussian_noise = metamorphic('with_gaussian_noise', relation=equality)
+with_background_noise = metamorphic('with_background_noise', relation=equality)
 with_altered_pitch = metamorphic('with_altered_pitch', relation=equality)
-
-
 # with_combined_effect = metamorphic('with_combined_effect', relation=equality)
 
 
 # define and register the audio transformations
 # transformation to add Gaussian noise:
-# @transformation(with_gaussian_noise)
-# @randomized('min_amplitude', 0.0001)
-# @randomized('max_amplitude', 0.001)
-# @randomized('p', 1.)
-# def add_gaussian_noise(
-#         source_audio: Union[numpy.ndarray, torch.Tensor],
-#         min_amplitude: float,
-#         max_amplitude: float,
-#         p: float
-# ):
-#     """
-#     This transformation adds a random Gaussian noise (within min_amplitude and max_amplitude)
-#     to the source_audio with probability p and returns that transformed audio.
-#
-#     params:
-#         source_audio: numpy ndarray of shape (<number of samples>,): the input audio
-#         min_amplitude: float: minimum amplitude of the Gaussian noise
-#         max_amplitude: float: maximum amplitude of the Gaussian noise
-#         p: float: probability of applying the transformation
-#
-#     returns:
-#         numpy ndarray of shape (<number of samples>,) (same shape of input)
-#     """
-#     transform = AddGaussianNoise(min_amplitude=min_amplitude, max_amplitude=max_amplitude, p=p)
-#     if not torch.is_tensor(source_audio):
-#         return torch.from_numpy(transform(source_audio, 16000))
-#     else:
-#         return torch.from_numpy(transform(source_audio.numpy(), 16000))
+@transformation(with_gaussian_noise)
+@randomized('min_amplitude', 0.0001)
+@randomized('max_amplitude', 0.001)
+@randomized('p', 1.)
+def add_gaussian_noise(
+        source_audio: Union[numpy.ndarray, torch.Tensor],
+        min_amplitude: float,
+        max_amplitude: float,
+        p: float
+):
+    """
+    This transformation adds a random Gaussian noise (within min_amplitude and max_amplitude)
+    to the source_audio with probability p and returns that transformed audio.
+
+    params:
+        source_audio: numpy ndarray of shape (<number of samples>,): the input audio
+        min_amplitude: float: minimum amplitude of the Gaussian noise
+        max_amplitude: float: maximum amplitude of the Gaussian noise
+        p: float: probability of applying the transformation
+
+    returns:
+        numpy ndarray of shape (<number of samples>,) (same shape of input)
+    """
+    transform = AddGaussianNoise(min_amplitude=min_amplitude, max_amplitude=max_amplitude, p=p)
+    if not torch.is_tensor(source_audio):
+        return torch.from_numpy(transform(source_audio, 16000))
+    else:
+        return torch.from_numpy(transform(source_audio.numpy(), 16000))
 
 
 # transformation to add background noise
-# @transformation(with_background_noise)
-# @randomized('sounds_path', "../audio_examples/background_noises")
-# @randomized('p', 1.)
-# def add_background_noise(
-#         source_audio: numpy.ndarray,
-#         sounds_path: Union[List[Path], List[str], Path, str],
-#         p: float
-# ):
-#     """
-#     This transformation adds a random background noise from the sounds_path folder
-#     to the source_audio with probability p and returns that transformed audio.
-#
-#     params:
-#         source_audio: numpy ndarray of shape (<number of samples>,): the input audio
-#         sounds_path: A path or list of paths to audio file(s) and/or folder(s) with
-#             audio files. Can be str or Path instance(s). The audio files given here are
-#             supposed to be background noises.
-#         p: float: probability of applying the transformation
-#
-#     returns:
-#         numpy ndarray of shape (<number of samples>,) (same shape of input)
-#     """
-#     transform = AddBackgroundNoise(sounds_path=sounds_path, p=p)
-#     return transform(source_audio, 16000)  # 16000 is the sampling rate, but not that important
+@transformation(with_background_noise)
+@randomized('sounds_path', "../audio_examples/background_noises")
+@randomized('p', 1.)
+def add_background_noise(
+        source_audio: numpy.ndarray,
+        sounds_path: Union[List[Path], List[str], Path, str],
+        p: float
+):
+    """
+    This transformation adds a random background noise from the sounds_path folder
+    to the source_audio with probability p and returns that transformed audio.
+
+    params:
+        source_audio: numpy ndarray of shape (<number of samples>,): the input audio
+        sounds_path: A path or list of paths to audio file(s) and/or folder(s) with
+            audio files. Can be str or Path instance(s). The audio files given here are
+            supposed to be background noises.
+        p: float: probability of applying the transformation
+
+    returns:
+        numpy ndarray of shape (<number of samples>,) (same shape of input)
+    """
+    transform = AddBackgroundNoise(sounds_path=sounds_path, p=p)
+    return transform(source_audio, 16000)  # 16000 is the sampling rate, but not that important
 
 
 # transformation to alter pitch
@@ -178,13 +176,7 @@ class SpeechToText:
         if not torch.is_tensor(audio):
             assert isinstance(audio, numpy.ndarray), "input audio must be of type " \
                                                      "numpy.ndarray or torch.Tensor."
-            # print("Converting to tensor")
             audio = torch.from_numpy(audio)
-
-            # print(audio)
-            # print(audio.size())
-            # print(audio.shape)
-            # print(type(audio))
 
         intermediate = self.model(audio).squeeze(0)
         print(intermediate.shape)
