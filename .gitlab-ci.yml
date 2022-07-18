@@ -10,6 +10,7 @@ stages:
     - test
     - linter
     - publish
+    - examples
 
 include:
     - template: Code-Quality.gitlab-ci.yml
@@ -17,7 +18,7 @@ include:
 variables:
     LANG: C.UTF-8
 
-coverage:
+pytest:
     stage: test
     script:
         - echo "This is the coverage test stage"
@@ -59,3 +60,22 @@ publishing:
     only:
         - main
     when: manual
+
+
+simple_example:
+    stage: example
+    allow_failure: true
+    script:
+        - poetry run example simple
+
+trigonometry_example:
+    stage: example
+    allow_failure: true
+    script:
+        - poetry run example trigonometry
+
+house_pricing_example:
+    stage: example
+    allow_failure: true
+    script:
+        - poetry run example house_pricing
