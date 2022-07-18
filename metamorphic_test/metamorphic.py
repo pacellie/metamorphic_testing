@@ -46,6 +46,7 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
+        # pylint: disable-msg=too-many-locals
         if not self.relation:
             raise ValueError(
                 f"No relation registered on {self.name}, cannot execute test."
