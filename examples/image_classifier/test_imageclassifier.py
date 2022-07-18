@@ -7,13 +7,11 @@ from typing import Dict
 # thus is skipped. Same with matplotlib in classifier. Should we ignore?
 # more info: https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
 
-from hypothesis import given, settings
-import hypothesis.strategies as st
-
 from .classifier import read_traffic_signs, TrafficSignClassifier
 
 from metamorphic_test import (
     transformation,
+    relation,
     metamorphic,
     system,
     randomized,
@@ -24,6 +22,17 @@ from metamorphic_test.relations import equality
 brightness = metamorphic('brightness', relation=equality)
 contrast = metamorphic('contrast', relation=equality)
 both_cv2 = metamorphic('both_cv2', relation=equality)
+rain = metamorphic('rain', relation=equality)
+snow = metamorphic('snow', relation=equality)
+fog = metamorphic('fog', relation=equality)
+gamma = metamorphic('gamma', relation=equality)
+equalize = metamorphic('equalize', relation=equality)
+downscale = metamorphic('downscale', relation=equality)
+noise = metamorphic('noise', relation=equality)
+clahe = metamorphic('clahe', relation=equality)
+blur = metamorphic('blur', relation=equality)
+horizontal_flip = metamorphic('horizontal_flip')
+vertical_flip = metamorphic('vertical_flip')
 
 
 @transformation(brightness)
@@ -48,7 +57,6 @@ def cv2_brightness_and_contrast_adjustments(image, alpha, beta):
     return cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
 
 
-rain = metamorphic('rain', relation=equality)
 @transformation(rain)
 @randomized('slant', RandInt(-5, 5))
 def album_rain(image, slant=0, drop_length=9, drop_width=1, blur_value=3):
@@ -62,7 +70,6 @@ def album_rain(image, slant=0, drop_length=9, drop_width=1, blur_value=3):
     return image_transform.apply(image)
 
 
-snow = metamorphic('snow', relation=equality)
 @transformation(snow)
 @randomized('snow_point', RandFloat(0.1, 0.2))
 def album_snow(image, snow_point=0.2, brightness_coeff=2):
@@ -74,7 +81,6 @@ def album_snow(image, snow_point=0.2, brightness_coeff=2):
     return image_transform.apply(image)
 
 
-fog = metamorphic('fog', relation=equality)
 @transformation(fog)
 @randomized('fog_coef', RandFloat(0.3, 0.5))
 def album_fog(image, fog_coef=0.5, alpha_coef=0.08):
@@ -95,7 +101,6 @@ def album_fog(image, fog_coef=0.5, alpha_coef=0.08):
 #     return image_transform.apply(image)
 
 
-gamma = metamorphic('gamma', relation=equality)
 @transformation(gamma)
 @randomized('limit', RandInt(100, 110))
 def album_gamma(image, limit=101):
@@ -103,7 +108,6 @@ def album_gamma(image, limit=101):
     return image_transform.apply(image)
 
 
-equalize = metamorphic('equalize', relation=equality)
 @transformation(equalize)
 def album_equalize(image):
     image_transform = albumentations.Equalize(p=1)
@@ -114,7 +118,6 @@ def album_equalize(image):
 # add coarse dropout, and change to go via transform since basic apply does nothing
 
 
-downscale = metamorphic('downscale', relation=equality)
 @transformation(downscale)
 @randomized('scale', RandFloat(0.6, 0.8))
 def album_downscale(image, scale=0.5):
@@ -122,7 +125,6 @@ def album_downscale(image, scale=0.5):
     return image_transform.apply(image, scale=scale, interpolation=0)
 
 
-noise = metamorphic('noise', relation=equality)
 @transformation(noise)
 @randomized('color_shift', RandFloat(0.02, 0.04))
 def album_ISONoise(image, color_shift=0.03, intensity=0.3):
@@ -133,7 +135,6 @@ def album_ISONoise(image, color_shift=0.03, intensity=0.3):
     return image_transform.apply(image)
 
 
-clahe = metamorphic('clahe', relation=equality)
 @transformation(clahe)
 @randomized('clip_limit', RandFloat(3.0, 3.5))
 def album_CLAHE(image, clip_limit=3.0, tile_grid_size=8):
@@ -144,26 +145,30 @@ def album_CLAHE(image, clip_limit=3.0, tile_grid_size=8):
     return image_transform.apply(image)
 
 
-blur = metamorphic('blur', relation=equality)
 @transformation(blur)
 @randomized('kernel_size', RandInt(3, 5))
 def album_blur(image, kernel_size=3):
     image_transform = albumentations.Blur(blur_limit=[kernel_size, kernel_size], p=1)
     return image_transform.apply(image)
-#
-#
-# def album_horizonflip():
-#     image_transform = albumentations.HorizontalFlip(p=1)
-#     return image_transform.apply
-#
-#
-# def album_verticalflip():
-#     image_transform = albumentations.VerticalFlip(p=1)
-#     return image_transform.apply
-#
-#
-# def int_mapping(x: int, int_map: Dict[int, int]) -> int:
-#     return int_map.get(x, x)
+
+
+@transformation(horizontal_flip)
+def album_horizonflip(image):
+    image_transform = albumentations.HorizontalFlip(p=1)
+    return image_transform.apply(image)
+
+
+@transformation(vertical_flip)
+def album_verticalflip(image):
+    image_transform = albumentations.VerticalFlip(p=1)
+    return image_transform.apply(image)
+
+
+@relation(horizontal_flip, vertical_flip)
+def flip_sign(x, y):
+    mapping = {16: 10, 10: 16, 38: 39, 39: 38, 33: 34, 34: 33, 25: 27, 27: 25}
+    xhat = mapping.get(x, x)
+    return equality(xhat, y)
 
 
 # setup
