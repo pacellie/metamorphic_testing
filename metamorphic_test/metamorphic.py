@@ -24,12 +24,12 @@ class MetamorphicTest:
 
     def add_transform(self, transform, priority=0):
         self.transforms.append(PrioritizedTransform(transform, priority))
-    
+
     def set_relation(self, relation):
         if self.relation:
             raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
         self.relation = relation
-    
+
     def _log_info(self, msg: str):
         logger.info(msg)
 
@@ -78,12 +78,19 @@ class MetamorphicTest:
             p_transform.transform.__name__ for p_transform in self.transforms
         ]
 
-        self._log_info(f"\n[running suite '{self.name}']"
-              f"\n\tinput x: {x[0] if len(x) == 1 else x} "
-              f"\n\tinput y: {y} "
-              f"\n\toutput x: {system_x} "
-              f"\n\toutput y: {system_y} "
-              f"\n\ttransform: {', '.join(transform_names)} "
-              f"\n\trelation: {self.relation.__name__}")
+        suite_text = f"[running suite '{self.name}']"
+        input_x_text = f"input x: {x[0] if len(x) == 1 else x}"
+        input_y_text = f"input y: {y}"
+        output_x_text = f"output x: {system_x}"
+        output_y_text = f"output y: {system_y}"
+        transforms_text = f"transform: {', '.join(transform_names)}"
+        relation_text = f"relation: {self.relation.__name__}"
 
-        assert self.relation(system_x, system_y)
+        self._log_info(
+            f"\n{suite_text}\n\t{input_x_text}\n\t{input_y_text}\n\t{output_x_text}"
+            f"\n\t{output_y_text}\n\t{transforms_text}\n\t{relation_text}"
+        )
+
+        assert self.relation(system_x, system_y), \
+            f"{suite_text}: {input_x_text} {input_y_text} {output_x_text}" \
+                f"{output_y_text} {transforms_text} {relation_text}"
