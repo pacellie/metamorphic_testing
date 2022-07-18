@@ -36,6 +36,13 @@
 This way you should see linting and typing errors directly in your editor, which is way more convenient.
 
 
+## Create a new example
+- Create a new directory in the `examples` directory.
+- Put your test files in there like normal (e.g. `test_example.py`, files to be checked by Pytest need to have their names start with `test_`).
+- Install development dependencies using `poetry add --D <package name>`.
+- Run `poetry run example <which>` to run the tests.
+
+
 ## Publishing a New Version
 - Increase the version number in pyproject.toml following the suggestions on https://semver.org/
 - Push into your branch, then create a merge request into main
