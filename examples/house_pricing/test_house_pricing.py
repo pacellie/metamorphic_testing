@@ -6,11 +6,11 @@ from metamorphic_test import (
     metamorphic,
     system,
     randomized,
-    randint,
 )
+from metamorphic_test.generators import RandInt
 from metamorphic_test.relations import becomes_larger, approximately, or_
 
-from tests.house_pricing.house_pricing import (
+from .house_pricing import (
     HousingPricePredictor,
     get_housing_data,
     get_training_and_test_set,
@@ -29,7 +29,7 @@ HousePriceTest = metamorphic(
 )
 
 @transformation(HousePriceTest)
-@randomized('increase_rooms_by', randint(1, 10))
+@randomized('increase_rooms_by', RandInt(1, 10))
 def transform(x, increase_rooms_by: int) -> np.ndarray:
     assert all(x["total_rooms"] % 1 == 0)
     copy = x.copy()
