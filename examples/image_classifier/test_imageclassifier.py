@@ -2,7 +2,6 @@ import numpy as np
 import cv2  # type: ignore
 import albumentations  # type: ignore
 import pytest
-from typing import Dict
 # mypy complains that cv2 (and torchvision) has no stubs / not PEP 561-compliant
 # thus is skipped. Same with matplotlib in classifier. Should we ignore?
 # more info: https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
