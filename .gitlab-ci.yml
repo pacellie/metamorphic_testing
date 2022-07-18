@@ -22,7 +22,7 @@ pytest:
     stage: test
     script:
         - echo "This is the coverage test stage"
-        - coverage run -m pytest --junitxml=report.xml
+        - coverage run -m pytest tests --junitxml=report.xml
         - coverage report
         - coverage xml
     coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
