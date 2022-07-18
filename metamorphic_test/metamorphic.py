@@ -53,32 +53,24 @@ class MetamorphicTest:
             )
 
         random.shuffle(self.transforms)
-
-        if len(x) == 1:
-            y = x[0]  # TODO: This is a bit weird
-        else:
-            y = x
         prio_sorted_transforms = sorted(
             self.transforms,
             key=lambda tp: tp.priority,
             reverse=True
         )
+
+        singular = len(x) == 1
+
+        y = x[0] if singular else x
         for p_transform in prio_sorted_transforms:
-            if len(x) == 1:
-                y = p_transform.transform(y)
-            else:
-                y = p_transform.transform(*y)
+            y = p_transform.transform(y) if singular else p_transform.transform(*y)
 
         system_x = system(*x)
-        if len(x) == 1:
-            system_y = system(y)
-        else:
-            system_y = system(*y)
+        system_y = system(y) if singular else system(*y)
 
         transform_names = [
             p_transform.transform.__name__ for p_transform in self.transforms
         ]
-
         suite_text = f"[running suite '{self.name}']"
         input_x_text = f"input x: {x[0] if len(x) == 1 else x}"
         input_y_text = f"input y: {y}"
@@ -88,8 +80,13 @@ class MetamorphicTest:
         relation_text = f"relation: {self.relation.__name__}"
 
         self._log_info(
-            f"\n{suite_text}\n\t{input_x_text}\n\t{input_y_text}\n\t{output_x_text}"
-            f"\n\t{output_y_text}\n\t{transforms_text}\n\t{relation_text}"
+            f"\n{suite_text}"
+            f"\n\t{input_x_text}"
+            f"\n\t{input_y_text}"
+            f"\n\t{output_x_text}"
+            f"\n\t{output_y_text}"
+            f"\n\t{transforms_text}"
+            f"\n\t{relation_text}"
         )
 
         assert self.relation(system_x, system_y), \
