@@ -86,6 +86,7 @@ def system(flag=None, *, name=None):
                 suite.execute_all(test, *args)
             else:
                 suite.execute(name, test, *args)
+            return suite
 
         return execute
 
