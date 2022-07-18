@@ -7,7 +7,7 @@ import sys
 def html_coverage():
     try:
         run(
-            ["poetry", "run", "coverage", "run", "-m", "pytest"],
+            ["poetry", "run", "coverage", "run", "-m", "pytest", "tests"],
             check=True
         )
     except CalledProcessError:
