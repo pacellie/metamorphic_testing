@@ -64,18 +64,21 @@ publishing:
 
 simple_example:
     stage: examples
+    needs: []
     allow_failure: true
     script:
         - poetry run example simple
 
 trigonometry_example:
     stage: examples
+    needs: []
     allow_failure: true
     script:
         - poetry run example trigonometry
 
 house_pricing_example:
     stage: examples
+    needs: []
     allow_failure: true
     script:
         - poetry run example house_pricing
