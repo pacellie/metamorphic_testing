@@ -35,6 +35,7 @@ pandas-stubs = "^1.4.3"
 sklearn = "^0.0"
 jiwer = "^2.3.0"
 albumentations = "^1.2.1"
+Dijkstar = "^2.6.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
