@@ -61,7 +61,7 @@ def add_gaussian_noise(
 
 # transformation to add background noise
 @transformation(with_background_noise)
-@fixed('sounds_path', "examples/audio/background_noises")
+@fixed('sounds_path', 'examples/audio/background_noises')
 @fixed('p', 1.)
 def add_background_noise(
         source_audio: Union[numpy.ndarray, torch.Tensor],
