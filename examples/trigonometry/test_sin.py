@@ -17,7 +17,6 @@ from metamorphic_test.relations import approximately
 A = metamorphic('A', relation=approximately)
 B = metamorphic('B')
 C = metamorphic('C')
-D = metamorphic('D')
 
 
 # Register the 'shift' transform for test A with default priority 0 and test C
@@ -47,9 +46,9 @@ def approximately_negate(x, y):
     return approximately(-x, y)
 
 
-# Parametrize the input, in this case: -1, 0
-@pytest.mark.parametrize('x', range(-1, 1))
+# Parametrize the input, in this case: -10, 9
+@pytest.mark.parametrize('x', range(-10, 10))
 # Mark this function as the system under test
-@system(name=A)
+@system(A, B, C)
 def test_sin(x):
     return math.sin(x)
