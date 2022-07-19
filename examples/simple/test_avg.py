@@ -17,6 +17,6 @@ def swap(a, b, c):
 @pytest.mark.parametrize('a', [0, 1])
 @pytest.mark.parametrize('b', [2, 3])
 @pytest.mark.parametrize('c', [4, 5])
-@system
+@system(A)
 def test_avg(a, b, c):
     return (a + b + c)/3

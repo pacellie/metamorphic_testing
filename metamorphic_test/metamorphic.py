@@ -24,12 +24,12 @@ class MetamorphicTest:
 
     def add_transform(self, transform, priority=0):
         self.transforms.append(PrioritizedTransform(transform, priority))
-    
+
     def set_relation(self, relation):
         if self.relation:
             raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
         self.relation = relation
-    
+
     def _log_info(self, msg: str):
         logger.info(msg)
 
@@ -46,44 +46,49 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
+        # pylint: disable-msg=too-many-locals
         if not self.relation:
             raise ValueError(
                 f"No relation registered on {self.name}, cannot execute test."
             )
 
         random.shuffle(self.transforms)
-
-        if len(x) == 1:
-            y = x[0]  # TODO: This is a bit weird
-        else:
-            y = x
         prio_sorted_transforms = sorted(
             self.transforms,
             key=lambda tp: tp.priority,
             reverse=True
         )
+
+        singular = len(x) == 1
+
+        y = x[0] if singular else x
         for p_transform in prio_sorted_transforms:
-            if len(x) == 1:
-                y = p_transform.transform(y)
-            else:
-                y = p_transform.transform(*y)
+            y = p_transform.transform(y) if singular else p_transform.transform(*y)
 
         system_x = system(*x)
-        if len(x) == 1:
-            system_y = system(y)
-        else:
-            system_y = system(*y)
+        system_y = system(y) if singular else system(*y)
 
         transform_names = [
             p_transform.transform.__name__ for p_transform in self.transforms
         ]
+        suite_text = f"[running suite '{self.name}']"
+        input_x_text = f"input x: {x[0] if len(x) == 1 else x}"
+        input_y_text = f"input y: {y}"
+        output_x_text = f"output x: {system_x}"
+        output_y_text = f"output y: {system_y}"
+        transforms_text = f"transform: {', '.join(transform_names)}"
+        relation_text = f"relation: {self.relation.__name__}"
 
-        self._log_info(f"\n[running suite '{self.name}']"
-              f"\n\tinput x: {x[0] if len(x) == 1 else x} "
-              f"\n\tinput y: {y} "
-              f"\n\toutput x: {system_x} "
-              f"\n\toutput y: {system_y} "
-              f"\n\ttransform: {', '.join(transform_names)} "
-              f"\n\trelation: {self.relation.__name__}")
+        self._log_info(
+            f"\n{suite_text}"
+            f"\n\t{input_x_text}"
+            f"\n\t{input_y_text}"
+            f"\n\t{output_x_text}"
+            f"\n\t{output_y_text}"
+            f"\n\t{transforms_text}"
+            f"\n\t{relation_text}"
+        )
 
-        assert self.relation(system_x, system_y)
+        assert self.relation(system_x, system_y), \
+            f"{suite_text}: {input_x_text} {input_y_text} {output_x_text}" \
+                f"{output_y_text} {transforms_text} {relation_text}"

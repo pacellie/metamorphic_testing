@@ -24,7 +24,7 @@ p = HousingPricePredictor(training_set)
 hide_labels(test_set)  # otherwise this MT would be somewhat pointless
 
 HousePriceTest = metamorphic(
-    'HousePriceTest', 
+    'HousePriceTest',
     relation=or_(approximately, becomes_larger)
 )
 
@@ -41,7 +41,7 @@ def transform(x, increase_rooms_by: int) -> np.ndarray:
     'x',
     [test_set.iloc[n:n+1] for n in range(20)],
 )
-@system(name=HousePriceTest)
+@system(HousePriceTest)
 def test_house_pricing_more_rooms(x) -> float:
     assert all(x["total_rooms"] % 1 == 0)
     return p.predict(x)
