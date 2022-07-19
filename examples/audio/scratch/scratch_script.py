@@ -1,6 +1,5 @@
 import os
 import warnings
-
 import torch
 from glob import glob
 from audiomentations import Compose, AddGaussianNoise  # type: ignore
@@ -9,33 +8,6 @@ import soundfile  # type: ignore
 from pathlib import Path
 
 warnings.filterwarnings("ignore")
-
-device = torch.device('cpu')  # gpu also works, but our models are fast enough for CPU
-model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
-                                       model='silero_stt',
-                                       language='en',  # also available 'de', 'es'
-                                       device=device)
-(read_batch, split_into_batches,
- read_audio, prepare_model_input) = utils  # see function signature for details
-
-# download a single file in any format compatible with TorchAudio
-torch.hub.download_url_to_file(
-    'https://opus-codec.org/static/examples/samples/speech_orig.wav',
-    dst='audio_examples/speech_orig.wav', progress=True)
-test_files = glob('audio_examples/speech_orig.wav')
-batches = split_into_batches(test_files, batch_size=10)
-
-input_ = prepare_model_input(read_batch(batches[0]),
-                             device=device)
-
-augment = Compose([
-    AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.3),
-    # AddGaussianSNR(min_snr_in_db=12, max_snr_in_db=35, p=0.3),
-    AddBackgroundNoise(sounds_path=["audio_examples/background_noises"], p=0.7),
-    # LoudnessNormalization(p=0.5),
-    # TimeStretch(min_rate=1, max_rate=1.5, p=0.8, leave_length_unchanged=True),
-    PitchShift(min_semitones=-2, max_semitones=+2, p=0.5),
-], shuffle=True)
 
 
 def write_audio(audio, sr, file_name, dir_path):
@@ -46,7 +18,7 @@ def write_audio(audio, sr, file_name, dir_path):
 
 
 def transform(source_audio, source_sample_rate, n_out_puts=5,
-              out_dir="audio_examples/transformed_audios", verbose=False):
+              out_dir="transformed_audios", verbose=False):
     if isinstance(source_audio, torch.Tensor):
         source_audio = source_audio.numpy()
     source_audio = source_audio.reshape((-1,))  # only for mono audio
@@ -63,15 +35,44 @@ def transform(source_audio, source_sample_rate, n_out_puts=5,
     return follow_up_audio_list
 
 
-followup_inputs = transform(input_, 16000)
+if __name__ == "__main__":
+    device = torch.device('cpu')  # gpu also works, but our models are fast enough for CPU
+    model, decoder, utils = torch.hub.load(repo_or_dir='snakers4/silero-models',
+                                           model='silero_stt',
+                                           language='en',  # also available 'de', 'es'
+                                           device=device)
+    (read_batch, split_into_batches,
+     read_audio, prepare_model_input) = utils  # see function signature for details
 
-output = model(input_).squeeze(0)  # output shape: 136 x 999
-followup_outputs = [model(inp).squeeze(0) for inp in followup_inputs]  # op shape : 136 x 999
+    # download a single file in any format compatible with TorchAudio
+    torch.hub.download_url_to_file(
+        'https://opus-codec.org/static/examples/samples/speech_orig.wav',
+        dst='audio_examples/speech_orig.wav', progress=True)
+    test_files = glob('audio_examples/speech_orig.wav')
+    batches = split_into_batches(test_files, batch_size=10)
 
-# look at the recognized texts for original and followup inputs
-print("\n\n")
-for i, example in enumerate([output] + followup_outputs):
-    if i == 0:
-        print(f"Original Speech2Text: '{decoder(example.cpu())}'\n")
-    else:
-        print(f"Augmented Speech2Text_{i}: '{decoder(example.cpu())}'\n")
+    input_ = prepare_model_input(read_batch(batches[0]),
+                                 device=device)
+
+    augment = Compose([
+        AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.3),
+        # AddGaussianSNR(min_snr_in_db=12, max_snr_in_db=35, p=0.3),
+        AddBackgroundNoise(sounds_path=["audio_examples/background_noises"], p=0.7),
+        # LoudnessNormalization(p=0.5),
+        # TimeStretch(min_rate=1, max_rate=1.5, p=0.8, leave_length_unchanged=True),
+        PitchShift(min_semitones=-2, max_semitones=+2, p=0.5),
+    ], shuffle=True)
+
+    followup_inputs = transform(input_, 16000)
+
+    output = model(input_).squeeze(0)  # output shape: 136 x 999
+    followup_outputs = [model(inp).squeeze(0) for inp in
+                        followup_inputs]  # op shape : 136 x 999
+
+    # look at the recognized texts for original and followup inputs
+    print("\n\n")
+    for i, example in enumerate([output] + followup_outputs):
+        if i == 0:
+            print(f"Original Speech2Text: '{decoder(example.cpu())}'\n")
+        else:
+            print(f"Augmented Speech2Text_{i}: '{decoder(example.cpu())}'\n")
