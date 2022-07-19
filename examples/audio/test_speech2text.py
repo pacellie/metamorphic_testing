@@ -7,6 +7,7 @@ from pathlib import Path
 import torch
 import pytest
 import warnings
+from jiwer import wer, mer, wil
 
 from models.speech_to_text import SpeechToText
 from utils.stt_utils import stt_read_audio
@@ -16,8 +17,6 @@ from metamorphic_test import (
     metamorphic,
     system,
     randomized,
-    randint,
-    approximately,
     equality
 )
 
@@ -25,9 +24,9 @@ warnings.filterwarnings("ignore")
 
 # region test_names
 # register the metamorphic testcases for speech recognition
-with_gaussian_noise = metamorphic('with_gaussian_noise', relation=equality)
-with_background_noise = metamorphic('with_background_noise', relation=equality)
-with_altered_pitch = metamorphic('with_altered_pitch', relation=equality)
+with_gaussian_noise = metamorphic('with_gaussian_noise')
+with_background_noise = metamorphic('with_background_noise')
+with_altered_pitch = metamorphic('with_altered_pitch')
 # with_combined_effect = metamorphic('with_combined_effect', relation=equality)
 # endregion
 
@@ -131,7 +130,15 @@ def alter_pitch(
 
 
 # region custom_relations
-# todo:
+@relation(with_gaussian_noise, with_background_noise, with_altered_pitch)
+def stt_soft_compare(x, y):
+    wer_val = wer(x, y)
+
+    mer_val = mer(x, y)
+
+    wil_val = wil(x, y)
+    print(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")
+    return wer_val < 0.25 and mer_val < 0.25 and wil_val < 0.35
 # endregion
 
 
@@ -141,7 +148,7 @@ stt = SpeechToText()
 
 
 # region data_list
-src_audios = [stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in range(1, 3)]
+src_audios = [stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in range(1, 4)]
 # endregion
 
 

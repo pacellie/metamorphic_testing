@@ -31,6 +31,7 @@ numpy = "^1.23.0"
 pandas = "^1.4.3"
 pandas-stubs = "^1.4.3"
 sklearn = "^0.0"
+jiwer = "^2.3.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
