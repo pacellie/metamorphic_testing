@@ -1,15 +1,14 @@
 import numpy
 from audiomentations import Compose, AddGaussianNoise  # type: ignore
 from audiomentations import PitchShift, AddBackgroundNoise  # type: ignore
-import soundfile  # type: ignore
 from typing import Union, List
 from pathlib import Path
 import torch
 import pytest
-from jiwer import wer, mer, wil
+from jiwer import wer, mer, wil  # type: ignore
 
-from models.speech_to_text import SpeechToText
-from utils.stt_utils import stt_read_audio
+from models.speech_to_text import SpeechToText  # type: ignore
+from utils.stt_utils import stt_read_audio  # type: ignore
 from metamorphic_test import (
     transformation,
     relation,
@@ -52,13 +51,12 @@ def add_gaussian_noise(
         p: float: probability of applying the transformation
 
     returns:
-        numpy ndarray of shape (<number of samples>,) (same shape of input)
+        torch tensor of shape (<number of samples>,) (same shape of input)
     """
     transform = AddGaussianNoise(min_amplitude=min_amplitude, max_amplitude=max_amplitude, p=p)
     if not torch.is_tensor(source_audio):
         return torch.from_numpy(transform(source_audio, 16000))
-    else:
-        return torch.from_numpy(transform(source_audio.numpy(), 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 
 # transformation to add background noise
@@ -82,13 +80,12 @@ def add_background_noise(
         p: float: probability of applying the transformation
 
     returns:
-        numpy ndarray of shape (<number of samples>,) (same shape of input)
+        torch tensor of shape (<number of samples>,) (same shape of input)
     """
     transform = AddBackgroundNoise(sounds_path=sounds_path, p=p)
     if not torch.is_tensor(source_audio):
         return torch.from_numpy(transform(source_audio, 16000))
-    else:
-        return torch.from_numpy(transform(source_audio.numpy(), 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 
 # transformation to alter pitch
@@ -119,8 +116,7 @@ def alter_pitch(
     transform = PitchShift(min_semitones=min_semitones, max_semitones=max_semitones, p=p)
     if not torch.is_tensor(source_audio):
         return torch.from_numpy(transform(source_audio, 16000))
-    else:
-        return torch.from_numpy(transform(source_audio.numpy(), 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 
 # combined transformation
@@ -148,8 +144,7 @@ def composite_transformation(
         ], shuffle=True)
     if not torch.is_tensor(source_audio):
         return torch.from_numpy(transform(source_audio, 16000))
-    else:
-        return torch.from_numpy(transform(source_audio.numpy(), 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 # endregion
 

@@ -1,4 +1,4 @@
-import soundfile
+import soundfile  # type: ignore
 from pathlib import Path
 import os
 
