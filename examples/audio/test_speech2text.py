@@ -6,7 +6,6 @@ from typing import Union, List
 from pathlib import Path
 import torch
 import pytest
-import warnings
 from jiwer import wer, mer, wil
 
 from models.speech_to_text import SpeechToText
@@ -17,17 +16,14 @@ from metamorphic_test import (
     metamorphic,
     system,
     randomized,
-    equality
 )
-
-warnings.filterwarnings("ignore")
 
 # region test_names
 # register the metamorphic testcases for speech recognition
 with_gaussian_noise = metamorphic('with_gaussian_noise')
 with_background_noise = metamorphic('with_background_noise')
 with_altered_pitch = metamorphic('with_altered_pitch')
-# with_combined_effect = metamorphic('with_combined_effect', relation=equality)
+with_combined_effect = metamorphic('with_combined_effect')
 # endregion
 
 
@@ -44,7 +40,7 @@ def add_gaussian_noise(
         min_amplitude: float,
         max_amplitude: float,
         p: float
-):
+) -> torch.Tensor:
     """
     This transformation adds a random Gaussian noise (within min_amplitude and max_amplitude)
     to the source_audio with probability p and returns that transformed audio.
@@ -73,7 +69,7 @@ def add_background_noise(
         source_audio: Union[numpy.ndarray, torch.Tensor],
         sounds_path: Union[List[Path], List[str], Path, str],
         p: float
-):
+) -> torch.Tensor:
     """
     This transformation adds a random background noise from the sounds_path folder
     to the source_audio with probability p and returns that transformed audio.
@@ -126,19 +122,65 @@ def alter_pitch(
     else:
         return torch.from_numpy(transform(source_audio.numpy(), 16000))
 
+
+# combined transformation
+@transformation(with_combined_effect)
+def composite_transformation(
+        source_audio: Union[numpy.ndarray, torch.Tensor]
+) -> torch.Tensor:
+    """
+    This composite transformation probabilistically combines the above three transformations
+    in random order. Each of the three basic transforms (AddGaussianNoise, AddBackgroundNoise,
+    PitchShift) has 50% percent chance of being used in this transformation. Chosen transforms
+    are then applied in a randomly shuffled order.
+
+    params:
+        source_audio: Union[numpy.ndarray, torch.Tensor]: input audio of shape
+                    (<number of samples>,)
+    returns:
+        torch tensor of shape (<number of samples>,) (same shape of input)
+    """
+    transform = Compose(
+        [
+            AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.5),
+            AddBackgroundNoise(sounds_path=["examples/audio/background_noises"], p=0.5),
+            PitchShift(min_semitones=-1, max_semitones=+1, p=0.5),
+        ], shuffle=True)
+    if not torch.is_tensor(source_audio):
+        return torch.from_numpy(transform(source_audio, 16000))
+    else:
+        return torch.from_numpy(transform(source_audio.numpy(), 16000))
+
 # endregion
 
 
 # region custom_relations
-@relation(with_gaussian_noise, with_background_noise, with_altered_pitch)
-def stt_soft_compare(x, y):
+
+@relation(with_gaussian_noise, with_background_noise, with_altered_pitch, with_combined_effect)
+def stt_soft_compare(x: str, y: str) -> bool:
+    """
+    This is a custom metamorphic comparison relation designed specifically for speech2text
+    algorithms. Direct string comparison for recognized texts from source and followup cases
+    can be to restrictive and too harsh on the speech recognition algorithm under test.
+
+    So, we use standard metrics for speech recognition algorithms, namely:
+    Word Error Rate (WER), Matching Error Rate (MER) and Word Information Loss (WIL) and
+    consider our test to be passing if those metrics are below certain predefined threshold.
+
+    params:
+        x: str: recognize text from source test case
+        y: str: recognized text from follow up test case
+
+    returns:
+        bool: True refers to a passing test
+    """
     wer_val = wer(x, y)
-
     mer_val = mer(x, y)
-
     wil_val = wil(x, y)
     print(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")
-    return wer_val < 0.25 and mer_val < 0.25 and wil_val < 0.35
+    # todo: parameterize the following thresholds instead of hard coding
+    return wer_val < 0.4 and mer_val < 0.4 and wil_val < 0.55
+
 # endregion
 
 
@@ -148,12 +190,13 @@ stt = SpeechToText()
 
 
 # region data_list
-src_audios = [stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in range(1, 4)]
+src_audios = [stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in
+              range(1, 4)]
 # endregion
 
 
 # region system under test
-# Parametrize the input (audio file indices), in this case: [0,4]
+# src_audios is the list of audios with which the test need to be performed
 @pytest.mark.parametrize('audio', src_audios)
 # Mark this function as the system under test
 @system
