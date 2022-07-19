@@ -5,16 +5,17 @@ from metamorphic_test import (
     metamorphic,
     system,
     randomized,
-    randint,
-    approximately
+    fixed,
 )
+from metamorphic_test.generators import RandInt
+from metamorphic_test.relations import approximately
 
 A = metamorphic('A', relation=approximately)
 
 
 @transformation(A)
-@randomized('n', randint(1, 10))
-@randomized('c', 0)
+@randomized('n', RandInt(1, 10))
+@fixed('c', 0)
 def shift(x, n, c):
     return x + 2 * n * math.pi + c
 

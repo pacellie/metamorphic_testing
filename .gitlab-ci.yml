@@ -10,6 +10,7 @@ stages:
     - test
     - linter
     - publish
+    - examples
 
 include:
     - template: Code-Quality.gitlab-ci.yml
@@ -17,11 +18,11 @@ include:
 variables:
     LANG: C.UTF-8
 
-coverage:
+pytest:
     stage: test
     script:
         - echo "This is the coverage test stage"
-        - coverage run -m pytest --junitxml=report.xml
+        - coverage run -m pytest tests --junitxml=report.xml
         - coverage report
         - coverage xml
     coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
@@ -49,7 +50,7 @@ prospector:
 
 publishing:
     stage: publish
-    needs: [coverage, prospector]
+    needs: [pytest, prospector]
     script:
         - echo "This is the publish stage"
         - poetry config repositories.gitlab https://gitlab.lrz.de/api/v4/projects/$CI_PROJECT_ID/packages/pypi
@@ -59,3 +60,25 @@ publishing:
     only:
         - main
     when: manual
+
+
+simple_example:
+    stage: examples
+    needs: []
+    allow_failure: true
+    script:
+        - poetry run example simple
+
+trigonometry_example:
+    stage: examples
+    needs: []
+    allow_failure: true
+    script:
+        - poetry run example trigonometry
+
+house_pricing_example:
+    stage: examples
+    needs: []
+    allow_failure: true
+    script:
+        - poetry run example house_pricing

@@ -1,14 +1,37 @@
 from dataclasses import dataclass, field
-from typing import Callable, Any, Optional, List, Tuple
 import random
+from typing import Callable, Any, Optional, List
 
+from .logger import logger
+
+
+@dataclass
+class PrioritizedTransform:
+    transform: Callable[[Any], Any]
+    priority: int = 0
+
+
+Relation = Callable[[Any, Any], bool]
 
 @dataclass
 class MetamorphicTest:
     name: Optional[str] = None
-    # list of (transform, priority) pairs
-    transforms: List[Tuple[Callable[[Any], Any], int]] = field(default_factory=list)
-    relation: Optional[Callable[[Any, Any], bool]] = None
+    transforms: List[PrioritizedTransform] = field(
+        default_factory=lambda: []
+    )
+    relation: Optional[Relation] = None
+
+
+    def add_transform(self, transform, priority=0):
+        self.transforms.append(PrioritizedTransform(transform, priority))
+    
+    def set_relation(self, relation):
+        if self.relation:
+            raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
+        self.relation = relation
+    
+    def _log_info(self, msg: str):
+        logger.info(msg)
 
 
     # x: the actual input
@@ -23,28 +46,44 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
+        if not self.relation:
+            raise ValueError(
+                f"No relation registered on {self.name}, cannot execute test."
+            )
+
         random.shuffle(self.transforms)
 
-        y = x[0] if len(x) == 1 else x
-        for transform, _ in sorted(self.transforms, key=lambda tp: tp[1], reverse=True):
-            if transform.__name__ == 'identity':
-                continue
-            y = transform(y) if len(x) == 1 else transform(*y)
-
-        transforms = [
-            transform.__name__ for transform, _ in self.transforms
-            if transform.__name__ != 'identity'
-        ]
+        if len(x) == 1:
+            y = x[0]  # TODO: This is a bit weird
+        else:
+            y = x
+        prio_sorted_transforms = sorted(
+            self.transforms,
+            key=lambda tp: tp.priority,
+            reverse=True
+        )
+        for p_transform in prio_sorted_transforms:
+            if len(x) == 1:
+                y = p_transform.transform(y)
+            else:
+                y = p_transform.transform(*y)
 
         system_x = system(*x)
-        system_y = system(y) if len(x) == 1 else system(*y)
+        if len(x) == 1:
+            system_y = system(y)
+        else:
+            system_y = system(*y)
 
-        print(f"\n[running suite '{self.name}']"
+        transform_names = [
+            p_transform.transform.__name__ for p_transform in self.transforms
+        ]
+
+        self._log_info(f"\n[running suite '{self.name}']"
               f"\n\tinput x: {x[0] if len(x) == 1 else x} "
               f"\n\tinput y: {y} "
               f"\n\toutput x: {system_x} "
               f"\n\toutput y: {system_y} "
-              f"\n\ttransform: {transforms} "
+              f"\n\ttransform: {', '.join(transform_names)} "
               f"\n\trelation: {self.relation.__name__}")
 
         assert self.relation(system_x, system_y)
