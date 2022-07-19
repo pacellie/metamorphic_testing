@@ -185,13 +185,15 @@ def stt_soft_compare(x: str, y: str) -> bool:
 
 
 # region model
+# creating this model object outside the test not to load it again and again for each test
+# todo: try to use some form of fixture or so instead of a global
 stt = SpeechToText()
 # endregion
 
 
 # region data_list
-src_audios = [stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in
-              range(1, 4)]
+src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in
+              range(1, 4))
 # endregion
 
 
