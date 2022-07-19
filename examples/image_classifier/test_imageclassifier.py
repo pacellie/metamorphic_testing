@@ -176,6 +176,7 @@ classifier_under_test = TrafficSignClassifier()
 
 
 @pytest.mark.parametrize('image', test_images)
-@system
+@system(brightness, contrast, both_cv2, rain, snow, fog, gamma, equalize, downscale, noise,
+        clahe, blur, horizontal_flip, vertical_flip)
 def test_image_classifier(image):
     return classifier_under_test.evaluate_image(image)
