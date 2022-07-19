@@ -7,7 +7,7 @@ def read_audio_from_idx(idx):
     audio, sample_rate = soundfile.read(
         file=f"tests/speech_samples/test_audio_{idx}.wav",
         always_2d=True,
-        dtype='float32',
+        dtype="float32",
     )
     return sample_rate, audio.T
 
