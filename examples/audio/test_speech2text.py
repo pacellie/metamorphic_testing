@@ -14,7 +14,7 @@ from metamorphic_test import (
     relation,
     metamorphic,
     system,
-    randomized,
+    fixed,
 )
 
 # region test_names
@@ -31,9 +31,9 @@ with_combined_effect = metamorphic('with_combined_effect')
 # define and register the audio transformations
 # transformation to add Gaussian noise:
 @transformation(with_gaussian_noise)
-@randomized('min_amplitude', 0.0001)
-@randomized('max_amplitude', 0.001)
-@randomized('p', 1.)
+@fixed('min_amplitude', 0.0001)
+@fixed('max_amplitude', 0.001)
+@fixed('p', 1.)
 def add_gaussian_noise(
         source_audio: Union[numpy.ndarray, torch.Tensor],
         min_amplitude: float,
@@ -61,8 +61,8 @@ def add_gaussian_noise(
 
 # transformation to add background noise
 @transformation(with_background_noise)
-@randomized('sounds_path', "examples/audio/background_noises")
-@randomized('p', 1.)
+@fixed('sounds_path', "examples/audio/background_noises")
+@fixed('p', 1.)
 def add_background_noise(
         source_audio: Union[numpy.ndarray, torch.Tensor],
         sounds_path: Union[List[Path], List[str], Path, str],
@@ -90,9 +90,9 @@ def add_background_noise(
 
 # transformation to alter pitch
 @transformation(with_altered_pitch)
-@randomized('min_semitones', -1)
-@randomized('max_semitones', 1)
-@randomized('p', 1.)
+@fixed('min_semitones', -1)
+@fixed('max_semitones', 1)
+@fixed('p', 1.)
 def alter_pitch(
         source_audio: Union[numpy.ndarray, torch.Tensor],
         min_semitones: int,
