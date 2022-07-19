@@ -4,11 +4,12 @@ from audiomentations import PitchShift, AddBackgroundNoise  # type: ignore
 import soundfile  # type: ignore
 from typing import Union, List
 from pathlib import Path
-from scipy.io.wavfile import read
 import torch
-import os
-
 import pytest
+import warnings
+
+from models.speech_to_text import SpeechToText
+from utils.stt_utils import stt_read_audio
 from metamorphic_test import (
     transformation,
     relation,
@@ -20,12 +21,18 @@ from metamorphic_test import (
     equality
 )
 
+warnings.filterwarnings("ignore")
+
+# region test_names
 # register the metamorphic testcases for speech recognition
 with_gaussian_noise = metamorphic('with_gaussian_noise', relation=equality)
 with_background_noise = metamorphic('with_background_noise', relation=equality)
 with_altered_pitch = metamorphic('with_altered_pitch', relation=equality)
 # with_combined_effect = metamorphic('with_combined_effect', relation=equality)
+# endregion
 
+
+# region custom_transformations
 
 # define and register the audio transformations
 # transformation to add Gaussian noise:
@@ -61,10 +68,10 @@ def add_gaussian_noise(
 
 # transformation to add background noise
 @transformation(with_background_noise)
-@randomized('sounds_path', "../audio_examples/background_noises")
+@randomized('sounds_path', "examples/audio/background_noises")
 @randomized('p', 1.)
 def add_background_noise(
-        source_audio: numpy.ndarray,
+        source_audio: Union[numpy.ndarray, torch.Tensor],
         sounds_path: Union[List[Path], List[str], Path, str],
         p: float
 ):
@@ -83,7 +90,10 @@ def add_background_noise(
         numpy ndarray of shape (<number of samples>,) (same shape of input)
     """
     transform = AddBackgroundNoise(sounds_path=sounds_path, p=p)
-    return transform(source_audio, 16000)  # 16000 is the sampling rate, but not that important
+    if not torch.is_tensor(source_audio):
+        return torch.from_numpy(transform(source_audio, 16000))
+    else:
+        return torch.from_numpy(transform(source_audio.numpy(), 16000))
 
 
 # transformation to alter pitch
@@ -117,82 +127,29 @@ def alter_pitch(
     else:
         return torch.from_numpy(transform(source_audio.numpy(), 16000))
 
-
-# now define relations (only for complex relations, as of now equality works). later on
-
-
-def read_audio(idx):  # util file, not in use currently
-    audio, sample_rate = soundfile.read(
-        file=f"tests/speech_samples/test_audio_{idx}.wav",
-        always_2d=True,
-        dtype='float32',
-    )
-    print(sample_rate)
-    print(audio.shape)
-    return sample_rate, audio.T
+# endregion
 
 
-def write_audio(audio, sr, file_name, dir_path):
-    if not dir_path:
-        return
-    Path(dir_path).mkdir(parents=True, exist_ok=True)
-    soundfile.write(os.path.join(dir_path, file_name), audio, sr)
+# region custom_relations
+# todo:
+# endregion
 
 
-class SpeechToText:
-    def __init__(
-            self,
-            repo_or_dir='snakers4/silero-models',
-            model_name='silero_stt',
-            language='en',  # also available 'de', 'es'
-            device=torch.device('cpu')
-    ):
-        self.device = device
-        self.repo = repo_or_dir
-        self.model_name = model_name
-        self.language = language
-
-        self.model, self.decoder, utils = torch.hub.load(
-            repo_or_dir=self.repo,
-            model=self.model_name,
-            language=self.language,  # also available 'de', 'es'
-            device=self.device
-        )
-        self.read_audio = utils[2]
-        self.prepare_input = utils[3]
-
-    def recognize(self, audio: Union[torch.Tensor, numpy.ndarray]):
-        # def recognize(self, idx: int):
-        # audio = self.read_audio(f"tests/speech_samples/test_audio_1.wav")
-        print(audio.shape)
-        if audio.ndim == 1:
-            audio = audio.reshape(1, -1)
-        else:
-            assert audio.ndim == 2, f"Input audio must have either 1 or 2 dimension. " \
-                                    f"But received {audio.ndim} instead"
-            assert audio.shape[0] == 1, f"stereo audio is not supported. " \
-                                        f"First dimension must be singleton. " \
-                                        f"But received {audio.shape[0]} instead."
-        if not torch.is_tensor(audio):
-            assert isinstance(audio, numpy.ndarray), "input audio must be of type " \
-                                                     "numpy.ndarray or torch.Tensor."
-            audio = torch.from_numpy(audio)
-
-        intermediate = self.model(audio).squeeze(0)
-        print(intermediate.shape)
-        recognized_text = self.decoder(intermediate.cpu())
-
-        return recognized_text
-
-
+# region model
 stt = SpeechToText()
-src_audio = stt.read_audio(f"tests/speech_samples/test_audio_1.wav")
+# endregion
 
 
-# system under test
+# region data_list
+src_audios = [stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in range(1, 3)]
+# endregion
+
+
+# region system under test
 # Parametrize the input (audio file indices), in this case: [0,4]
-@pytest.mark.parametrize('audio', [src_audio])
+@pytest.mark.parametrize('audio', src_audios)
 # Mark this function as the system under test
 @system
 def test_stt(audio):
     return stt.recognize(audio)
+# endregion
