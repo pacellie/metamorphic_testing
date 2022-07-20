@@ -1,9 +1,13 @@
 import inspect
+from sqlite3 import adapt
 import wrapt  # type: ignore
 
 
 def change_signature(adapt_func):
-    @wrapt.decorator(adapter=inspect.getfullargspec(adapt_func))
+    fullargspec = inspect.getfullargspec(adapt_func)
+    fullargspec.args.insert(0, 'name')
+
+    @wrapt.decorator(adapter=fullargspec)
     def change(wrapped, instance, args, kwargs):
         if instance is None:
             return wrapped(*args, **kwargs)
