@@ -6,10 +6,14 @@ from metamorphic_test.decorator import suite
 from metamorphic_test.report.html_generator import HTMLReportGenerator
 
 
+class NoMetamorphicMarkError(ValueError):
+    pass
+
+
 def find_metamorphic_mark(item):
     for mark in item.iter_markers(name='metamorphic'):
         return mark
-    raise ValueError('No metamorphic mark found')
+    raise NoMetamorphicMarkError('No metamorphic mark found')
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -24,7 +28,11 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
     extra = getattr(report, "extra", [])
 
     if report.when == "call":
-        m_mark: pytest.Mark = find_metamorphic_mark(item)
+        try:
+            m_mark: pytest.Mark = find_metamorphic_mark(item)
+        except NoMetamorphicMarkError:
+            # This is a non-metamorphic test
+            return
         test_id: TestID = item.funcargs['name']
         m_test = suite.get_test(test_id)
         # generate report
