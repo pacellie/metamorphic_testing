@@ -1,3 +1,4 @@
+from typing import Callable
 import pytest
 
 from metamorphic_test.suite import TestID
@@ -26,6 +27,7 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
             "pytest marker should have been added by the system decorator"
         test_id: TestID = item.funcargs['name']
         m_test = suite.get_test(test_id)
+        visualize_input: Callable = m_mark.kwargs.get("visualize_input", str)
         # Using `for report in m_test.reports:` breaks
         # the code in some very mysterious way:
         # There will be no report any more and even
@@ -34,7 +36,9 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
         # what's happening.
         # pylint: disable=consider-using-enumerate
         for i in range(len(m_test.reports)):
-            html = HTMLReportGenerator(m_test.reports[i]).generate()
+            generator = HTMLReportGenerator(m_test.reports[i])
+            setattr(generator, "visualize_input", visualize_input)
+            html = generator.generate()
             extra_html += f"<div>{html}</div>"
         extra_html = "<div>" + extra_html + "</div>"
         extra.append(pytest_html.extras.html(extra_html))
