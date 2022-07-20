@@ -80,7 +80,7 @@ def relation(*test_ids):
 # x: the actual input
 # execute all the tests of this module in the global suites variable by delegating
 # the the execute function of the MetamorphicTest class
-def system(flag=None, *, name: TestID = None):
+def system(flag=None, *, name: TestID = None, visualize_input=None):
     # TODO: This makes the decorator incompatible with
     # the pytest.mark.parametrize approach again
     # => only displayed as one test.
@@ -101,6 +101,7 @@ def system(flag=None, *, name: TestID = None):
         return pytest.mark.metamorphic(
             test_id=name,
             module=f.__module__,
+            visualize_input=visualize_input,
         )(wrapper(f))
 
     if flag is None:
