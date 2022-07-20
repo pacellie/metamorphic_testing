@@ -3,6 +3,7 @@ import random
 from typing import Callable, Any, Optional, List
 
 from metamorphic_test.report.execution_report import MetamorphicExecutionReport
+from metamorphic_test.report.string_generator import StringReportGenerator
 from .prioritized_transform import PrioritizedTransform
 
 from .logger import logger
@@ -93,4 +94,4 @@ class MetamorphicTest:
             assert relation_result
         finally:
             self.reports.append(report)
-            logger.info("\n%s\n", report)
+            logger.info("\n%s\n", StringReportGenerator(report).generate())

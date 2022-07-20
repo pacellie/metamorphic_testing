@@ -2,6 +2,7 @@ import pytest
 
 from metamorphic_test.suite import TestID
 from metamorphic_test.decorator import suite
+from metamorphic_test.report.html_generator import HTMLReportGenerator
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -40,7 +41,8 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
             # what's happening.
             # pylint: disable=consider-using-enumerate
             for i in range(len(m_test.reports)):
-                extra_html += f"<div>{ m_test.reports[i] }:</div>"
+                html = HTMLReportGenerator(m_test.reports[i]).generate()
+                extra_html += f"<div>{html}</div>"
         extra_html = "<div>" + extra_html + "</div>"
         extra.append(pytest_html.extras.html(extra_html))
         print("extra:", extra, extra_html)
