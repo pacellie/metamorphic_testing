@@ -20,6 +20,7 @@ from metamorphic_test.relations import equality
 
 brightness = metamorphic('brightness', relation=equality)
 contrast = metamorphic('contrast', relation=equality)
+both_transform = metamorphic('both_transform', relation=equality)
 both_cv2 = metamorphic('both_cv2', relation=equality)
 rain = metamorphic('rain', relation=equality)
 snow = metamorphic('snow', relation=equality)
@@ -35,6 +36,7 @@ vertical_flip = metamorphic('vertical_flip')
 
 
 @transformation(brightness)
+@transformation(both_transform)
 @randomized('beta', RandInt(-1, 1))
 def brightness_adjustments(image, beta):
     return np.clip(image + beta, 0, 255).astype(np.uint8)
@@ -44,6 +46,7 @@ def brightness_adjustments(image, beta):
 
 
 @transformation(contrast)
+@transformation(both_transform)
 @randomized('alpha', RandFloat(0.6, 1.5))
 def contrast_adjustments(image, alpha):
     return np.clip(alpha * image, 0, 255).astype(np.uint8)
@@ -176,7 +179,7 @@ classifier_under_test = TrafficSignClassifier()
 
 
 @pytest.mark.parametrize('image', test_images)
-@system(brightness, contrast, both_cv2, rain, snow, fog, gamma, equalize, downscale, noise,
-        clahe, blur, horizontal_flip, vertical_flip)
+@system(brightness, contrast, both_transform, both_cv2, rain, snow, fog, gamma,
+        equalize, downscale, noise, clahe, blur, horizontal_flip, vertical_flip)
 def test_image_classifier(image):
     return classifier_under_test.evaluate_image(image)
