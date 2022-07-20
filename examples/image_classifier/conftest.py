@@ -26,13 +26,13 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
             "pytest marker should have been added by the system decorator"
         test_id: TestID = item.funcargs['name']
         m_test = suite.get_test(test_id)
-            # Using `for report in m_test.reports:` breaks
-            # the code in some very mysterious way:
-            # There will be no report any more and even
-            # just `for report in m_test.reports: pass` will
-            # break the reporting. I have absolutely no idea
-            # what's happening.
-            # pylint: disable=consider-using-enumerate
+        # Using `for report in m_test.reports:` breaks
+        # the code in some very mysterious way:
+        # There will be no report any more and even
+        # just `for report in m_test.reports: pass` will
+        # break the reporting. I have absolutely no idea
+        # what's happening.
+        # pylint: disable=consider-using-enumerate
         for i in range(len(m_test.reports)):
             html = HTMLReportGenerator(m_test.reports[i]).generate()
             extra_html += f"<div>{html}</div>"

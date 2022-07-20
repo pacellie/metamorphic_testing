@@ -2,7 +2,7 @@ import pytest
 
 from .helper import change_signature
 from .generator import MetamorphicGenerator
-from .suite import Suite, TestID
+from .suite import Suite
 
 
 # A Suite maps module names with test names to the actual test instance
@@ -80,8 +80,6 @@ def relation(*test_ids):
 # x: the actual input
 # execute all the tests of this module in the global suites variable by delegating
 # the the execute function of the MetamorphicTest class
-import inspect
-
 def system(*names, **kwargs):
     def wrapper(test):
         @change_signature(test)

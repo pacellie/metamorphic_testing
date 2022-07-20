@@ -1,5 +1,4 @@
 import inspect
-from sqlite3 import adapt
 import wrapt  # type: ignore
 
 
