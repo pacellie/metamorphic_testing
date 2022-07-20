@@ -6,6 +6,12 @@ from metamorphic_test.decorator import suite
 from metamorphic_test.report.html_generator import HTMLReportGenerator
 
 
+def find_metamorphic_mark(item):
+    for mark in item.iter_markers(name='metamorphic'):
+        return mark
+    raise ValueError('No metamorphic mark found')
+
+
 @pytest.hookimpl(hookwrapper=True)
 # call param is needed for the hook signature to be correct
 # pylint: disable=unused-argument
@@ -18,32 +24,19 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
     extra = getattr(report, "extra", [])
 
     if report.when == "call":
-        extra_html = "<b>Reports</b><br/>"
-        # find the metamorphic mark
-        m_mark = None
-        for mark in item.own_markers:
-            if mark.name == "metamorphic":
-                m_mark = mark
-                break
-        assert m_mark is not None, \
-            "pytest marker should have been added by the system decorator"
+        m_mark: pytest.Mark = find_metamorphic_mark(item)
         test_id: TestID = item.funcargs['name']
         m_test = suite.get_test(test_id)
+        # generate report
+        generator = HTMLReportGenerator(m_test.reports[-1])
         visualize_input: Callable = m_mark.kwargs["visualize_input"] or str
-        # Using `for report in m_test.reports:` breaks
-        # the code in some very mysterious way:
-        # There will be no report any more and even
-        # just `for report in m_test.reports: pass` will
-        # break the reporting. I have absolutely no idea
-        # what's happening.
-        # pylint: disable=consider-using-enumerate
-        for i in range(len(m_test.reports)):
-            generator = HTMLReportGenerator(m_test.reports[i])
-            setattr(generator, "visualize_input", visualize_input)
-            html = generator.generate()
-            extra_html += f"<div>{html}</div>"
-        extra_html = "<div>" + extra_html + "</div>"
-        extra.append(pytest_html.extras.html(extra_html))
+        setattr(generator, "visualize_input", visualize_input)
+        extra_html = generator.generate()
+        # add report to pytest-html output
+        extra.append(pytest_html.extras.html(f"""
+            <b>Report:</b><br />
+            {extra_html}
+        """))
         report.extra = extra
 
 
