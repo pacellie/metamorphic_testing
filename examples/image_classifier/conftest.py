@@ -27,7 +27,7 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
             "pytest marker should have been added by the system decorator"
         test_id: TestID = item.funcargs['name']
         m_test = suite.get_test(test_id)
-        visualize_input: Callable = m_mark.kwargs.get("visualize_input", str)
+        visualize_input: Callable = m_mark.kwargs["visualize_input"] or str
         # Using `for report in m_test.reports:` breaks
         # the code in some very mysterious way:
         # There will be no report any more and even
