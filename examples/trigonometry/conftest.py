@@ -13,6 +13,7 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
     outcome = yield
     report = outcome.get_result()
     extra = getattr(report, "extra", [])
+
     if report.when == "call":
         extra_html = "<b>Reports</b><br/>"
         # find the metamorphic mark
@@ -23,25 +24,18 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
                 break
         assert m_mark is not None, \
             "pytest marker should have been added by the system decorator"
-        test_id: TestID = m_mark.kwargs["test_id"]
-        module: str = m_mark.kwargs["module"]
-        if test_id is None:
-            # means all tests in the module
-            # TODO: implement
-            print("Not implemented:", module)
-            extra_html += "<div>(Not yet implemented)</div>"
-        else:
-            m_test = suite.get_test(test_id)
+        test_id: TestID = item.funcargs['name']
+        m_test = suite.get_test(test_id)
             # Using `for report in m_test.reports:` breaks
             # the code in some very mysterious way:
             # There will be no report any more and even
             # just `for report in m_test.reports: pass` will
-            # break the reporting. I have absolutely no idea 
+            # break the reporting. I have absolutely no idea
             # what's happening.
             # pylint: disable=consider-using-enumerate
-            for i in range(len(m_test.reports)):
-                html = HTMLReportGenerator(m_test.reports[i]).generate()
-                extra_html += f"<div>{html}</div>"
+        for i in range(len(m_test.reports)):
+            html = HTMLReportGenerator(m_test.reports[i]).generate()
+            extra_html += f"<div>{html}</div>"
         extra_html = "<div>" + extra_html + "</div>"
         extra.append(pytest_html.extras.html(extra_html))
         report.extra = extra
