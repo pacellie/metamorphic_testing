@@ -2,13 +2,11 @@ from dataclasses import dataclass, field
 import random
 from typing import Callable, Any, Optional, List
 
+from metamorphic_test.report.execution_report import MetamorphicExecutionReport
+from metamorphic_test.report.string_generator import StringReportGenerator
+from .prioritized_transform import PrioritizedTransform
+
 from .logger import logger
-
-
-@dataclass
-class PrioritizedTransform:
-    transform: Callable[[Any], Any]
-    priority: int = 0
 
 
 Relation = Callable[[Any, Any], bool]
@@ -20,6 +18,9 @@ class MetamorphicTest:
         default_factory=lambda: []
     )
     relation: Optional[Relation] = None
+    reports: List[MetamorphicExecutionReport] = field(
+        default_factory=lambda: []
+    )
 
 
     def add_transform(self, transform, priority=0):
@@ -29,9 +30,6 @@ class MetamorphicTest:
         if self.relation:
             raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
         self.relation = relation
-
-    def _log_info(self, msg: str):
-        logger.info(msg)
 
 
     # x: the actual input
@@ -46,49 +44,54 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
-        # pylint: disable-msg=too-many-locals
         if not self.relation:
             raise ValueError(
                 f"No relation registered on {self.name}, cannot execute test."
             )
 
         random.shuffle(self.transforms)
-        prio_sorted_transforms = sorted(
-            self.transforms,
-            key=lambda tp: tp.priority,
-            reverse=True
+
+        report = MetamorphicExecutionReport(
+            x[0] if len(x) == 1 else x,
+            system, 
+            self.relation
         )
 
-        singular = len(x) == 1
+        try:
+            with report.register_output_x() as set_:
+                system_x = system(*x)
+                set_(system_x)
 
-        y = x[0] if singular else x
-        for p_transform in prio_sorted_transforms:
-            y = p_transform.transform(y) if singular else p_transform.transform(*y)
+            if len(x) == 1:
+                y = x[0]
+            else:
+                y = x
+            prio_sorted_transforms = sorted(
+                self.transforms,
+                key=lambda tp: tp.priority,
+                reverse=True
+            )
+            report.transforms = prio_sorted_transforms
 
-        system_x = system(*x)
-        system_y = system(y) if singular else system(*y)
+            for i, p_transform in enumerate(prio_sorted_transforms):
+                with report.register_transform_result(i) as set_:
+                    if len(x) == 1:
+                        y = p_transform.transform(y)
+                    else:
+                        y = p_transform.transform(*y)
+                    set_(y)
 
-        transform_names = [
-            p_transform.transform.__name__ for p_transform in self.transforms
-        ]
-        suite_text = f"[running suite '{self.name}']"
-        input_x_text = f"input x: {x[0] if len(x) == 1 else x}"
-        input_y_text = f"input y: {y}"
-        output_x_text = f"output x: {system_x}"
-        output_y_text = f"output y: {system_y}"
-        transforms_text = f"transform: {', '.join(transform_names)}"
-        relation_text = f"relation: {self.relation.__name__}"
+            with report.register_output_y() as set_:
+                if len(x) == 1:
+                    system_y = system(y)
+                else:
+                    system_y = system(*y)
+                set_(system_y)
 
-        self._log_info(
-            f"\n{suite_text}"
-            f"\n\t{input_x_text}"
-            f"\n\t{input_y_text}"
-            f"\n\t{output_x_text}"
-            f"\n\t{output_y_text}"
-            f"\n\t{transforms_text}"
-            f"\n\t{relation_text}"
-        )
-
-        assert self.relation(system_x, system_y), \
-            f"{suite_text}: {input_x_text} {input_y_text} {output_x_text}" \
-                f"{output_y_text} {transforms_text} {relation_text}"
+            with report.register_relation_result() as set_:
+                relation_result = self.relation(system_x, system_y)
+                set_(relation_result)
+            assert relation_result
+        finally:
+            self.reports.append(report)
+            logger.info("\n%s\n", StringReportGenerator(report).generate())

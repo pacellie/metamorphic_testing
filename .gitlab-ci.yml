@@ -82,3 +82,10 @@ house_pricing_example:
     allow_failure: true
     script:
         - poetry run example house_pricing
+
+image_classifier_example:
+    stage: examples
+    needs: []
+    allow_failure: true
+    script:
+        - poetry run example image_classifier

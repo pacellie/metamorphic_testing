@@ -1,7 +1,8 @@
+import pytest
+
 from .helper import change_signature
 from .generator import MetamorphicGenerator
-from .suite import Suite
-import pytest
+from .suite import Suite, TestID
 
 
 # A Suite maps module names with test names to the actual test instance
@@ -77,16 +78,33 @@ def relation(*test_ids):
 # test: the system under test function
 # name: the name of the metamorphic test to be run
 # x: the actual input
-# execute all given metamorphic tests by delegating
-# to the execute function of the MetamorphicTest class
-def system(*names):
+# execute all the tests of this module in the global suites variable by delegating
+# the the execute function of the MetamorphicTest class
+def system(flag=None, *, name: TestID = None, visualize_input=None):
+    # TODO: This makes the decorator incompatible with
+    # the pytest.mark.parametrize approach again
+    # => only displayed as one test.
     def wrapper(test):
         @change_signature(test)
-        def execute(name, *args, **kwargs):
-            if kwargs:
+        def execute(*args, **kwargs):
+            if kwargs:  # to be compatible with both given and pytest
                 args = tuple(kwargs.values())
-            suite.execute(name, test, *args)
+            if name is None:
+                suite.execute_all(test, *args)
+            else:
+                suite.execute(name, test, *args)
+            return suite
 
-        return pytest.mark.parametrize('name', names)(execute)
+        return execute
 
-    return wrapper
+    def mark_wrap(f):
+        return pytest.mark.sjkfhgkjhsdfgkj(
+            test_id=name,
+            module=f.__module__,
+            visualize_input=visualize_input,
+        )(wrapper(f))
+
+    if flag is None:
+        return mark_wrap
+    # flag is actually the function to be wrapped
+    return mark_wrap(flag)

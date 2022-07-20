@@ -78,6 +78,7 @@ def approximately_negate(x, y):
 
 @pytest.mark.skip
 @pytest.mark.parametrize('x', range(-10, 10))
-@system(test_two_pi, test_negate_x, test_plus_pi, test_pi_minus_x)
+# TODO: make this work again with multiple tests for one system
+@system(name=test_two_pi) # test_negate_x, test_plus_pi, test_pi_minus_x
 def test(x):
     return MathLibrary.sin(x)
