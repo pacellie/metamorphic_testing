@@ -11,6 +11,8 @@ from metamorphic_test.report.html_generator import HTMLReportGenerator
 # pylint: disable=unused-argument
 def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
     pytest_html = item.config.pluginmanager.getplugin("html")
+    if pytest_html is None:
+        return  # skip if no HTML plugin is available
     outcome = yield
     report = outcome.get_result()
     extra = getattr(report, "extra", [])

@@ -11,6 +11,9 @@ lint = "scripts.lint:lint"
 test = "scripts.run_tests:run_tests"
 example = "scripts.run_tests:run_example"
 
+[tool.poetry.plugins."pytest11"]
+metamorphic = "metamorphic_test"
+
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
 hypothesis = "^6.49.1"
