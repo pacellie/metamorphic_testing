@@ -86,6 +86,45 @@ def randomized(arg, generator):
 # (transform, priority) pair to the already present transformations of the given
 # metamorphic test
 def transformation(name, *, priority=0):
+    """
+    This function decorator registers the decorated function as a transformation for a
+    pre-defined metamorphic test given by 'name' parameter.
+
+    Parameters
+    ----------
+    name : str
+        Name of the metamorphic test that is supposed to use the decorated function
+        as transformation
+    priority : int
+        Priority of the transformation. While using multiple transformations, use this
+        priority to set a specific order between the transformations if order is important
+        for a use case. The higher the value the earlier the transformation will be applied.
+        Transformations with equal priority will be executed is a randomly shuffled order.
+        Please note this is a keyword only argument. Default: 0
+
+    Returns
+    -------
+    wrapper : callable
+        returns a function which would ultimately register the transformation to suite
+
+    See Also
+    --------
+    system : register and execute tests for the system under test.
+    metamorphic : register a new metamorphic test
+    suite : the object that holds all the metamorphic transformations and relations
+
+    Examples
+    --------
+    identifier = metamorphic('A', relation=approximately)
+
+    @transformation(identifier)
+    def negate(x):
+        return -x
+
+    @system(name=identifier)
+    def test_function(input):
+        func(input)
+    """
     def wrapper(transform):
         suite.transformation(name, transform, priority=priority)
         return transform

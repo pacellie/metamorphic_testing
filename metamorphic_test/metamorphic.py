@@ -10,10 +10,9 @@ class MetamorphicTest:
     transforms: List[Tuple[Callable[[Any], Any], int]] = field(default_factory=list)
     relation: Optional[Callable[[Any, Any], bool]] = None
 
-
     # x: the actual input
     # system: the system under test
-    # Idea: given tansformations (t1, 0), (t2, 0), (t3, 1), (t4, 2) which have been registered
+    # Idea: given transformations (t1, 0), (t2, 0), (t3, 1), (t4, 2) which have been registered
     #       in any order we want to apply them either in order t4, t3, t2, t1 or t4, t3, t1,
     #       t2. In other words: higher priority means first, same priority means random order.
     # (1) shuffle all transforms
