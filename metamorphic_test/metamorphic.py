@@ -25,7 +25,7 @@ class MetamorphicTest:
 
     def add_transform(self, transform, priority=0):
         self.transforms.append(PrioritizedTransform(transform, priority))
-    
+
     def set_relation(self, relation):
         if self.relation:
             raise ValueError(f"Relation to {self.name} already set ({self.relation}).")

@@ -74,11 +74,16 @@ def relation(*test_ids):
     return wrapper
 
 
+# names: the names of the metamorphic tests to be run
 # test: the system under test function
+# name: the name of the metamorphic test to be run
 # x: the actual input
 # execute all the tests of this module in the global suites variable by delegating
 # the the execute function of the MetamorphicTest class
 def system(flag=None, *, name: TestID = None):
+    # TODO: This makes the decorator incompatible with
+    # the pytest.mark.parametrize approach again
+    # => only displayed as one test.
     def wrapper(test):
         @change_signature(test)
         def execute(*args, **kwargs):

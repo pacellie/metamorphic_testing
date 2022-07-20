@@ -60,27 +60,10 @@ class Suite:
         self.tests[test_id].set_relation(relation)
 
     def execute(self, test_id, test_function, *args):
-        assert test_id is not None, "Use execute_all"
+        assert test_id is not None, "Test id is 'None'"
         logger.debug(
             "Executing %test_id in %(test_function)",
             test_id=test_id,
             test_function=test_function.__module__
         )
         self.tests[test_id].execute(test_function, *args)
-
-    def _belongs_to(self, test_id: str, module_name: str) -> bool:
-        """Check if the given test belongs to the given module."""
-        return test_id.startswith(f"{module_name}.")
-
-    def execute_all(self, test_function, *args):
-        logger.debug(
-            "Executing all tests in %(test_function)",
-            test_function=test_function.__module__
-        )
-        for full_name, m_test in self.tests.items():
-            if self._belongs_to(full_name, test_function.__module__):
-                logger.debug(
-                    "Executing %(full_name)",
-                    full_name=full_name
-                )
-                m_test.execute(test_function, *args)

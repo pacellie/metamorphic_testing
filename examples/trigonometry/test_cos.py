@@ -20,7 +20,7 @@ def shift(x, n, c):
     return x + 2 * n * math.pi + c
 
 
-@pytest.mark.parametrize('x', range(-1, 1))
-@system
+@pytest.mark.parametrize('x', range(-10, 10))
+@system(name=A)
 def test_cos(x):
     return math.cos(x)
