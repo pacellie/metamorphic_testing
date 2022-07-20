@@ -21,6 +21,6 @@ def shift(x, n, c):
 
 
 @pytest.mark.parametrize('x', range(-10, 10))
-@system(name=A)
+@system(A)
 def test_cos(x):
     return math.cos(x)
