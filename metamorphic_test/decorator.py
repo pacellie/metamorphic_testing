@@ -98,7 +98,7 @@ def system(flag=None, *, name: TestID = None, visualize_input=None):
         return execute
 
     def mark_wrap(f):
-        return pytest.mark.metamorphic(
+        return pytest.mark.sjkfhgkjhsdfgkj(
             test_id=name,
             module=f.__module__,
             visualize_input=visualize_input,

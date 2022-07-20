@@ -21,13 +21,14 @@ class HTMLReportGenerator(ReportGenerator):
         rows = []
         rows.append([self.visualize_input(self.report.input_x)])
         # add transform names
+        last_transform_result = None
         for transform_index, transform_result in enumerate(self.report.transform_results):
             rows.append(
                 [f"⇩ {self.report.transforms[transform_index].get_name()}", "", "", "", "|"]
             )
-            rows.append([str(transform_result), "", "", "", "|"])
+            rows.append([self.visualize_input(transform_result.output), "", "", "", "|"])
             last_transform_result = transform_result
-        if last_transform_result.error is None:
+        if last_transform_result is not None and last_transform_result.error is None:
             rows[-1][0] = self.visualize_input(last_transform_result.output)
         # add system name with arrows
         system_name = self.report.system.__name__

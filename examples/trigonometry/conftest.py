@@ -15,7 +15,6 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
     extra = getattr(report, "extra", [])
     if report.when == "call":
         extra_html = "<b>Reports</b><br/>"
-        print("appended extra for", report, extra)
         # find the metamorphic mark
         m_mark = None
         for mark in item.own_markers:
@@ -45,7 +44,6 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
                 extra_html += f"<div>{html}</div>"
         extra_html = "<div>" + extra_html + "</div>"
         extra.append(pytest_html.extras.html(extra_html))
-        print("extra:", extra, extra_html)
         report.extra = extra
 
 
