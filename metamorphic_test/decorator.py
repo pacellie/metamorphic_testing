@@ -1,6 +1,8 @@
+import pytest
+
 from .helper import change_signature
 from .generator import MetamorphicGenerator
-from .suite import Suite
+from .suite import Suite, TestID
 
 
 # A Suite maps module names with test names to the actual test instance
@@ -76,7 +78,7 @@ def relation(*test_ids):
 # x: the actual input
 # execute all the tests of this module in the global suites variable by delegating
 # the the execute function of the MetamorphicTest class
-def system(flag=None, *, name=None):
+def system(flag=None, *, name: TestID = None):
     def wrapper(test):
         @change_signature(test)
         def execute(*args, **kwargs):
@@ -90,6 +92,13 @@ def system(flag=None, *, name=None):
 
         return execute
 
+    def mark_wrap(f):
+        return pytest.mark.metamorphic(
+            test_id=name,
+            module=f.__module__,
+        )(wrapper(f))
+
     if flag is None:
-        return wrapper
-    return wrapper(flag)
+        return mark_wrap
+    # flag is actually the function to be wrapped
+    return mark_wrap(flag)

@@ -17,7 +17,6 @@ from metamorphic_test.relations import approximately
 A = metamorphic('A', relation=approximately)
 B = metamorphic('B')
 C = metamorphic('C')
-D = metamorphic('D')
 
 
 # Register the 'shift' transform for test A with default priority 0 and test C

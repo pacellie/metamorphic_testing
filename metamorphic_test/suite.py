@@ -13,6 +13,9 @@ TestID = Hashable  # only guarantee made for outside use
 class Suite:
     def __init__(self):
         self.tests: Dict[TestID, MetamorphicTest] = {}
+    
+    def get_test(self, test_id: TestID) -> MetamorphicTest:
+        return self.tests[test_id]
 
     @staticmethod
     def get_caller_module():
