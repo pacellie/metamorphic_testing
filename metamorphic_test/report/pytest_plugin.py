@@ -39,7 +39,9 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
         # generate report
         generator = HTMLReportGenerator(m_test.reports[-1])
         visualize_input: Callable = m_mark.kwargs["visualize_input"] or str
+        visualize_output: Callable = m_mark.kwargs["visualize_output"] or str
         setattr(generator, "visualize_input", visualize_input)
+        setattr(generator, "visualize_output", visualize_output)
         extra_html = generator.generate()
         # add report to pytest-html output
         extra.append(pytest_html.extras.html(f"""
