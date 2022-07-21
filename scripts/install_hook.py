@@ -6,7 +6,7 @@ import stat
 def install_hook() -> None:
     hook_path = Path.cwd() / ".git" / "hooks" / "pre-commit"
     if hook_path.exists():
-        shutil.move(hook_path, hook_path.with_suffix(".bak"))
+        shutil.move(hook_path, hook_path.with_suffix(".bak")) # type: ignore
         print("Backed up old hook to pre-commit.bak")
     with hook_path.open("w", encoding="utf-8") as f:
         f.write("#!/bin/sh\n")

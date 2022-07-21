@@ -28,7 +28,7 @@ C = metamorphic('C')
 # '0' or thunks, functions of the form lambda: value, e.g. 'randint(1, 10)'
 @randomized('n', RandInt(1, 10))
 @fixed('c', 0)
-def shift(x, n, c):
+def shift(x: float, n: int, c: int) -> float:
     return x + 2 * n * math.pi + c
 
 
@@ -36,13 +36,13 @@ def shift(x, n, c):
 # with priority 0.
 @transformation(B)
 @transformation(C, priority=0)
-def negate(x):
+def negate(x: float) -> float:
     return -x
 
 
 # Register the 'approximately_negate' relation for test B and test C.
 @relation(B, C)
-def approximately_negate(x, y):
+def approximately_negate(x: float, y: float) -> bool:
     return approximately(-x, y)
 
 
@@ -50,5 +50,5 @@ def approximately_negate(x, y):
 @pytest.mark.parametrize('x', range(-10, 10))
 # Mark this function as the system under test
 @system(A, B, C)
-def test_sin(x):
+def test_sin(x: float) -> float:
     return math.sin(x)
