@@ -10,7 +10,7 @@ class RelationDoesNotHoldError(Exception):
 def error_html(error: Exception) -> str:
     if isinstance(error, RelationDoesNotHoldError):
         return '<span class="error">does not hold</span>'
-    error_str = traceback.format_tb(error.__traceback__)[-1].replace("\n", "<br />")
+    error_str = traceback.format_tb(error.__traceback__)[-1].replace('\n', '<br>')
     return f'<span class="error">{error_str}</span>'
 
 
@@ -83,7 +83,7 @@ class HTMLReportGenerator(ReportGenerator):
         if x_err:
             output_x_str = f"""
                 {error_html(self.report.output_x.error)}
-                <br />
+                <br>
                 (⇨ Transformations skipped)
             """
         else:
@@ -106,7 +106,7 @@ class HTMLReportGenerator(ReportGenerator):
         if self._transform_error_occurred() or self.report.output_y.error is not None:
             holds_str = placeholder_html("(skipped)")
         elif self.report.relation_result.error:
-            holds_str = "<br />" + error_html(self.report.relation_result.error)
+            holds_str = "<br>" + error_html(self.report.relation_result.error)
         elif self.report.relation_result.output:
             holds_str = "holds"
         else:
@@ -132,4 +132,4 @@ class HTMLReportGenerator(ReportGenerator):
         self._add_column(rows, fill="|")
         self._add_outputs(rows)
         self._add_relation(rows)
-        return self._list_to_table(rows) + "<br/>"
+        return self._list_to_table(rows) + "<br>"
