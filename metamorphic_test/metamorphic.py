@@ -85,7 +85,11 @@ class MetamorphicTest:
                 relation_result = self.relation(system_x, system_y)
                 set_(relation_result)
 
-            assert relation_result
+            assert relation_result, \
+                f"{self.name} failed: " \
+                f"x: {x[0] if singular else x}, " \
+                f"transform: {', '.join([t.get_name() for t in prio_sorted_transforms])}, " \
+                f"relation: {self.relation.__name__}"
         finally:
             self.reports.append(report)
             logger.info("\n%s\n", StringReportGenerator(report).generate())
