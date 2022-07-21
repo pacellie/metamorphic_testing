@@ -1,9 +1,21 @@
 from typing import Callable, List
+import traceback
 from .report_generator import ReportGenerator
 
 
-def error_html(error_message: str) -> str:
-    return f'<span class="error">{error_message}</span>'
+class RelationDoesNotHoldError(Exception):
+    pass
+
+
+def error_html(error: Exception) -> str:
+    if isinstance(error, RelationDoesNotHoldError):
+        return '<span class="error">does not hold</span>'
+    error_str = traceback.format_tb(error.__traceback__)[-1].replace("\n", "<br />")
+    return f'<span class="error">{error_str}</span>'
+
+
+def placeholder_html(s: str) -> str:
+    return f'<i>{s}</i>'
 
 
 class HTMLReportGenerator(ReportGenerator):
@@ -30,48 +42,75 @@ class HTMLReportGenerator(ReportGenerator):
         and their results.
         """
         # start with initial input
-        rows = [self.visualize_input(self.report.input_x)]
+        column = [self.visualize_input(self.report.input_x)]
+        previous_fail = False
         for transform_index, transform_result in enumerate(self.report.transform_results):
-            rows.append(
+            column.append(
                 f"⇩ {self.report.transforms[transform_index].get_name()}"
             )
-            if transform_result.error:
-                rows.append(error_html(transform_result.error))
+            if previous_fail:
+                column.append(placeholder_html("(skipped)"))
+            elif transform_result.error:
+                column.append(error_html(transform_result.error))
+                previous_fail = True
             else:
-                rows.append(self.visualize_input(transform_result.output))
-        return rows
+                column.append(self.visualize_input(transform_result.output))
+        return column
     
     @staticmethod
     def _add_column(to: List[List], fill=""):
         for x in to:
             x.append(fill)
     
+    def _transform_error_occurred(self) -> bool:
+        return any(
+            transform_result.error is not None
+            for transform_result in self.report.transform_results
+        )
+    
     def _add_system_name(self, rows: List[List[str]]):
         """Put the system name in the second column of the first & last row."""
         system_name = self.report.system.__name__
-        rows[0][1] = rows[-1][1] = f"⇨ {system_name} ⇨"
+        rows[0][1] = f"⇨ {system_name} ⇨"
+        if self._transform_error_occurred():
+            system_name += placeholder_html(" (skipped)")
+        rows[-1][1] = f"⇨ {system_name} ⇨"
     
     def _add_outputs(self, rows: List[List[str]]):
         """Add the outputs in the last column of the first & last row."""
-        if self.report.output_x.error:
-            output_x_str = error_html(self.report.output_x.error)
+        x_err = self.report.output_x.error is not None
+        y_err = self.report.output_y.error is not None
+        if x_err:
+            output_x_str = f"""
+                {error_html(self.report.output_x.error)}
+                <br />
+                (⇨ Transformations skipped)
+            """
         else:
             output_x_str = self.visualize_output(self.report.output_x.output)
         rows[0][-1] = output_x_str
-        if self.report.output_y.error:
-            output_y_str = error_html(self.report.output_y.error)
-        else:
-            output_y_str = self.visualize_output(self.report.output_y.output)
-        rows[-1][-1] = output_y_str
+        if not x_err:
+            if self._transform_error_occurred():
+                output_y_str = placeholder_html("(skipped)")
+            elif y_err:
+                output_y_str = error_html(self.report.output_y.error)
+            else:
+                output_y_str = self.visualize_output(self.report.output_y.output)
+            rows[-1][-1] = output_y_str
     
     def _add_relation(self, rows: List[List[str]]):
         """Add the relation in the last row in the middle."""
-        if self.report.relation_result.error:
-            holds_str = error_html(self.report.relation_result.error)
+        if self.report.output_x.error is not None:
+            # Everything just stopped, no relation annotation
+            return
+        if self._transform_error_occurred() or self.report.output_y.error is not None:
+            holds_str = placeholder_html("(skipped)")
+        elif self.report.relation_result.error:
+            holds_str = "<br />" + error_html(self.report.relation_result.error)
         elif self.report.relation_result.output:
             holds_str = "holds"
         else:
-            holds_str = error_html("does not hold")
+            holds_str = error_html(RelationDoesNotHoldError())
         rows[len(rows) // 2][-1] = (
             f"⇵ {self.report.relation.__name__} {holds_str}"
         )
