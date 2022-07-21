@@ -22,6 +22,7 @@ def find_metamorphic_mark(item):
 def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
     pytest_html = item.config.pluginmanager.getplugin("html")
     if pytest_html is None:
+        yield  # needed for the hook
         return  # skip if no HTML plugin is available
     outcome = yield
     report = outcome.get_result()
