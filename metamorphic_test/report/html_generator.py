@@ -157,7 +157,7 @@ class HTMLReportGenerator(ReportGenerator):
             for entry in row:
                 table_inner += f'<td class="metamorphic__td">{entry}</td>'
             table_inner += '</tr>'
-        return f'<table>{table_inner}</table>'
+        return f'<table class="metamorphic__table">{table_inner}</table>'
     
     def _get_js(self):
         return (Path(__file__).parent / "js" / "report.js").read_text()

@@ -7,7 +7,11 @@
     display: none;
 }
 
-.metamorphic__td {
+table.metamorphic__table {
+    margin: 8px;
+}
+
+td.metamorphic__td {
     min-width: 60px;
 }
 

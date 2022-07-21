@@ -45,7 +45,7 @@ def pytest_runtest_makereport(item: pytest.TestReport, call: pytest.CallInfo):
         extra_html = generator.generate()
         # add report to pytest-html output
         extra.append(pytest_html.extras.html(f"""
-            <b>Report:</b><br>
+            <b>Metamorphic Diagram:</b><br>
             {extra_html}
         """))
         report.extra = extra
