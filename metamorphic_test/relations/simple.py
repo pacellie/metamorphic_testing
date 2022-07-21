@@ -1,8 +1,8 @@
 def equality(x, y):
     return x == y
 
-def becomes_larger(x, y):
+def less_than(x, y):
     return x < y
 
-def becomes_smaller(x, y):
+def greater_than(x, y):
     return x > y
