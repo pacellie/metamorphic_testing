@@ -7,9 +7,12 @@ authors = ["Python Practicum TUM 2022"]
 [tool.poetry.scripts]
 cov = "scripts.cov:html_coverage"
 install-hook = "scripts.install_hook:install_hook"
-lint = "prospector.run:main"
+lint = "scripts.lint:lint"
 test = "scripts.run_tests:run_tests"
 example = "scripts.run_tests:run_example"
+
+[tool.poetry.plugins."pytest11"]
+metamorphic = "metamorphic_test"
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"

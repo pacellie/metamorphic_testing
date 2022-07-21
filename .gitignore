@@ -1,4 +1,7 @@
 .vscode
+report.html
+assets/*
+!assets/.gitkeep
 
 
 # Created by setuppyproj v2.2 (from https://www.gitignore.io/api/linux,python,visualstudiocode)

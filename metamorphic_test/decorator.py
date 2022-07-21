@@ -1,7 +1,8 @@
+import pytest
+
 from .helper import change_signature
 from .generator import MetamorphicGenerator
 from .suite import Suite
-import pytest
 
 
 # A Suite maps module names with test names to the actual test instance
@@ -77,9 +78,9 @@ def relation(*test_ids):
 # test: the system under test function
 # name: the name of the metamorphic test to be run
 # x: the actual input
-# execute all given metamorphic tests by delegating
-# to the execute function of the MetamorphicTest class
-def system(*names):
+# execute all the tests of this module in the global suites variable by delegating
+# the the execute function of the MetamorphicTest class
+def system(*names, **kwargs):
     def wrapper(test):
         @change_signature(test)
         def execute(name, *args, **kwargs):
@@ -87,6 +88,10 @@ def system(*names):
                 args = tuple(kwargs.values())
             suite.execute(name, test, *args)
 
-        return pytest.mark.parametrize('name', names)(execute)
+        return pytest.mark.metamorphic(
+            visualize_input=kwargs.get('visualize_input', None)
+        )(
+            pytest.mark.parametrize('name', names)(execute)
+        )
 
     return wrapper

@@ -1,6 +1,10 @@
+from pathlib import Path
+import random
+
 import numpy as np
 import cv2  # type: ignore
 import albumentations  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
 import pytest
 # mypy complains that cv2 (and torchvision) has no stubs / not PEP 561-compliant
 # thus is skipped. Same with matplotlib in classifier. Should we ignore?
@@ -178,8 +182,20 @@ test_images, test_labels = read_traffic_signs()
 classifier_under_test = TrafficSignClassifier()
 
 
+def visualize(image):
+    path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
+    try:
+        plt.imsave(path, image)
+    except Exception as e:
+        print(e)
+    return f"""
+    <img src="{path}" width="53" height="54">
+"""
+
+
 @pytest.mark.parametrize('image', test_images)
-@system(brightness, contrast, both_transform, both_cv2, rain, snow, fog, gamma,
-        equalize, downscale, noise, clahe, blur, horizontal_flip, vertical_flip)
+@system(horizontal_flip, visualize_input=visualize)
+# brightness, contrast, both_transform, both_cv2, rain, snow, fog, gamma, equalize,
+#        downscale, noise, clahe, blur, horizontal_flip, vertical_flip)
 def test_image_classifier(image):
     return classifier_under_test.evaluate_image(image)
