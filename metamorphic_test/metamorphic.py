@@ -1,15 +1,14 @@
 from dataclasses import dataclass, field
 import random
-from typing import Callable, Any, Optional, List
+from typing import Callable, Optional, List
 
 from metamorphic_test.report.execution_report import MetamorphicExecutionReport
 from metamorphic_test.report.string_generator import StringReportGenerator
 from .prioritized_transform import PrioritizedTransform
-
+from .transform import Transform
+from .rel import Relation
 from .logger import logger
 
-
-Relation = Callable[[Any, Any], bool]
 
 @dataclass
 class MetamorphicTest:
@@ -23,10 +22,10 @@ class MetamorphicTest:
     )
 
 
-    def add_transform(self, transform, priority=0):
+    def add_transform(self, transform: Transform, priority:int = 0) -> None:
         self.transforms.append(PrioritizedTransform(transform, priority))
 
-    def set_relation(self, relation):
+    def set_relation(self, relation: Relation) -> None:
         if self.relation:
             raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
         self.relation = relation
@@ -43,7 +42,7 @@ class MetamorphicTest:
     # (3) apply the transforms one after the other two the input 'x' to obtain the output 'y'
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
-    def execute(self, system, *x):
+    def execute(self, system: Callable, *x: tuple) -> None:
         if not self.relation:
             raise ValueError(
                 f"No relation registered on {self.name}, cannot execute test."
@@ -53,7 +52,7 @@ class MetamorphicTest:
 
         report = MetamorphicExecutionReport(
             x[0] if len(x) == 1 else x,
-            system, 
+            system,
             self.relation
         )
 
