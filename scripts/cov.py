@@ -4,7 +4,7 @@ from os import getcwd
 import sys
 
 
-def html_coverage():
+def html_coverage() -> None:
     try:
         run(
             ["poetry", "run", "coverage", "run", "-m", "pytest", "tests"],

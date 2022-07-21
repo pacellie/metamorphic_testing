@@ -3,7 +3,7 @@ import shutil
 import os
 import stat
 
-def install_hook():
+def install_hook() -> None:
     hook_path = Path.cwd() / ".git" / "hooks" / "pre-commit"
     if hook_path.exists():
         shutil.move(hook_path, hook_path.with_suffix(".bak"))
