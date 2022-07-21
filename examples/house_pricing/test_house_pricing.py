@@ -8,7 +8,7 @@ from metamorphic_test import (
     randomized,
 )
 from metamorphic_test.generators import RandInt
-from metamorphic_test.relations import becomes_larger, approximately, or_
+from metamorphic_test.relations import less_than, approximately, or_
 
 from .house_pricing import (
     HousingPricePredictor,
@@ -25,7 +25,7 @@ hide_labels(test_set)  # otherwise this MT would be somewhat pointless
 
 HousePriceTest = metamorphic(
     'HousePriceTest',
-    relation=or_(approximately, becomes_larger)
+    relation=or_(approximately, less_than)
 )
 
 @transformation(HousePriceTest)
