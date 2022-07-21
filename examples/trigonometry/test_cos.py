@@ -16,11 +16,11 @@ A = metamorphic('A', relation=approximately)
 @transformation(A)
 @randomized('n', RandInt(1, 10))
 @fixed('c', 0)
-def shift(x, n, c):
+def shift(x: float, n: int, c: int) -> float:
     return x + 2 * n * math.pi + c
 
 
 @pytest.mark.parametrize('x', range(-10, 10))
 @system(A)
-def test_cos(x):
+def test_cos(x: float) -> float:
     return math.cos(x)
