@@ -92,4 +92,8 @@ class MetamorphicTest:
                 f"relation: {self.relation.__name__}"
         finally:
             self.reports.append(report)
-            logger.info("\n%s\n", StringReportGenerator(report).generate())
+            msg = f"\n{StringReportGenerator(report).generate()}\n"
+            if relation_result:
+                logger.info(msg)
+            else:
+                logger.error(msg)
