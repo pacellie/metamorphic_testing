@@ -53,8 +53,16 @@ class HTMLReportGenerator(ReportGenerator):
     
     def _add_outputs(self, rows: List[List[str]]):
         """Add the outputs in the last column of the first & last row."""
-        rows[0][-1] = self.visualize_output(self.report.output_x)
-        rows[-1][-1] = self.visualize_output(self.report.output_y)
+        if self.report.output_x.error:
+            output_x_str = error_html(self.report.output_x.error)
+        else:
+            output_x_str = self.visualize_output(self.report.output_x.output)
+        rows[0][-1] = output_x_str
+        if self.report.output_y.error:
+            output_y_str = error_html(self.report.output_y.error)
+        else:
+            output_y_str = self.visualize_output(self.report.output_y.output)
+        rows[-1][-1] = output_y_str
     
     def _add_relation(self, rows: List[List[str]]):
         """Add the relation in the last row in the middle."""
