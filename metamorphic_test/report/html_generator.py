@@ -32,7 +32,9 @@ def error_html(error: Exception) -> str:
     <span id="{error_id}_full" class="metamorphic__error metamorphic__hidden">
         {quick_sanitize_html(full_error_str)}
     </span>
-    <button onclick="metamorphic.toggleFullError('{error_id}')">
+    <button
+        class="metamorphic__error_button"
+        onclick="metamorphic.toggleFullError('{error_id}')">
         Toggle full error
     </button>
     '''
@@ -116,7 +118,7 @@ class HTMLReportGenerator(ReportGenerator):
             output_x_str = f"""
                 {error_html(self.report.output_x.error)}
                 <br>
-                (⇨ Transformations skipped)
+                {placeholder_html("(⇨ Transformations skipped)")}
             """
         else:
             output_x_str = self.visualize_output(self.report.output_x.output)
@@ -151,11 +153,11 @@ class HTMLReportGenerator(ReportGenerator):
     def _list_to_table(rows: List[List[str]]):
         table_inner = ""
         for row in rows:
-            table_inner += "<tr>"
+            table_inner += '<tr>'
             for entry in row:
-                table_inner += f"<td>{entry}</td>"
-            table_inner += "</tr>"
-        return f"<table>{table_inner}</table>"
+                table_inner += f'<td class="metamorphic__td">{entry}</td>'
+            table_inner += '</tr>'
+        return f'<table>{table_inner}</table>'
     
     def _get_js(self):
         return (Path(__file__).parent / "js" / "report.js").read_text()

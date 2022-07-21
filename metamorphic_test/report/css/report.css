@@ -6,3 +6,17 @@
 .metamorphic__hidden {
     display: none;
 }
+
+.metamorphic__td {
+    min-width: 60px;
+}
+
+.metamorphic__error_button {
+    font-size: 0.8em;
+    font-family: monospace;
+    border: none;
+    background: transparent;
+    padding: 8px 0px;
+    text-align: left;
+    cursor: pointer;
+}
