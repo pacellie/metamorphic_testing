@@ -1,0 +1,8 @@
+.metamorphic__error {
+    color: red;
+    font-family: monospace;
+}
+
+.metamorphic__hidden {
+    display: none;
+}

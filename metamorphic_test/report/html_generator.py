@@ -1,5 +1,9 @@
+from pathlib import Path
 from typing import Callable, List
 import traceback
+import random
+
+from .execution_report import MetamorphicExecutionReport
 from .report_generator import ReportGenerator
 
 
@@ -7,11 +11,31 @@ class RelationDoesNotHoldError(Exception):
     pass
 
 
+def quick_sanitize_html(s: str) -> str:
+    return s \
+        .replace('<', '&lt;') \
+        .replace('>', '&gt;') \
+        .replace('\n', '<br>')
+
+
 def error_html(error: Exception) -> str:
     if isinstance(error, RelationDoesNotHoldError):
-        return '<span class="error">does not hold</span>'
-    error_str = traceback.format_tb(error.__traceback__)[-1].replace('\n', '<br>')
-    return f'<span class="error">{error_str}</span>'
+        return '<span class="metamorphic__error">does not hold</span>'
+    full_error_str = ''.join(
+        traceback.format_exception(type(error), error, error.__traceback__))
+    error_str = traceback.format_tb(error.__traceback__)[-1]
+    error_id = f'metamorphic_error_{random.randint(0, 1000000000)}'  # nosec
+    return f'''
+    <span id="{error_id}" class="metamorphic__error">
+        {quick_sanitize_html(error_str)}
+    </span>
+    <span id="{error_id}_full" class="metamorphic__error metamorphic__hidden">
+        {quick_sanitize_html(full_error_str)}
+    </span>
+    <button onclick="metamorphic.toggleFullError('{error_id}')">
+        Toggle full error
+    </button>
+    '''
 
 
 def placeholder_html(s: str) -> str:
@@ -30,6 +54,14 @@ class HTMLReportGenerator(ReportGenerator):
     | ...                                 |
     transform_result[-1] -> system -> output_y
     """
+
+    def __init__(
+            self, report: MetamorphicExecutionReport,
+            include_js: bool = True, include_css: bool = True
+        ):
+        super().__init__(report)
+        self.include_js = include_js
+        self.include_css = include_css
 
     # a function to change how the inputs look (left side, before system)
     visualize_input: Callable[..., str] = str
@@ -124,6 +156,20 @@ class HTMLReportGenerator(ReportGenerator):
                 table_inner += f"<td>{entry}</td>"
             table_inner += "</tr>"
         return f"<table>{table_inner}</table>"
+    
+    def _get_js(self):
+        return (Path(__file__).parent / "js" / "report.js").read_text()
+    
+    def _get_css(self):
+        return (Path(__file__).parent / "css" / "report.css").read_text()
+    
+    def _get_inline_assets(self):
+        assets = ""
+        if self.include_js:
+            assets += f'<script type="text/javascript">{self._get_js()}</script>'
+        if self.include_css:
+            assets += f'<style type="text/css">{self._get_css()}</style>'
+        return assets
 
     def generate(self) -> str:
         rows = [[c] for c in self._generate_transform_column()]
@@ -132,4 +178,6 @@ class HTMLReportGenerator(ReportGenerator):
         self._add_column(rows, fill="|")
         self._add_outputs(rows)
         self._add_relation(rows)
-        return self._list_to_table(rows) + "<br>"
+        return  self._list_to_table(rows) \
+                + "<br>" \
+                + self._get_inline_assets()
