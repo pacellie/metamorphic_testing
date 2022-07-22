@@ -2,7 +2,7 @@ from subprocess import CalledProcessError, run  # nosec
 import sys
 
 
-def lint():
+def lint() -> None:
     try:
         run(
             [

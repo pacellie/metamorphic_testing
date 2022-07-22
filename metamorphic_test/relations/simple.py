@@ -1,8 +1,12 @@
-def equality(x, y):
+from metamorphic_test.rel import A, B
+
+def equality(x: A, y: A) -> bool:
     return x == y
 
-def becomes_larger(x, y):
+
+def is_less_than(x: B, y: B) -> bool:
     return x < y
 
-def becomes_smaller(x, y):
-    return x > y
+
+def is_greater_than(x: B, y: B) -> bool:
+    return x < y

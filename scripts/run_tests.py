@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 
-def run_tests():
+def run_tests() -> None:
     try:
         run(
             [
@@ -17,7 +17,7 @@ def run_tests():
         sys.exit(1)
 
 
-def run_example():
+def run_example() -> None:
     if len(sys.argv) <= 1:
         print("No example specified", file=sys.stderr)
         sys.exit(1)
@@ -29,7 +29,7 @@ def run_example():
     try:
         run(
             [
-                "poetry", "run", "pytest", 
+                "poetry", "run", "pytest",
                 str(example_path),
                 "--capture=tee-sys",
                 "--html=report.html", "--self-contained-html",
