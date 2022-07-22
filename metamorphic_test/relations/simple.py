@@ -4,9 +4,9 @@ def equality(x: A, y: A) -> bool:
     return x == y
 
 
-def less_than(x: B, y: B) -> bool:
+def is_less_than(x: B, y: B) -> bool:
     return x < y
 
 
-def greater_than(x: B, y: B) -> bool:
+def is_greater_than(x: B, y: B) -> bool:
     return x > y
