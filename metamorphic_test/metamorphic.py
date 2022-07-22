@@ -8,8 +8,8 @@ from .prioritized_transform import PrioritizedTransform
 
 from .logger import logger
 
-
 Relation = Callable[[Any, Any], bool]
+
 
 @dataclass
 class MetamorphicTest:
@@ -21,7 +21,6 @@ class MetamorphicTest:
     reports: List[MetamorphicExecutionReport] = field(
         default_factory=lambda: []
     )
-
 
     def add_transform(self, transform, priority=0):
         self.transforms.append(PrioritizedTransform(transform, priority))
@@ -52,7 +51,7 @@ class MetamorphicTest:
 
         report = MetamorphicExecutionReport(
             x[0] if len(x) == 1 else x,
-            system, 
+            system,
             self.relation
         )
 

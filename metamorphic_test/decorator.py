@@ -94,6 +94,9 @@ def randomized(arg, generator: MetamorphicGenerator):
 
     from randint import RandInt
 
+    mm_test = metamorphic('some_metamorphic_test_name')
+
+    @transformation(mm_test)
     @randomized('n', RandInt(1, 10))
     def add(x, n):
         return x + n
@@ -131,11 +134,15 @@ def fixed(arg, value):
 
     Examples
     --------
+    from randint import RandInt
+
+    mm_test = metamorphic('some_metamorphic_test_name')
+
+    @transformation(mm_test)
     @randomized('n', RandInt(1, 10))
     @fixed('c', 0)
     def shift(x, n, c):
         return x + 2 * n * math.pi + c
-
     """
     def wrapper(transform):
         return suite.fixed_generator(transform, arg, value)
@@ -265,7 +272,7 @@ def relation(*test_ids):
 # the the execute function of the MetamorphicTest class
 def system(*names, **kwargs):
     """
-    Registers the function decorated with this decorator as a systemUnderTest and
+    Identifies the function decorated with this decorator as a systemUnderTest and
     executes all the metamorphic tests given by names.
 
     Parameters
