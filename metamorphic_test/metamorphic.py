@@ -43,6 +43,7 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system: Callable, *x: tuple) -> None:
+        # pylint: disable-msg=too-many-locals
         if not self.relation:
             raise ValueError(
                 f"No relation registered on {self.name}, cannot execute test."
@@ -50,21 +51,25 @@ class MetamorphicTest:
 
         random.shuffle(self.transforms)
 
+        singular = len(x) == 1
+
         report = MetamorphicExecutionReport(
-            x[0] if len(x) == 1 else x,
+            x[0] if singular else x,
             system,
             self.relation
         )
 
+        succesfull_system_x = False
+        succesfull_system_y = False
+        succesfull_relation = False
+
         try:
             with report.register_output_x() as set_:
                 system_x = system(*x)
+                succesfull_system_x = True
                 set_(system_x)
 
-            if len(x) == 1:
-                y = x[0]
-            else:
-                y = x
+            y = x[0] if singular else x
             prio_sorted_transforms = sorted(
                 self.transforms,
                 key=lambda tp: tp.priority,
@@ -74,23 +79,29 @@ class MetamorphicTest:
 
             for i, p_transform in enumerate(prio_sorted_transforms):
                 with report.register_transform_result(i) as set_:
-                    if len(x) == 1:
-                        y = p_transform.transform(y)
-                    else:
-                        y = p_transform.transform(*y)
+                    y = p_transform.transform(y) if singular else p_transform.transform(*y)
                     set_(y)
 
             with report.register_output_y() as set_:
-                if len(x) == 1:
-                    system_y = system(y)
-                else:
-                    system_y = system(*y)
+                system_y = system(y) if singular else system(*y)
+                succesfull_system_y = True
                 set_(system_y)
 
             with report.register_relation_result() as set_:
                 relation_result = self.relation(system_x, system_y)
+                succesfull_relation = True
                 set_(relation_result)
-            assert relation_result
+
+            assert relation_result, \
+                f"{self.name} failed: " \
+                f"x: {x[0] if singular else x}, " \
+                f"transform: {', '.join([t.get_name() for t in prio_sorted_transforms])}, " \
+                f"relation: {self.relation.__name__}"
         finally:
             self.reports.append(report)
-            logger.info("\n%s\n", StringReportGenerator(report).generate())
+            msg = f"\n{StringReportGenerator(report).generate()}\n"
+            if succesfull_system_x and succesfull_system_y and succesfull_relation and \
+                relation_result:
+                logger.info(msg)
+            else:
+                logger.error(msg)

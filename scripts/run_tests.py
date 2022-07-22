@@ -32,6 +32,7 @@ def run_example() -> None:
                 "poetry", "run", "pytest",
                 str(example_path),
                 "--capture=tee-sys",
+                "--tb=no",
                 "--html=report.html", "--self-contained-html",
                 *sys.argv[2:]
             ],
