@@ -24,3 +24,27 @@ td.metamorphic__td {
     text-align: left;
     cursor: pointer;
 }
+
+.metamorphic__function {
+    display: inline;
+}
+
+.metamorphic__function_src {
+    display: none;
+    position: absolute;
+    max-width: 400px;
+    background-color: white;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 0 10px #ccc;
+}
+
+.metamorphic__function:hover .metamorphic__function_src {
+    display: block;
+}
+
+.metamorphic__function_src code {
+    display: block;
+    margin-top: 6px;
+}

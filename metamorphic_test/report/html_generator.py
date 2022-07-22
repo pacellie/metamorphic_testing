@@ -1,3 +1,4 @@
+import inspect
 from pathlib import Path
 from typing import Callable, List
 import traceback
@@ -7,19 +8,52 @@ from .execution_report import MetamorphicExecutionReport
 from .report_generator import ReportGenerator
 
 
-class RelationDoesNotHoldError(Exception):
+class _RelationDoesNotHoldError(Exception):
     pass
 
 
-def quick_sanitize_html(s: str) -> str:
+def _replace_linebreaks(s: str) -> str:
+    return s.replace('\n', '<br>')
+
+
+def _quick_sanitize_html(s: str) -> str:
     return s \
         .replace('<', '&lt;') \
-        .replace('>', '&gt;') \
-        .replace('\n', '<br>')
+        .replace('>', '&gt;')
+
+
+def _prepare_html(s: str) -> str:
+    return _replace_linebreaks(_quick_sanitize_html(s))
+
+
+def _code_spaces(s: str) -> str:
+    return s.replace(' ', '&nbsp;')
+
+
+def _function_html(function: Callable) -> str:
+    """Create HTML for a function which can be hovered for source code."""
+    source_code = inspect.getsource(function)
+    source_file = inspect.getsourcefile(function)
+    source_line = inspect.getsourcelines(function)[1]
+    return f'''
+    <div class="metamorphic__function">
+        <span>
+            {function.__name__}
+        </span>
+        <div class="metamorphic__function_src">
+            <div>
+                {source_file}, line {source_line}:
+            </div>
+            <code>
+                {_code_spaces(_prepare_html(source_code))}
+            </code>
+        </div>
+    </div>
+    '''
 
 
 def error_html(error: Exception) -> str:
-    if isinstance(error, RelationDoesNotHoldError):
+    if isinstance(error, _RelationDoesNotHoldError):
         return '<span class="metamorphic__error">does not hold</span>'
     full_error_str = ''.join(
         traceback.format_exception(type(error), error, error.__traceback__))
@@ -27,10 +61,10 @@ def error_html(error: Exception) -> str:
     error_id = f'metamorphic_error_{random.randint(0, 1000000000)}'  # nosec
     return f'''
     <span id="{error_id}" class="metamorphic__error">
-        {quick_sanitize_html(error_str)}
+        {_prepare_html(error_str)}
     </span>
     <span id="{error_id}_full" class="metamorphic__error metamorphic__hidden">
-        {quick_sanitize_html(full_error_str)}
+        {_prepare_html(full_error_str)}
     </span>
     <button
         class="metamorphic__error_button"
@@ -80,7 +114,7 @@ class HTMLReportGenerator(ReportGenerator):
         previous_fail = False
         for transform_index, transform_result in enumerate(self.report.transform_results):
             column.append(
-                f"⇩ {self.report.transforms[transform_index].get_name()}"
+                f"⇩ {_function_html(self.report.transforms[transform_index].transform)}"
             )
             if previous_fail:
                 column.append(placeholder_html("(skipped)"))
@@ -101,10 +135,10 @@ class HTMLReportGenerator(ReportGenerator):
             transform_result.error is not None
             for transform_result in self.report.transform_results
         )
-    
+
     def _add_system_name(self, rows: List[List[str]]):
         """Put the system name in the second column of the first & last row."""
-        system_name = self.report.system.__name__
+        system_name = _function_html(self.report.system)
         rows[0][1] = f"⇨ {system_name} ⇨"
         if self._transform_error_occurred():
             system_name += placeholder_html(" (skipped)")
@@ -144,9 +178,9 @@ class HTMLReportGenerator(ReportGenerator):
         elif self.report.relation_result.output:
             holds_str = "holds"
         else:
-            holds_str = error_html(RelationDoesNotHoldError())
+            holds_str = error_html(_RelationDoesNotHoldError())
         rows[len(rows) // 2][-1] = (
-            f"⇵ {self.report.relation.__name__} {holds_str}"
+            f"⇵ {_function_html(self.report.relation)} {holds_str}"
         )
     
     @staticmethod
