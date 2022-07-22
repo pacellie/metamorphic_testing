@@ -8,12 +8,13 @@ Python >=3.8,<3.11
 
 ## Installation
 - [Install the package](https://gitlab.lrz.de/help/user/packages/pypi_repository/index#install-a-pypi-package) with pip.
-- Set or use your personal access token with `read_api` scope [here](https://gitlab.lrz.de/-/profile/personal_access_tokens).
-- `__token__` is your personal token name.
-- `<your_personal_token>` is your personal access token.
 ```shell
 pip install metamorphic-test --extra-index-url https://__token__:<your_personal_token>@gitlab.lrz.de/api/v4/projects/114417/packages/pypi/simple
 ```
+
+- Set or use your personal access token with `read_api` scope [here](https://gitlab.lrz.de/-/profile/personal_access_tokens).
+- `__token__` is your personal token name.
+- `<your_personal_token>` is your personal access token.
 
 ## Example: testing the sine function
 ### Create a metamorphic test
@@ -134,14 +135,14 @@ def test_sin_2(x):
 ```
 Now we have three tests `A`, `B`, and `C` for testing the sine function with the relations as follows:
 
-`A`: 
-$\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ shift & \downarrow & & \updownarrow & approximately \\ & x+2n \pi +c & \longrightarrow & \sin (x+2n \pi + c) &\end{array}$
+`A`:\
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ shift & \downarrow & & \updownarrow & approximately \\ & x+2n \pi +c & \longrightarrow & \sin (x+2n \pi + c) &\end{array}" title="example2_sin_A" />
 
-`B`:
-$\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ negate & \downarrow & & \updownarrow & approximately \ negate \\ & -x& \longrightarrow & \sin (-x) &\end{array}$
+`B`:\
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ negate & \downarrow & & \updownarrow & approximately \ negate \\ & -x& \longrightarrow & \sin (-x) &\end{array}" title="example2_sin_B" />
 
-`C`:
-$\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ negate & \downarrow & & &  \\ & -x&  & \updownarrow & approximately \ negate \\ shift & \downarrow & &  &  & \\ & -x + 2n \pi + c & \longrightarrow & \sin (-x + 2n \pi + c) & \end{array}$
+`C`:\
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ negate & \downarrow & & &  \\ & -x&  & \updownarrow & approximately \ negate \\ shift & \downarrow & &  &  \\ & -x + 2n \pi + c & \longrightarrow & \sin (-x + 2n \pi + c) & \end{array}" title="example1_sin_C" />
 
 1. Optionally specify the predefined relation `relation=approximately` when registering the metamorphic test instead of repeatedly writing the same function. You can pass the keyword argument `transform=<some_transformation>` as well.
 2. For test `C`, we want to first negate the input `x` and then shift it. Therefore, we assign the transformation `negate` with `priority=1` and the transformation `shift` with `priority=0`. The transformation with a higher priority number will be applied to the input `x` first.
