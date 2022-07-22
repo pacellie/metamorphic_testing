@@ -58,9 +58,14 @@ class MetamorphicTest:
             self.relation
         )
 
+        succesfull_system_x = False
+        succesfull_system_y = False
+        succesfull_relation = False
+
         try:
             with report.register_output_x() as set_:
                 system_x = system(*x)
+                succesfull_system_x = True
                 set_(system_x)
 
             y = x[0] if singular else x
@@ -78,10 +83,12 @@ class MetamorphicTest:
 
             with report.register_output_y() as set_:
                 system_y = system(y) if singular else system(*y)
+                succesfull_system_y = True
                 set_(system_y)
 
             with report.register_relation_result() as set_:
                 relation_result = self.relation(system_x, system_y)
+                succesfull_relation = True
                 set_(relation_result)
 
             assert relation_result, \
@@ -92,7 +99,8 @@ class MetamorphicTest:
         finally:
             self.reports.append(report)
             msg = f"\n{StringReportGenerator(report).generate()}\n"
-            if relation_result:
+            if succesfull_system_x and succesfull_system_y and succesfull_relation and \
+                relation_result:
                 logger.info(msg)
             else:
                 logger.error(msg)
