@@ -142,7 +142,7 @@ Now we have three tests `A`, `B`, and `C` for testing the sine function with the
 <img src="https://latex.codecogs.com/svg.latex?\Large&space;\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ negate & \downarrow & & \updownarrow & approximately \ negate \\ & -x& \longrightarrow & \sin (-x) &\end{array}" title="example2_sin_B" />
 
 `C`:\
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ negate & \downarrow & & &  \\ & -x&  & \updownarrow & approximately \ negate \\ shift & \downarrow & &  &  \\ & -x + 2n \pi + c & \longrightarrow & \sin (-x + 2n \pi + c) & \end{array}" title="example1_sin_C" />
+<img src="https://latex.codecogs.com/svg.latex?\Large&space;\begin{array}{ccccc} & x & \longrightarrow & \sin (x) & \\ negate & \downarrow & & &  \\ & -x&  & \updownarrow & approximately \ negate \\ shift & \downarrow & &  &  \\ & -x + 2n \pi + c & \longrightarrow & \sin (-x + 2n \pi + c) & \end{array}" title="example2_sin_C" />
 
 1. Optionally specify the predefined relation `relation=approximately` when registering the metamorphic test instead of repeatedly writing the same function. You can pass the keyword argument `transform=<some_transformation>` as well.
 2. For test `C`, we want to first negate the input `x` and then shift it. Therefore, we assign the transformation `negate` with `priority=1` and the transformation `shift` with `priority=0`. The transformation with a higher priority number will be applied to the input `x` first.
