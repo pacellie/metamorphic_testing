@@ -50,8 +50,10 @@ class MetamorphicTest:
 
         random.shuffle(self.transforms)
 
+        singular = len(x) == 1
+
         report = MetamorphicExecutionReport(
-            x[0] if len(x) == 1 else x,
+            x[0] if singular else x,
             system,
             self.relation
         )
@@ -61,10 +63,7 @@ class MetamorphicTest:
                 system_x = system(*x)
                 set_(system_x)
 
-            if len(x) == 1:
-                y = x[0]
-            else:
-                y = x
+            y = x[0] if singular else x
             prio_sorted_transforms = sorted(
                 self.transforms,
                 key=lambda tp: tp.priority,
@@ -74,22 +73,17 @@ class MetamorphicTest:
 
             for i, p_transform in enumerate(prio_sorted_transforms):
                 with report.register_transform_result(i) as set_:
-                    if len(x) == 1:
-                        y = p_transform.transform(y)
-                    else:
-                        y = p_transform.transform(*y)
+                    y = p_transform.transform(y) if singular else p_transform.transform(*y)
                     set_(y)
 
             with report.register_output_y() as set_:
-                if len(x) == 1:
-                    system_y = system(y)
-                else:
-                    system_y = system(*y)
+                system_y = system(y) if singular else system(*y)
                 set_(system_y)
 
             with report.register_relation_result() as set_:
                 relation_result = self.relation(system_x, system_y)
                 set_(relation_result)
+
             assert relation_result
         finally:
             self.reports.append(report)
