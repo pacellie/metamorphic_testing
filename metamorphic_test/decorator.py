@@ -89,7 +89,8 @@ def system(*names, **kwargs):
             suite.execute(name, test, *args)
 
         return pytest.mark.metamorphic(
-            visualize_input=kwargs.get('visualize_input', None)
+            visualize_input=kwargs.get('visualize_input', None),
+            visualize_output=kwargs.get('visualize_output', None),
         )(
             pytest.mark.parametrize('name', names)(execute)
         )
