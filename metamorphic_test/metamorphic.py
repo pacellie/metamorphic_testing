@@ -1,14 +1,35 @@
 from dataclasses import dataclass, field
-from typing import Callable, Any, Optional, List, Tuple
 import random
+from typing import Callable, Any, Optional, List
 
+from metamorphic_test.report.execution_report import MetamorphicExecutionReport
+from metamorphic_test.report.string_generator import StringReportGenerator
+from .prioritized_transform import PrioritizedTransform
+
+from .logger import logger
+
+
+Relation = Callable[[Any, Any], bool]
 
 @dataclass
 class MetamorphicTest:
     name: Optional[str] = None
-    # list of (transform, priority) pairs
-    transforms: List[Tuple[Callable[[Any], Any], int]] = field(default_factory=list)
-    relation: Optional[Callable[[Any, Any], bool]] = None
+    transforms: List[PrioritizedTransform] = field(
+        default_factory=lambda: []
+    )
+    relation: Optional[Relation] = None
+    reports: List[MetamorphicExecutionReport] = field(
+        default_factory=lambda: []
+    )
+
+
+    def add_transform(self, transform, priority=0):
+        self.transforms.append(PrioritizedTransform(transform, priority))
+
+    def set_relation(self, relation):
+        if self.relation:
+            raise ValueError(f"Relation to {self.name} already set ({self.relation}).")
+        self.relation = relation
 
     # x: the actual input
     # system: the system under test
@@ -22,28 +43,54 @@ class MetamorphicTest:
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
     def execute(self, system, *x):
+        if not self.relation:
+            raise ValueError(
+                f"No relation registered on {self.name}, cannot execute test."
+            )
+
         random.shuffle(self.transforms)
 
-        y = x[0] if len(x) == 1 else x
-        for transform, _ in sorted(self.transforms, key=lambda tp: tp[1], reverse=True):
-            if transform.__name__ == 'identity':
-                continue
-            y = transform(y) if len(x) == 1 else transform(*y)
+        report = MetamorphicExecutionReport(
+            x[0] if len(x) == 1 else x,
+            system, 
+            self.relation
+        )
 
-        transforms = [
-            transform.__name__ for transform, _ in self.transforms
-            if transform.__name__ != 'identity'
-        ]
+        try:
+            with report.register_output_x() as set_:
+                system_x = system(*x)
+                set_(system_x)
 
-        system_x = system(*x)
-        system_y = system(y) if len(x) == 1 else system(*y)
+            if len(x) == 1:
+                y = x[0]
+            else:
+                y = x
+            prio_sorted_transforms = sorted(
+                self.transforms,
+                key=lambda tp: tp.priority,
+                reverse=True
+            )
+            report.transforms = prio_sorted_transforms
 
-        print(f"\n[running suite '{self.name}']"
-              f"\n\tinput x: {x[0] if len(x) == 1 else x} "
-              f"\n\tinput y: {y} "
-              f"\n\toutput x: {system_x} "
-              f"\n\toutput y: {system_y} "
-              f"\n\ttransform: {transforms} "
-              f"\n\trelation: {self.relation.__name__}")
+            for i, p_transform in enumerate(prio_sorted_transforms):
+                with report.register_transform_result(i) as set_:
+                    if len(x) == 1:
+                        y = p_transform.transform(y)
+                    else:
+                        y = p_transform.transform(*y)
+                    set_(y)
 
-        assert self.relation(system_x, system_y)
+            with report.register_output_y() as set_:
+                if len(x) == 1:
+                    system_y = system(y)
+                else:
+                    system_y = system(*y)
+                set_(system_y)
+
+            with report.register_relation_result() as set_:
+                relation_result = self.relation(system_x, system_y)
+                set_(relation_result)
+            assert relation_result
+        finally:
+            self.reports.append(report)
+            logger.info("\n%s\n", StringReportGenerator(report).generate())

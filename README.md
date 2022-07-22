@@ -18,7 +18,8 @@
 
 ## Available poetry Scripts
 - `poetry install`: Install all dependencies
-- `poetry run pytest`: Run tests
+- `poetry run test`: Run tests (with outputs)
+- `poetry run example <which>`: Run tests on example
 - `poetry run cov`: Run tests with coverage and show results
 - `poetry run lint`: Run linters. Equivalent to `poetry run prospector`. This will automatically check with mypy, pylint, bandit and some other tools.
 - `poetry run install-hook`: Install Git pre-commit hook to lint before committing
@@ -33,6 +34,23 @@
     ```
 
 This way you should see linting and typing errors directly in your editor, which is way more convenient.
+
+
+## Create a new example
+- Create a new directory in the `examples` directory.
+- Put your test files in there like normal (e.g. `test_example.py`, files to be checked by Pytest need to have their names start with `test_`).
+- Install development dependencies using `poetry add --D <package name>`.
+- Run `poetry run example <which>` to run the tests locally.
+- Create a new job for your example: Assuming your example is called `hello_world`, add this to the `.gitlab-ci.yml` file in the repository root:
+```
+hello_world_example:
+    stage: examples
+    needs: []
+    allow_failure: true
+    script:
+        - poetry run example hello_world
+```
+- Explanation: This will declare a job called `hello_world_example` and run the example `hello_world` when it is triggered, independently of other jobs and not blocking the pipeline on failure.
 
 
 ## Publishing a New Version
