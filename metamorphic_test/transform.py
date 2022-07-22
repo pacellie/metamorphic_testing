@@ -1,5 +1,3 @@
-from typing import Callable, TypeVar
+from typing import Callable
 
-A = TypeVar('A')
-
-Transform = Callable # is there a more concrete type for this?
+Transform = Callable
