@@ -182,7 +182,7 @@ test_images, test_labels = read_traffic_signs()
 classifier_under_test = TrafficSignClassifier()
 
 
-def visualize(image):
+def visualize_input(image):
     path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
     try:
         plt.imsave(path, image)
@@ -193,9 +193,33 @@ def visualize(image):
 """
 
 
+def visualize_output(label: int) -> str:
+    LABEL_NAMES = {
+        16: "truck driving left",
+        10: "truck driving right",
+        11: "priority in traffic (next crossing)",
+        12: "priority in traffic (road)",
+        18: "warning",
+        35: "straight road",
+        38: "drive right",
+        39: "drive left",
+        33: "right turn",
+        34: "left turn",
+        25: "construction site right",
+        27: "construction site left"
+    }
+    if int(label) in LABEL_NAMES:
+        return LABEL_NAMES[label]
+    return f"unknown: {label}"
+
+
 @pytest.mark.parametrize('image', test_images)
-@system(horizontal_flip, visualize_input=visualize)
-# brightness, contrast, both_transform, both_cv2, rain, snow, fog, gamma, equalize,
-#        downscale, noise, clahe, blur, horizontal_flip, vertical_flip)
+@system(
+    brightness, contrast, both_cv2,
+    rain, snow, fog, gamma, equalize, downscale,
+    noise, clahe, blur, horizontal_flip, vertical_flip,
+    visualize_input=visualize_input,
+    visualize_output=visualize_output,
+)
 def test_image_classifier(image):
     return classifier_under_test.evaluate_image(image)

@@ -27,11 +27,11 @@ class FunctionOutput(Generic[T]):
         self._output = value
     
     @property
-    def error(self):
+    def error(self) -> Exception:
         return self._error
     
     @error.setter
-    def error(self, value):
+    def error(self, value: Exception):
         if self._set:
             raise ValueError("Output already set.")
         self._set = True

@@ -1,11 +1,11 @@
 from .approximately import approximately
-from .simple import equality, becomes_larger, becomes_smaller
+from .simple import equality, is_less_than, is_greater_than
 from .or_ import or_
 
 __all__ = [
     'approximately',
     'equality',
-    'becomes_larger',
-    'becomes_smaller',
+    'is_greater_than',
+    'is_less_than',
     'or_',
 ]
