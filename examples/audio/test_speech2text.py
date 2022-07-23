@@ -196,7 +196,7 @@ src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav"
 # src_audios is the list of audios with which the test need to be performed
 @pytest.mark.parametrize('audio', src_audios)
 # Mark this function as the system under test
-@system
+@system(with_gaussian_noise, with_background_noise, with_altered_pitch, with_combined_effect)
 def test_stt(audio):
     return stt.recognize(audio)
 # endregion
