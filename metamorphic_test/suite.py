@@ -1,6 +1,6 @@
 from functools import wraps
 import inspect
-from typing import Dict, TypeVar, Callable, Hashable, List
+from typing import Dict, TypeVar, Callable, Hashable, Tuple
 
 from .metamorphic import MetamorphicTest
 from .generator import MetamorphicGenerator
@@ -60,7 +60,7 @@ class Suite:
         """
         return self.tests[test_id]
 
-    def get_test_id(self) -> List:
+    def get_test_id(self) -> Tuple[Hashable, ...]:
         """
         A method to get a metamorphic test_id from the internal dictionary
         containing all of the metamorphic tests.
@@ -73,9 +73,9 @@ class Suite:
         module = self.get_caller_module()
         test_id_list = []
         for k, _ in self.tests.items():
-            if str(k).split('.')[0] == module:
+            if str(k).split('.', maxsplit=1)[0] == module:
                 test_id_list.append(k)
-        return test_id_list
+        return tuple(test_id_list)
 
     @staticmethod
     def get_caller_module() -> str:
