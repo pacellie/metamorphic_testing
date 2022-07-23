@@ -49,6 +49,6 @@ def approximately_negate(x: float, y: float) -> bool:
 # Parametrize the input, in this case: -10, 9
 @pytest.mark.parametrize('x', range(-10, 10))
 # Mark this function as the system under test
-@system(A, B, C)
+@system()
 def test_sin(x: float) -> float:
     return math.sin(x)
