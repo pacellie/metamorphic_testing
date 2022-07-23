@@ -1,14 +1,13 @@
 from dataclasses import dataclass, field
 import random
-from typing import Callable, Any, Optional, List
+from typing import Callable, Optional, List
 
 from metamorphic_test.report.execution_report import MetamorphicExecutionReport
 from metamorphic_test.report.string_generator import StringReportGenerator
 from .prioritized_transform import PrioritizedTransform
-
+from .transform import Transform
+from .rel import Relation
 from .logger import logger
-
-Relation = Callable[[Any, Any], bool]
 
 
 @dataclass
@@ -51,7 +50,7 @@ class MetamorphicTest:
         default_factory=lambda: []
     )
 
-    def add_transform(self, transform, priority=0):
+    def add_transform(self, transform: Transform, priority: int = 0) -> None:
         """
         Registers a transformation to a metamorphic test object
 
@@ -76,7 +75,7 @@ class MetamorphicTest:
         """
         self.transforms.append(PrioritizedTransform(transform, priority))
 
-    def set_relation(self, relation):
+    def set_relation(self, relation: Relation) -> None:
         """
         Registers a relation to a metamorphic test object
 
@@ -106,7 +105,8 @@ class MetamorphicTest:
     # (3) apply the transforms one after the other two the input 'x' to obtain the output 'y'
     # (4) print some logging information
     # (5) apply the system under test and assert the relation function
-    def execute(self, system, *x):
+    def execute(self, system: Callable, *x: tuple) -> None:
+        # pylint: disable-msg=too-many-locals
         """
         Executes the metamorphic test defined in the object and generate
         reports
@@ -116,11 +116,11 @@ class MetamorphicTest:
 
         Parameters
         ----------
-        system : callable
+        system : Callable
             a function (or callable) which needs to be tested. This refers to the
             function decorated with decorator.system
 
-        x : Any
+        x : tuple
             actual inputs for the system under test
 
         See Also
@@ -129,6 +129,7 @@ class MetamorphicTest:
                            a SystemUnderTest and executes all the metamorphic tests
         suite.Suite.execute : Execute a metamorphic test on a system under test
         """
+
         if not self.relation:
             raise ValueError(
                 f"No relation registered on {self.name}, cannot execute test."
@@ -136,21 +137,25 @@ class MetamorphicTest:
 
         random.shuffle(self.transforms)
 
+        singular = len(x) == 1
+
         report = MetamorphicExecutionReport(
-            x[0] if len(x) == 1 else x,
+            x[0] if singular else x,
             system,
             self.relation
         )
 
+        successful_system_x = False
+        successful_system_y = False
+        successful_relation = False
+
         try:
             with report.register_output_x() as set_:
                 system_x = system(*x)
+                successful_system_x = True
                 set_(system_x)
 
-            if len(x) == 1:
-                y = x[0]
-            else:
-                y = x
+            y = x[0] if singular else x
             prio_sorted_transforms = sorted(
                 self.transforms,
                 key=lambda tp: tp.priority,
@@ -160,23 +165,29 @@ class MetamorphicTest:
 
             for i, p_transform in enumerate(prio_sorted_transforms):
                 with report.register_transform_result(i) as set_:
-                    if len(x) == 1:
-                        y = p_transform.transform(y)
-                    else:
-                        y = p_transform.transform(*y)
+                    y = p_transform.transform(y) if singular else p_transform.transform(*y)
                     set_(y)
 
             with report.register_output_y() as set_:
-                if len(x) == 1:
-                    system_y = system(y)
-                else:
-                    system_y = system(*y)
+                system_y = system(y) if singular else system(*y)
+                successful_system_y = True
                 set_(system_y)
 
             with report.register_relation_result() as set_:
                 relation_result = self.relation(system_x, system_y)
+                successful_relation = True
                 set_(relation_result)
-            assert relation_result
+
+            assert relation_result, \
+                f"{self.name} failed: " \
+                f"x: {x[0] if singular else x}, " \
+                f"transform: {', '.join([t.get_name() for t in prio_sorted_transforms])}, " \
+                f"relation: {self.relation.__name__}"
         finally:
             self.reports.append(report)
-            logger.info("\n%s\n", StringReportGenerator(report).generate())
+            msg = f"\n{StringReportGenerator(report).generate()}\n"
+            if successful_system_x and successful_system_y and successful_relation and \
+                    relation_result:
+                logger.info(msg)
+            else:
+                logger.error(msg)

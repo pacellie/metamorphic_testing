@@ -16,7 +16,7 @@ class MathLibrary():
     __PRECISION = 15
 
     @staticmethod
-    def sin(x):
+    def sin(x: float) -> float:
         x %= 2 * MathLibrary.__PI
 
         if x < 0:
@@ -37,7 +37,7 @@ class MathLibrary():
         return x
 
     @staticmethod
-    def factorial(n):
+    def factorial(n: int) -> int:
         fact = 1
         for i in range(1, n + 1):
             fact = fact * i
@@ -52,32 +52,32 @@ test_pi_minus_x = metamorphic('sin(π-x)', relation=approximately)
 
 @transformation(test_two_pi)
 @randomized('n', RandInt(0, 10))
-def two_pi_shift(x, n):
+def two_pi_shift(x: float, n: int) -> float:
     return x + 2 * n * math.pi
 
 
 @transformation(test_negate_x)
-def negate(x):
+def negate(x: float) -> float:
     return -x
 
 
 @transformation(test_plus_pi)
-def pi_shift(x):
+def pi_shift(x: float) -> float:
     return x + math.pi
 
 
 @transformation(test_pi_minus_x)
-def pi_shift_minus(x):
+def pi_shift_minus(x: float) -> float:
     return math.pi - x
 
 
 @relation(test_negate_x, test_plus_pi)
-def approximately_negate(x, y):
+def approximately_negate(x: float, y: float) -> bool:
     return approximately(-x, y)
 
 
 @pytest.mark.skip
 @pytest.mark.parametrize('x', range(-10, 10))
 @system(test_two_pi, test_negate_x, test_plus_pi, test_pi_minus_x)
-def test(x):
+def test(x: float) -> float:
     return MathLibrary.sin(x)
