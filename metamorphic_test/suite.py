@@ -67,7 +67,7 @@ class Suite:
 
         Returns
         -------
-        test_id_list : List
+        test_id_list : Tuple[Hashable, ...]
             a list of test ids for the corresponding test module
         """
         module = self.get_caller_module()
