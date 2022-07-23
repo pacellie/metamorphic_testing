@@ -1,5 +1,6 @@
 from metamorphic_test.rel import A, B
 
+
 def equality(x: A, y: A) -> bool:
     return x == y
 
