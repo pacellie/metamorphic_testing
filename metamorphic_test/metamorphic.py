@@ -16,25 +16,6 @@ class MetamorphicTest:
     This class holds a single metamorphic test object along with its associated
     transformations and relation and provides a mechanism to execute the test.
 
-    Attributes
-    ----------
-    name : str
-        name of the metamorphic test. This is optional but rally useful when there
-        are multiple metamorphic tests or some relation or transformation needs to
-        be added to the test at later point of time after itS creation.
-
-    transformation : List[PrioritizedTransform]
-        a list of transformations to be applied on the source input to perform the
-        metamorphic test.
-
-    relation : Optional[Relation]
-        a function that compares the source test case output to followup test case
-        output and returns True if the relation holds, False otherwise.
-
-    reports : List[MetamorphicExecutionReport]
-        a list of objects of MetamorphicExecutionReport which hold the reports generation
-        and logging logics for corresponding metamorphic tests.
-
     See Also
     --------
     decorator.metamorphic : Registers a new metamorphic test
@@ -42,13 +23,37 @@ class MetamorphicTest:
                             to register a metamorphic test
     """
     name: Optional[str] = None
+    """
+    name : str
+        name of the metamorphic test. This is optional but really useful when there
+        are multiple metamorphic tests or some relation or transformation needs to
+        be added to the test at later point of time after itS creation.
+    """
+
     transforms: List[PrioritizedTransform] = field(
         default_factory=lambda: []
     )
+    """
+    transformation : List[PrioritizedTransform]
+        a list of transformations to be applied on the source input to perform the
+        metamorphic test.
+    """
+
     relation: Optional[Relation] = None
+    """
+    relation : Optional[Relation]
+        a function that compares the source test case output to followup test case
+        output and returns True if the relation holds, False otherwise.
+    """
+
     reports: List[MetamorphicExecutionReport] = field(
         default_factory=lambda: []
     )
+    """
+    reports : List[MetamorphicExecutionReport]
+        a list of objects of MetamorphicExecutionReport which hold the reports generation
+        and logging logics for corresponding metamorphic tests.
+    """
 
     def add_transform(self, transform: Transform, priority: int = 0) -> None:
         """

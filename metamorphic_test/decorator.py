@@ -88,8 +88,7 @@ def randomized(arg: str, generator: MetamorphicGenerator[A]) -> TransformWrapper
     arg : str
         The name of the argument in the transformer function to assign value to.
     generator : MetamorphicGenerator[A]
-        An object of some concrete implementation (concrete child class) of
-        MetamorphicGenerator.
+        An object of some concrete implementation of MetamorphicGenerator.
 
     Returns
     -------
@@ -181,7 +180,7 @@ def transformation(test_id: TestID, *, priority: int = 0) -> TransformWrapper:
         metamorphic test, use this priority to set a specific order between the transformations
         if order is important for a use case. The higher the value the earlier the
         transformation will be applied. Transformations with equal priority will be executed in
-        a randomly shuffled order. Please note this is a keyword only argument. Default: 0
+        a random order. Default: 0
 
     Returns
     -------
@@ -288,11 +287,9 @@ def system(*names: Hashable, **kwargs) -> Callable[[System], Callable[..., None]
     Parameters
     ----------
     names : Hashable
-        Optional names of the metamorphic tests to be performed on the system under
+        Names of the metamorphic tests to be performed on the system under
         test. It's a multi-argument, i.e multiple metamorphic tests can be entered
-        as comma separated multiple arguments. If these arguments are not passed,
-        the framework executes all the metamorphic tests defined in the same file
-        on the system under test function.
+        as comma separated multiple arguments.
     kwargs: Any
         Optional key word arguments to pass some additional parameters to the
         tests or transformations.

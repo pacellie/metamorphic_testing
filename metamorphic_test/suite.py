@@ -23,12 +23,6 @@ class Suite:
     metamorphic test on corresponding system under test functions,
     in the backend all decorated functions get registered to this class.
 
-    Attributes
-    ----------
-    tests : Dict[TestID, MetamorphicTest]
-        A dictionary with keys as test_ids and values as metamorphic_tests
-        to hold all the metamorphic tests within a single data structure.
-
     See Also
     --------
     decorators.py
@@ -36,6 +30,11 @@ class Suite:
 
     def __init__(self) -> None:
         self.tests: Dict[TestID, MetamorphicTest] = {}
+        """
+        tests : Dict[TestID, MetamorphicTest]
+            A dictionary with keys as test_ids and values as metamorphic_tests
+            to hold all the metamorphic tests within a single data structure.
+        """
 
     def get_test(self, test_id: TestID) -> MetamorphicTest:
         """

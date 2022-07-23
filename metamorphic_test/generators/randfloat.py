@@ -4,26 +4,18 @@ from metamorphic_test.generator import MetamorphicGenerator
 
 
 class RandFloat(MetamorphicGenerator[float]):
-    """
-    This is a custom random floating point number generator
-
-    Parameters
-    ----------
-    min_value : float
-        minimum value of the range
-    max_value : float
-        maximum value of the range
-
-    Attributes
-    ----------
-    min_value : float
-        minimum value of the range
-    max_value : float
-        maximum value of the range
-    """
+    """ This is a custom random floating point number generator """
     def __init__(self, min_value: float, max_value: float):
         self.min_value = min_value
+        """
+        min_value : float
+            minimum value of the range
+        """
         self.max_value = max_value
+        """
+        max_value : float
+            maximum value of the range
+        """
 
     def generate(self) -> float:
         """
