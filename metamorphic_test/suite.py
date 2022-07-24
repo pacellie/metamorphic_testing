@@ -71,10 +71,7 @@ class Suite:
             a list of test ids for the corresponding test module
         """
         module = self.get_caller_module()
-        test_id_list = []
-        for k, _ in self.tests.items():
-            if str(k).split('.', maxsplit=1)[0] == module:
-                test_id_list.append(k)
+        test_id_list = [k for k, _ in self.tests.items() if str(k).split('.', maxsplit=1)[0] == module]
         return tuple(test_id_list)
 
     @staticmethod
