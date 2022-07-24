@@ -26,5 +26,15 @@ Ting-Yu Lu
 - Research pytest-commander and pytest-html ([#91](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/91), [branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/91-pytest-commander-experiment), [wiki](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Pytest-commander-&-Pytest-html))
 - External documentation ([#101](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/101))
 
-
-...
+Paul Schwind
+===
+- Implemented one of the initial concepts (#2, documented [in the Wiki](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Ideas-on-how-code-using-our-framework-could-look#paul-schwind)), also with a working implementation)
+- Implemented sin example and housing price example using the concept framework (see above, also #47)
+- Paper summary of "A Template-Based Approach to Describing Metamorphic Relations" ([Wiki page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Papers-summaries#a-template-based-approach-to-describing-metamorphic-relations))
+- Research on hypothesis strategies ([Wiki page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Inspiration-from-hypothesis#how-test-case-generation-works))
+- CI Setup Testing #20
+- Research into transformation chaining (see comments in #24)
+- Put house pricing into final framework and refactored code a bit (#79)
+- Put a visualization of Metamorphic Testing into pytest-html reports of the tests (#100, #103)
+- Improved how failed tests look in the GUI (#104)
+- Implemented: show function source code in GUI on hover (#110)
