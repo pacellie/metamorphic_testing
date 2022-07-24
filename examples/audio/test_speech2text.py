@@ -8,6 +8,7 @@ import pytest
 from jiwer import wer, mer, wil  # type: ignore
 
 from models.speech_to_text import SpeechToText  # type: ignore
+from audio_visualizer import audio_input_visualizer  # type: ignore
 from utils.stt_utils import stt_read_audio  # type: ignore
 from metamorphic_test import (
     transformation,
@@ -188,7 +189,7 @@ stt = SpeechToText()
 
 # region data_list
 src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in
-              range(1, 4))
+              range(1, 5))
 # endregion
 
 
@@ -196,7 +197,9 @@ src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav"
 # src_audios is the list of audios with which the test need to be performed
 @pytest.mark.parametrize('audio', src_audios)
 # Mark this function as the system under test
-@system(with_gaussian_noise, with_background_noise, with_altered_pitch, with_combined_effect)
+@system(with_gaussian_noise, with_background_noise, with_altered_pitch, with_combined_effect,
+        visualize_input=audio_input_visualizer
+        )
 def test_stt(audio):
     return stt.recognize(audio)
 # endregion
