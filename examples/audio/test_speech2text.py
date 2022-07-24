@@ -8,6 +8,7 @@ import pytest
 from jiwer import wer, mer, wil  # type: ignore
 
 from models.speech_to_text import SpeechToText  # type: ignore
+from audio_visualizer import audio_input_visualizer  # type: ignore
 from utils.stt_utils import stt_read_audio  # type: ignore
 from metamorphic_test import (
     transformation,
@@ -23,6 +24,8 @@ with_gaussian_noise = metamorphic('with_gaussian_noise')
 with_background_noise = metamorphic('with_background_noise')
 with_altered_pitch = metamorphic('with_altered_pitch')
 with_combined_effect = metamorphic('with_combined_effect')
+with_chained_transform_a = metamorphic('with_chained_transform_a')
+with_chained_transform_b = metamorphic('with_chained_transform_b')
 # endregion
 
 
@@ -30,6 +33,7 @@ with_combined_effect = metamorphic('with_combined_effect')
 
 # define and register the audio transformations
 # transformation to add Gaussian noise:
+@transformation(with_chained_transform_a)
 @transformation(with_gaussian_noise)
 @fixed('min_amplitude', 0.0001)
 @fixed('max_amplitude', 0.001)
@@ -61,6 +65,8 @@ def add_gaussian_noise(
 
 # transformation to add background noise
 @transformation(with_background_noise)
+@transformation(with_chained_transform_a)
+@transformation(with_chained_transform_b)
 @fixed('sounds_path', 'examples/audio/background_noises')
 @fixed('p', 1.)
 def add_background_noise(
@@ -89,9 +95,10 @@ def add_background_noise(
 
 
 # transformation to alter pitch
+@transformation(with_chained_transform_b)
 @transformation(with_altered_pitch)
-@fixed('min_semitones', -1)
-@fixed('max_semitones', 1)
+@fixed('min_semitones', -2)
+@fixed('max_semitones', 2)
 @fixed('p', 1.)
 def alter_pitch(
         source_audio: Union[numpy.ndarray, torch.Tensor],
@@ -138,9 +145,9 @@ def composite_transformation(
     """
     transform = Compose(
         [
-            AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.5),
+            AddGaussianNoise(min_amplitude=0.001, max_amplitude=0.01, p=0.5),
             AddBackgroundNoise(sounds_path=["examples/audio/background_noises"], p=0.5),
-            PitchShift(min_semitones=-1, max_semitones=+1, p=0.5),
+            PitchShift(min_semitones=-3, max_semitones=+3, p=0.5),
         ], shuffle=True)
     if not torch.is_tensor(source_audio):
         return torch.from_numpy(transform(source_audio, 16000))
@@ -151,7 +158,14 @@ def composite_transformation(
 
 # region custom_relations
 
-@relation(with_gaussian_noise, with_background_noise, with_altered_pitch, with_combined_effect)
+@relation(
+    with_gaussian_noise,
+    with_background_noise,
+    with_altered_pitch,
+    with_combined_effect,
+    with_chained_transform_a,
+    with_chained_transform_b
+)
 def stt_soft_compare(x: str, y: str) -> bool:
     """
     This is a custom metamorphic comparison relation designed specifically for speech2text
@@ -173,22 +187,20 @@ def stt_soft_compare(x: str, y: str) -> bool:
     mer_val = mer(x, y)
     wil_val = wil(x, y)
     print(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")
-    # todo: parameterize the following thresholds instead of hard coding
-    return wer_val < 0.4 and mer_val < 0.4 and wil_val < 0.55
+    return wer_val <= 0.3 and mer_val <= 0.3 and wil_val <= 0.5  # empirically chosen threshold
 
 # endregion
 
 
 # region model
 # creating this model object outside the test not to load it again and again for each test
-# todo: try to use some form of fixture or so instead of a global
 stt = SpeechToText()
 # endregion
 
 
 # region data_list
 src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in
-              range(1, 4))
+              range(0, 5))
 # endregion
 
 
@@ -196,7 +208,15 @@ src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav"
 # src_audios is the list of audios with which the test need to be performed
 @pytest.mark.parametrize('audio', src_audios)
 # Mark this function as the system under test
-@system(with_gaussian_noise, with_background_noise, with_altered_pitch, with_combined_effect)
+@system(
+    with_gaussian_noise,
+    with_background_noise,
+    with_altered_pitch,
+    with_combined_effect,
+    with_chained_transform_a,  # gaussian noise + background noise (random order)
+    with_chained_transform_b,  # background noise + altered pitch (random order)
+    visualize_input=audio_input_visualizer
+)
 def test_stt(audio):
     return stt.recognize(audio)
 # endregion
