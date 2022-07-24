@@ -1,9 +1,10 @@
 import os
 from pathlib import Path
 import soundfile  # type: ignore
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore
 import numpy as np
 import uuid
+import torch
 
 
 def save_spectrogram_plot(audio: np.ndarray, path: str, sampling_rate: int = 16000) -> None:
@@ -96,15 +97,15 @@ def save_audio(audio: np.ndarray, path: str, sampling_rate: int = 16000) -> None
     soundfile.write(path, audio, sampling_rate)
 
 
-def audio_input_visualizer(audio: np.ndarray) -> str:
+def audio_input_visualizer(audio: torch.Tensor) -> str:
     """
     Log and Visualize audio in the html test report
 
     Parameters
     ----------
-    audio: np.ndarray
+    audio: torch.Tensor
         audio for which spectrogram needs to be calculated. It needs to be a mono audio
-        as a numpy ndarray of shape (N,) where N is the total number of samples of the
+        as a torch tensor of shape (N,) where N is the total number of samples of the
         audio.
 
     Returns
@@ -120,10 +121,10 @@ def audio_input_visualizer(audio: np.ndarray) -> str:
     path_waveform = os.path.join(base_dir, f"wavf_{audio_id}.png")  # nosec
     path_audio = os.path.join(base_dir, f"aud_{audio_id}.wav")  # nosec
 
-    audio = audio.squeeze().cpu().numpy()
-    save_spectrogram_plot(audio, path_spec, sampling_rate=16000)
-    save_waveform_plot(audio, path_waveform, sampling_rate=16000)
-    save_audio(audio, path_audio, sampling_rate=16000)
+    audio_numpy = audio.squeeze().cpu().numpy()
+    save_spectrogram_plot(audio_numpy, path_spec, sampling_rate=16000)
+    save_waveform_plot(audio_numpy, path_waveform, sampling_rate=16000)
+    save_audio(audio_numpy, path_audio, sampling_rate=16000)
 
     inner_html = f"""
     <table style="display: block">

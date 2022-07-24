@@ -91,8 +91,8 @@ def add_background_noise(
 
 # transformation to alter pitch
 @transformation(with_altered_pitch)
-@fixed('min_semitones', -1)
-@fixed('max_semitones', 1)
+@fixed('min_semitones', -2)
+@fixed('max_semitones', 2)
 @fixed('p', 1.)
 def alter_pitch(
         source_audio: Union[numpy.ndarray, torch.Tensor],
@@ -139,9 +139,9 @@ def composite_transformation(
     """
     transform = Compose(
         [
-            AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.5),
+            AddGaussianNoise(min_amplitude=0.001, max_amplitude=0.01, p=0.5),
             AddBackgroundNoise(sounds_path=["examples/audio/background_noises"], p=0.5),
-            PitchShift(min_semitones=-1, max_semitones=+1, p=0.5),
+            PitchShift(min_semitones=-3, max_semitones=+3, p=0.5),
         ], shuffle=True)
     if not torch.is_tensor(source_audio):
         return torch.from_numpy(transform(source_audio, 16000))

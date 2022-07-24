@@ -1,3 +1,3 @@
-from audio_visualizer import audio_input_visualizer
+from .visualize import audio_input_visualizer  # type: ignore
 
 __all__ = ['audio_input_visualizer']
