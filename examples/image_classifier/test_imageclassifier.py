@@ -184,7 +184,7 @@ classifier_under_test = TrafficSignClassifier()
 
 
 def visualize_input(image):
-    image_name = f"img{random.randint(0, 1e10)}.png"
+    image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
     base_dir = "web_app/static/reports/assets/img"  # for web app
     Path(base_dir).mkdir(parents=True, exist_ok=True)
     write_path = os.path.join(base_dir, image_name)  # nosec

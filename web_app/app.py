@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request
 from argparse import ArgumentParser
 import glob
 import os
@@ -27,18 +27,20 @@ def run_test():
     report_name = request.form.get("report_name")
 
     selected_module = request.form.get("modules")
-    report_name = report_name.replace(".html", "")+".html" if report_name else f"report_{selected_module}_webapp.html"
+    report_name = report_name.replace(".html", "")+".html" if report_name \
+        else f"report_{selected_module}_webapp.html"
     if not request.form.get('check_box'):
-        if selected_module == "all":
-            test_result = os.system(
-                f"poetry run pytest {args.test_directory} --html=web_app/static/reports/{report_name} --self-contained-html")
-        else:
-            test_result = os.system(
-                f"poetry run pytest {args.test_directory}/{selected_module} --html=web_app/static/reports/{report_name} --self-contained-html")
+        command_args = f" --html=web_app/static/reports/{report_name} --self-contained-html"
+        command = f"poetry run pytest {args.test_directory}" if selected_module == "all" \
+            else f"poetry run pytest {args.test_directory}/{selected_module}"
+        os.system(command+command_args)  # nosec
     if "web_app" not in os.getcwd():
         os.chdir(os.path.join(os.getcwd(), "web_app"))
-    print(os.getcwd())
-    return render_template("index.html", report_file=f"reports/{report_name}", module_list=["all"] + [d.split(os.sep)[-2] for d in dirs])
+    return render_template(
+        "index.html",
+        report_file=f"reports/{report_name}",
+        module_list=["all"] + [d.split(os.sep)[-2] for d in dirs]
+    )
 
 
 if __name__ == "__main__":

@@ -145,7 +145,8 @@ def audio_input_visualizer(audio: torch.Tensor) -> str:
             </tr>
             <tr>
                 <td>
-                    <audio controls src={retrieve_path_audio} style="display: block;width: 150px">
+                    <audio controls src={retrieve_path_audio} style="display: block;width: 
+                    150px">
                         Your browser does not support the <code>audio</code> element.
                     </audio>
                 </td>
