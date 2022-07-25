@@ -200,7 +200,7 @@ stt = SpeechToText()
 
 # region data_list
 src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in
-              range(0, 5))
+              range(1, 3))
 # endregion
 
 

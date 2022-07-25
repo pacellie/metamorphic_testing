@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     cwd = os.getcwd()
-    if cwd.split(os.sep)[-1] == "WebApp":
+    if cwd.split(os.sep)[-1] == "web_app":
         os.chdir("..")
     dirs = glob.glob(f"{args.test_directory}/*/")
     return render_template("index.html",
@@ -19,7 +19,7 @@ def index():
 @app.route("/test", methods=["POST"])
 def run_test():
     cwd = os.getcwd()
-    if cwd.split(os.sep)[-1] == "WebApp":
+    if cwd.split(os.sep)[-1] == "web_app":
         os.chdir("..")
     dirs = glob.glob(f"{args.test_directory}/*/")
     # report_name = "reports/audio_test_new.html"
@@ -31,12 +31,12 @@ def run_test():
     if not request.form.get('check_box'):
         if selected_module == "all":
             test_result = os.system(
-                f"poetry run pytest {args.test_directory} --html=WebApp/static/reports/{report_name} --self-contained-html")
+                f"poetry run pytest {args.test_directory} --html=web_app/static/reports/{report_name} --self-contained-html")
         else:
             test_result = os.system(
-                f"poetry run pytest {args.test_directory}/{selected_module} --html=WebApp/static/reports/{report_name} --self-contained-html")
-    if "WebApp" not in os.getcwd():
-        os.chdir(os.path.join(os.getcwd(), "WebApp"))
+                f"poetry run pytest {args.test_directory}/{selected_module} --html=web_app/static/reports/{report_name} --self-contained-html")
+    if "web_app" not in os.getcwd():
+        os.chdir(os.path.join(os.getcwd(), "web_app"))
     print(os.getcwd())
     return render_template("index.html", report_file=f"reports/{report_name}", module_list=["all"] + [d.split(os.sep)[-2] for d in dirs])
 
@@ -52,4 +52,4 @@ if __name__ == "__main__":
                         )
 
     args = parser.parse_args()
-    app.run(port=args.port)
+    app.run(port=args.port, debug=False)

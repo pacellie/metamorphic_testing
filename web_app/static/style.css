@@ -88,24 +88,14 @@ canvas{
 }
 /* ---- particles.js container ---- */
 
-#particles-js{
-  width: 100%;
-  height: 100%;
-  background-color: #66a3ff;
-  background-image: url('');
-  background-size: cover;
-  background-position: 50% 50%;
-  background-repeat: no-repeat;
-  top:0
-}
 
 .hover_effect {
-  box-shadow: 0 0 1rem 0 rgba(1, 16, 16, 0.4);
+  box-shadow: 0 0 1rem 0 rgba(107, 102, 102, 0.4);
   position: relative;
   z-index: 1;
   background: inherit;
   overflow: hidden;
-  opacity: 0.6;
+  opacity: 1;
 }
 
 .hover_effect:before {
@@ -117,7 +107,7 @@ top: 0;
 left: 0;
 right: 0;
 bottom: 0;
-box-shadow: inset 0 0 200px rgba(60, 125, 218, 0.75);
+box-shadow: inset 0 0 250px rgba(246, 243, 243, 0.75);
 filter: blur(10px);
 margin: -20px;
 }
