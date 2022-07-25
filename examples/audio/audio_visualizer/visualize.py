@@ -115,7 +115,8 @@ def audio_input_visualizer(audio: torch.Tensor) -> str:
 
     """
     audio_id = str(uuid.uuid4())  # nosec
-    base_dir = "assets/stt"
+    # base_dir = "assets/stt"  # for command line
+    base_dir = "WebApp/static/reports/assets/stt"  # for web app
     Path(base_dir).mkdir(parents=True, exist_ok=True)
     path_spec = os.path.join(base_dir, f"spec_{audio_id}.png")  # nosec
     path_waveform = os.path.join(base_dir, f"wavf_{audio_id}.png")  # nosec
