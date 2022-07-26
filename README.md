@@ -149,6 +149,11 @@ Now we have three tests `A`, `B`, and `C` for testing the sine function with the
 3. The `randomized` decorator assigns the declared variable `n` a random number by `RandInt`. The `fixed` decorator simply sets `c` to a constant `0`. They provide a more flexible way to define the transformation function.
 4. Also compatible with `hypothesis` `given` for the input.
 
+## Flask GUI commands
+- Run from project root: `poetry run python web_app/app.py`
+- To use a different port than 5000: `poetry run python web_app/app.py --port <port-number>` or `poetry run python web_app/app.py -p <port-number>`
+- By default, inside the project root, it looks for a `examples` folder which is supposed to contain tests of different modules in different sub diretories. To use a custom base folder: `poetry run python web_app/app.py --test_directory <custom-base-path>` or `poetry run python web_app/app.py -t <custom-base-path>`
+
 ## Individual Contributor Setup
 - Run `poetry install` to install all requirements.
 - Run `poetry run install-hook` to install a Git pre-commit hook which performs linting before you commit.
