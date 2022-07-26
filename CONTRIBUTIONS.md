@@ -6,6 +6,19 @@ Name
 - ...
 - ...
 
+Tathagata Bandyopadhyay
+===
+- Research on machine learning based metamorphic testing examples. See [WiKi Page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Examples-for-Metamorphic-Testing#ml_examples_by_tathagata) (Scroll down to the bottom of the page)
+- Research and ideation on Class based framework approach, although we decided to use some other approach finally. See [here](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/40#note_1879716)
+- Study on Audio augmentation Framework. See [Wiki Page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Audiomentations:-A-audio-augmentation-library)
+- Comparison of our approach with MT_Keras. See [Wiki Page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/MTKeras-Idea-(paper-summary))
+- Ideation and implementation of an advanced deep learning based metamorphic example for **Speech Recognition**. See #49, #51, #54, #55, #62, #63
+- Research on finding a proper metamorphic relation for speech Recognition. See #62
+- Writing all docstrings. See #65
+- Ideation on how to log and visualize non-text data (image and audio for us) (Discusion & Brainstorming)
+- Implementation of audio logger and visualizer. See #116
+- Flask based GUI web app for running the tests module wise. #118
+
 
 Danny Benlin Oswan
 ===
