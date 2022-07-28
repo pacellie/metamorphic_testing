@@ -44,9 +44,6 @@ vertical_flip = metamorphic('vertical_flip')
 @randomized('beta', RandInt(-1, 1))
 def brightness_adjustments(image, beta):
     return np.clip(image + beta, 0, 255).astype(np.uint8)
-# to make some failing test with this brightness MR, add these 2 lines in the GT csv
-# 00003.ppm;27;29;5;5;22;24;33
-# 00008.ppm;45;50;6;5;40;45;25
 
 
 @transformation(contrast)

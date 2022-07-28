@@ -1,7 +1,7 @@
 # deep learning imports
 from pathlib import Path
 import csv
-from typing import List, Tuple
+from typing import List
 
 import matplotlib.pyplot as plt   # type: ignore
 
@@ -12,16 +12,12 @@ import torch.nn.functional as fun
 import torchvision as tv  # type: ignore
 
 
-def read_traffic_signs(rootpath: str = "data/") -> Tuple[List[ndarray], List[str]]:
-    """Reads traffic sign data for German Traffic Sign Recognition Benchmark.
+def read_traffic_signs(rootpath: str = "data/") -> List[ndarray]:
+    """Reads traffic sign pictures for German Traffic Sign Recognition Benchmark.
 
     Arguments: path to the traffic sign data, for example './GTSRB/Training'
-    Returns:   list of images, list of corresponding labels"""
+    Returns:   list of images"""
     images = []  # images
-    labels = []  # corresponding labels
-    # prefix = (
-    #     rootpath + "GTSRB_Final_Test_Images/GTSRB/Final_Test/Images/"
-    # )  # subdirectory for class
 
     data_dir = Path(__file__).parent / rootpath
     prefix = data_dir / "GTSRB/Final_Test/Images/"
@@ -32,13 +28,11 @@ def read_traffic_signs(rootpath: str = "data/") -> Tuple[List[ndarray], List[str
         # loop over all images in current annotations file
         for row in gt_reader:
             images.append(plt.imread(prefix / row[0]))  # the 0th column is the filename
-            labels.append(row[7])  # the 8th column is the label
-            # uncomment lines below to load only part of the images
-    return images, labels
+    return images
 
 
 class TrafficSignClassifier(nn.Module):
-    def __init__(self, eval_mode: bool = True, number_classes: int = 43) -> None:
+    def __init__(self) -> None:
         super().__init__()
 
         # CNN layers
@@ -50,7 +44,7 @@ class TrafficSignClassifier(nn.Module):
         self.bn3 = nn.BatchNorm2d(250)
         self.conv_drop = nn.Dropout2d()
         self.fc1 = nn.Linear(250 * 2 * 2, 350)
-        self.fc2 = nn.Linear(350, number_classes)
+        self.fc2 = nn.Linear(350, 43)
 
         self.localization = nn.Sequential(
             nn.Conv2d(3, 8, kernel_size=7),
@@ -80,14 +74,13 @@ class TrafficSignClassifier(nn.Module):
             ]
         )
 
-        if eval_mode:
-            self.eval()
-            self.load_state_dict(
-                torch.load(
-                    Path(__file__).parent / "model/classifier_pretrained_weights.pth",
-                    map_location=torch.device("cpu")
-                )
+        self.eval()
+        self.load_state_dict(
+            torch.load(
+                Path(__file__).parent / "model/classifier_pretrained_weights.pth",
+                map_location=torch.device("cpu")
             )
+        )
 
     # Spatial transformer network forward function
     def stn(self, x: Tensor) -> Tensor:

@@ -8,9 +8,6 @@ import albumentations  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import pytest
 from torchvision import transforms
-# mypy complains that cv2 (and torchvision) has no stubs / not PEP 561-compliant
-# thus is skipped. Same with matplotlib in classifier. Should we ignore?
-# more info: https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
 
 from .keypoint_detection import read_keypoint_images, KeypointModel
 
@@ -118,7 +115,7 @@ class KeypointVisualizer:
         self.second_input = None
         self.first_is_next = True
 
-    def visualize_input(self, image):
+    def vis_input(self, image):
         image = (self.transform(image).clone() * 255).view(96, 96)
         if self.first_is_next:
             self.first_input = image
@@ -132,7 +129,7 @@ class KeypointVisualizer:
             print(e)
         return f"""<img src="{path}" width="100" height="100">"""
 
-    def visualize_output(self, keypoints):
+    def vis_output(self, keypoints):
         if self.first_is_next:
             image = self.first_input
         else:
@@ -172,36 +169,6 @@ def visualize_input(image):
     <img src="{path}" width="53" height="54">
 """
 
-#
-# def visualize_output(label: int) -> str:
-#     LABEL_NAMES = {
-#         16: "truck driving left",
-#         10: "truck driving right",
-#         11: "priority in traffic (next crossing)",
-#         12: "priority in traffic (road)",
-#         18: "warning",
-#         35: "straight road",
-#         38: "drive right",
-#         39: "drive left",
-#         33: "right turn",
-#         34: "left turn",
-#         25: "construction site right",
-#         27: "construction site left"
-#     }
-#     if int(label) in LABEL_NAMES:
-#         return LABEL_NAMES[label]
-#     return f"unknown: {label}"
-
-
-# @pytest.mark.parametrize('image', test_images)
-# @system(dropout, clahe, downscale, hor_flip, equalize, pair, trio, bad1, bad2, badrel,
-#         visualize_input=visualize_input, visualize_output=visualize_output)
-# # @system(pair, trio, visualize_input=visualize)
-# # @system(brightness, contrast, both_cv2, rain, snow, fog, gamma, equalize, downscale, noise,
-# #          posterize, dropout, clahe, blur, hor_flip, ver_flip, visualize_input=visualize)
-# def test_image_classifier(image):
-#     return classifier_under_test.evaluate_image(image)
-
 
 # setup
 test_images = read_keypoint_images()
@@ -211,24 +178,6 @@ predictor_under_test = KeypointModel()
 
 @pytest.mark.parametrize('image', test_images)
 @system(contrast, brightness, both_cv2, dropout, downscale, gamma, equalize, clahe, blur,
-        visualize_input=visualizer.visualize_input, visualize_output=visualizer.visualize_output)
-# @system(pair, trio, visualize_input=visualize)
-# @system(brightness, contrast, both_cv2, rain, snow, fog, gamma, equalize, downscale, noise,
-#          posterize, dropout, clahe, blur, hor_flip, ver_flip, visualize_input=visualize)
+        visualize_input=visualizer.vis_input, visualize_output=visualizer.vis_output)
 def test_keypoint_predictor(image):
     return predictor_under_test.predict(image)
-
-
-def test_something():
-    test_image = read_keypoint_images()
-    image = test_image[0]
-    predicted_keypoints = predictor_under_test.predict(image)
-    # show_all_keypoints(image, key_pts, predicted_keypoints)
-    print("Shape of the image:", image.shape)
-    # print("Smallest value in the image:", torch.min(image))
-    # print("Largest value in the image:", torch.max(image))
-    print(predicted_keypoints)
-    # save_with_scatter(image, predicted_keypoints)
-    # torch.save(predictor_under_test.state_dict(), "keypoint_pretrain_weights.pth")
-    assert len(test_images)
-    assert predictor_under_test is not None
