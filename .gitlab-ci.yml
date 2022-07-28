@@ -96,3 +96,10 @@ facial_keypoints_example:
     allow_failure: true
     script:
         - poetry run example facial_keypoints
+
+shortest_path_example:
+    stage: examples
+    needs: []
+    allow_failure: true
+    script:
+        - poetry run example shortest_path
