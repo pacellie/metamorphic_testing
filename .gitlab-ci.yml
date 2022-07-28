@@ -89,3 +89,10 @@ image_classifier_example:
     allow_failure: true
     script:
         - poetry run example image_classifier
+
+facial_keypoints_example:
+    stage: examples
+    needs: []
+    allow_failure: true
+    script:
+        - poetry run example facial_keypoints
