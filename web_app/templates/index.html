@@ -7,7 +7,7 @@
         <script>
             function resizeIframe() {
                 var iframe = document.getElementById("details_report").querySelector("iframe");
-                iframe.height = iframe.contentWindow.document.body.scrollHeight + 100 + "px";
+                iframe.height = iframe.contentWindow.document.body.scrollHeight + 30 + "px";
                 // resize again because scroll height might change
                 setTimeout(resizeIframe, 1000);
             }
@@ -16,11 +16,19 @@
     <body style="background-color: rgba(255,255,255,0.5)">
         <br><br>
         <div id="outer_container" style="width: 95%; max-width: 900px; margin: auto;">
-            <div id="title_author" class="full_contrast" style="font-family:Verdana;text-align:left;font-color:white;padding:1em;position:relative;background:#f4f4f8;border-radius:1em;">
+            <div id="title_author"
+                 style="font-family:Verdana;
+                        text-align:left;
+                        padding:1em;
+                        position:relative;
+                        background:#f4f4f8;
+                        border-radius:1em;">
                 <div style="text-align: center">
-                    <h1 style="margin: 1em 0;"><a href="http://127.0.0.1:5000">Generic Metamorphic Testing Framework</a></h1>
-                    <h5 style="margin: 1.67em 0;">Tathagata Bandyopadhyay, Ting-Yu Lu, Danny Oswan, Martin Rau and Paul Schwind</h5>
-                    <h6 style="margin: 2.33em 0;">Technical University of Munich, Germany</h6><hr><br>
+                    <h1 style="margin: 1em 0;">
+                        <a href="http://127.0.0.1:5000">
+                            Generic Metamorphic Testing Framework
+                        </a>
+                    </h1>
                 </div>
                 <form action="http://127.0.0.1:5000/test" method="post">
                     <label for="modules">Choose a module to run test:</label>
@@ -33,11 +41,22 @@
                     <input type="text" id="report_name" name="report_name"><br><br>
                     <input type="checkbox" id="check_box" name="check_box" value="1">
                     <label for="check_box">Show precomputed report</label><br><br>
-                    <input type="submit" id="submit" value="Run Tests" style="position:relative;">
+                    <input type="submit"
+                           id="submit"
+                           value="Run Tests"
+                           style="position:relative;">
                 </form>
             </div>
             {% if report_file %}
-            <div id="details_report" class="full_contrast" style="display:flex;font-family:Verdana;text-align:center;font-color:white;margin:1em 0;padding:1em;position:relative;background:#f4f4f8;border-radius:1em;">
+            <div id="details_report"
+                 style="display:flex;
+                        font-family:Verdana;
+                        text-align:center;
+                        margin:1em 0;
+                        padding:1em;
+                        position:relative;
+                        background:#f4f4f8;
+                        border-radius:1em;">
                 <iframe 
                     src="{{ url_for('custom_static', filename=report_file) }}" 
                     style="position: relative; display: flex;" 

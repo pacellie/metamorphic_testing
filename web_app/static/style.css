@@ -1,3 +1,7 @@
+/* This CSS file is adapted from:
+    https://github.com/VincentGarreau/particles.js/issues/268#issuecomment-466633026
+*/
+
 /* =============================================================================
    HTML5 CSS Reset Minified - Eric Meyer
    ========================================================================== */
@@ -20,7 +24,6 @@ li{list-style:none}
 
 
 canvas {
-  /* particles.js container */
   display:block;
   vertical-align:top;
 }
