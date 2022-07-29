@@ -72,7 +72,7 @@ pytest -s
 
 To generate an html report with graphical illustration for tests (should have `pytest-html` [installed](https://pytest-html.readthedocs.io/en/latest/installing.html)):
 ```shell
-pytest --html=report.html --self-contained-html
+pytest --html=assets/reports/report.html --self-contained-html
 ```
 
 ## Example Upgrade
