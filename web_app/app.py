@@ -17,7 +17,7 @@ def index():
 
 
 # Custom static data
-@app.route('/cdn/<path:filename>')
+@app.route('/custom_static/<path:filename>')
 def custom_static(filename):
     return send_from_directory(app.config['CUSTOM_STATIC_PATH'], filename, conditional=True)
 
