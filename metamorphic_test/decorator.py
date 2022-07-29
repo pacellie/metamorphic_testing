@@ -340,4 +340,6 @@ def system(*names: Hashable, **kwargs) -> Callable[[System], Callable[..., None]
             pytest.mark.parametrize('name', names)(execute)
         )
 
+    if not names:
+        names = suite.get_test_id()
     return wrapper
