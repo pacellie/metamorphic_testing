@@ -34,9 +34,9 @@ def run_test():
     report_name = report_name.replace(".html", "") + ".html" if report_name \
         else f"report_{selected_module}_webapp.html"
     if not request.form.get('load_previous_report'):
-        command_args = f" --html=assets/reports/{report_name} --self-contained-html"
         command = f"poetry run pytest {args.test_directory}" if selected_module == "all" \
             else f"poetry run pytest {args.test_directory}/{selected_module}"
+        command_args = f" --html=assets/reports/{report_name} --self-contained-html"
         os.system(command + command_args)  # nosec
     if "web_app" not in os.getcwd():
         os.chdir(os.path.join(os.getcwd(), "web_app"))

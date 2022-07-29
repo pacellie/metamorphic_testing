@@ -152,7 +152,8 @@ Now we have three tests `A`, `B`, and `C` for testing the sine function with the
 ## Flask GUI commands
 - Run from project root: `poetry run python web_app/app.py`
 - To use a different port than 5000: `poetry run python web_app/app.py --port <port-number>` or `poetry run python web_app/app.py -p <port-number>`
-- By default, inside the project root, it looks for a `examples` folder which is supposed to contain tests of different modules in different sub diretories. To use a custom base folder: `poetry run python web_app/app.py --test_directory <custom-base-path>` or `poetry run python web_app/app.py -t <custom-base-path>`
+- By default, inside the project root, it looks for a `examples` folder which is supposed to contain tests of different modules in different sub-directories. To use a custom base folder: `poetry run python web_app/app.py --test_directory <custom-base-path>` or `poetry run python web_app/app.py -t <custom-base-path>`
+- App should be running on localhost and can be accessed by either http://127.0.0.1:5000/ or http://localhost:5000/ . If some custom port number is used please replace 5000 in the urls with the custom port number
 
 ## Individual Contributor Setup
 - Run `poetry install` to install all requirements.
