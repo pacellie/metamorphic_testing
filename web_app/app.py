@@ -48,7 +48,7 @@ def run_test():
 
 
 if __name__ == "__main__":
-    app.config['CUSTOM_STATIC_PATH'] = os.path.join(app.root_path, '../assets/')
+    app.config['CUSTOM_STATIC_PATH'] = os.path.join(app.root_path, '..' , 'assets')
     parser = ArgumentParser()
     parser.add_argument("--test_directory", "-t",
                         type=str, default="examples",

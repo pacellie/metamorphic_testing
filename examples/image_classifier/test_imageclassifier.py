@@ -185,10 +185,10 @@ classifier_under_test = TrafficSignClassifier()
 
 def visualize_input(image):
     image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
-    base_dir = "assets/img"  # for web app
+    base_dir = Path(".") / "assets" / "img"  # for web app
     Path(base_dir).mkdir(parents=True, exist_ok=True)
     write_path = os.path.join(base_dir, image_name)  # nosec
-    read_path = os.path.join("../img", image_name)
+    read_path = os.path.join("..", "img", image_name)
     try:
         plt.imsave(write_path, image)
     except Exception as e:
