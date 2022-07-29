@@ -4,10 +4,18 @@
         <meta charset="UTF-8">
         <title>Metamorphic Testing</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script>
+            function resizeIframe() {
+                var iframe = document.getElementById("details_report").querySelector("iframe");
+                iframe.height = iframe.contentWindow.document.body.scrollHeight + 100 + "px";
+                // resize again because scroll height might change
+                setTimeout(resizeIframe, 1000);
+            }
+        </script>
     </head>
     <body style="background-color: rgba(255,255,255,0.5)">
         <br><br>
-        <div id="outer_container" style="width: 70%; margin: auto;">
+        <div id="outer_container" style="width: 95%; max-width: 900px; margin: auto;">
             <div id="title_author" class="full_contrast" style="font-family:Verdana;text-align:left;font-color:white;padding:1em;position:relative;background:#f4f4f8;border-radius:1em;">
                 <div style="text-align: center">
                     <h1 style="margin: 1em 0;"><a href="http://127.0.0.1:5000">Generic Metamorphic Testing Framework</a></h1>
@@ -29,8 +37,13 @@
                 </form>
             </div>
             {% if report_file %}
-            <div id="details_report" class="full_contrast" style="height:2000px;display:flex;font-family:Verdana;text-align:center;font-color:white;margin:1em 0;padding:1em;position:relative;background:#f4f4f8;border-radius:1em;">
-                <iframe src="{{ url_for('custom_static', filename=report_file) }}" style="position: relative;display: flex;" title="test_report" width="100%" height="100%"></iframe>
+            <div id="details_report" class="full_contrast" style="display:flex;font-family:Verdana;text-align:center;font-color:white;margin:1em 0;padding:1em;position:relative;background:#f4f4f8;border-radius:1em;">
+                <iframe 
+                    src="{{ url_for('custom_static', filename=report_file) }}" 
+                    style="position: relative; display: flex;" 
+                    title="test_report" width="100%" height="100%"
+                    onload="resizeIframe();">
+                </iframe>
             </div>
             {% endif %}
         </div>
