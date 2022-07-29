@@ -31,13 +31,13 @@ def run_test():
     report_name = request.form.get("report_name")
 
     selected_module = request.form.get("modules")
-    report_name = report_name.replace(".html", "")+".html" if report_name \
+    report_name = report_name.replace(".html", "") + ".html" if report_name \
         else f"report_{selected_module}_webapp.html"
-    if not request.form.get('check_box'):
+    if not request.form.get('load_previous_report'):
         command_args = f" --html=assets/reports/{report_name} --self-contained-html"
         command = f"poetry run pytest {args.test_directory}" if selected_module == "all" \
             else f"poetry run pytest {args.test_directory}/{selected_module}"
-        os.system(command+command_args)  # nosec
+        os.system(command + command_args)  # nosec
     if "web_app" not in os.getcwd():
         os.chdir(os.path.join(os.getcwd(), "web_app"))
     return render_template(
@@ -48,7 +48,7 @@ def run_test():
 
 
 if __name__ == "__main__":
-    app.config['CUSTOM_STATIC_PATH'] = os.path.join(app.root_path, '..' , 'assets')
+    app.config['CUSTOM_STATIC_PATH'] = os.path.join(app.root_path, '..', 'assets')
     parser = ArgumentParser()
     parser.add_argument("--test_directory", "-t",
                         type=str, default="examples",
