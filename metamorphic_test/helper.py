@@ -13,17 +13,17 @@ def change_signature(adapt_func):
                 # Decorator was applied to a class.
                 raise RuntimeError("'change_signature' decorator should not "
                                    "be applied to a class.")
-            else:
-                # Decorator was applied to a function or staticmethod.
-                return wrapped(*args, **kwargs)
-        else:
-            if inspect.isclass(instance):
-                # Decorator was applied to a classmethod.
-                raise RuntimeError("'change_signature' decorator should not "
-                                   "be applied to a classmethod.")
-            else:
-                # Decorator was applied to an instancemethod.
-                raise RuntimeError("'change_signature' decorator should not "
-                                   "be applied to an instancemethod.")
+
+            # Decorator was applied to a function or staticmethod.
+            return wrapped(*args, **kwargs)
+
+        if inspect.isclass(instance):
+            # Decorator was applied to a classmethod.
+            raise RuntimeError("'change_signature' decorator should not "
+                               "be applied to a classmethod.")
+
+        # Decorator was applied to an instancemethod.
+        raise RuntimeError("'change_signature' decorator should not "
+                           "be applied to an instancemethod.")
 
     return change
