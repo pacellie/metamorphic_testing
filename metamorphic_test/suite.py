@@ -73,7 +73,7 @@ class Suite:
         module = self.get_caller_module()
         test_id_list = [
             k for k, _ in self.tests.items()
-            if str(k).split('.', maxsplit=1)[0] == module
+            if '.'.join(str(k).split('.')[:-1]) == module
         ]
         return tuple(test_id_list)
 
@@ -87,11 +87,13 @@ class Suite:
         name : str
             the module name where Suite is instantiated
         """
-        frame = inspect.stack()[3]
-        module = inspect.getmodule(frame[0])
-        if module is None:
-            raise ValueError('Internal Error: no calling module.')
-        return module.__name__
+        for frame in inspect.stack():
+            if str(frame[1]).rsplit('/', maxsplit=1)[-1].startswith('test_'):
+                module = inspect.getmodule(frame[0])
+                if module is not None:
+                    return module.__name__
+        raise ValueError('Internal Error: no calling module. '
+                         'Test module name should start with "test_*".')
 
     @staticmethod
     def fixed_generator(transform: Transform, arg: str, value: A) -> Transform:
