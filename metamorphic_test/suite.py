@@ -80,22 +80,22 @@ class Suite:
     @staticmethod
     def get_caller_module() -> str:
         """
-        A static method to get the name of the module where the test is created
+        A static method to get the name of the module where the Suite object is created
 
         Returns
         -------
         name : str
             the module name where the test is created
         """
-        # Returns a list of frame records for the caller's stack.
+        # inspect.stack() Returns a list of frame records for the caller's stack.
         # The first entry in the returned list represents the caller.
-        # The third index gets the third caller where the test is created:
-        # suite.py -> decorator.py -> test_*.py
-        frame = inspect.stack()[3]
-        module = inspect.getmodule(frame[0])
-        if module is None:
-            raise ValueError('Internal Error: no calling module.')
-        return module.__name__
+        for frame in inspect.stack():
+            if str(frame[1]).rsplit('/', maxsplit=1)[-1].startswith('test_'):
+                module = inspect.getmodule(frame[0])
+                if module is not None:
+                    return module.__name__
+        raise ValueError('Internal Error: no calling module. '
+                         'Test module name should start with "test_*".')
 
     @staticmethod
     def fixed_generator(transform: Transform, arg: str, value: A) -> Transform:
