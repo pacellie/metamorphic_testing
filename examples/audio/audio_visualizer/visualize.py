@@ -118,8 +118,11 @@ def audio_input_visualizer(audio: torch.Tensor) -> str:
     base_dir = "assets/stt"
     Path(base_dir).mkdir(parents=True, exist_ok=True)
     path_spec = os.path.join(base_dir, f"spec_{audio_id}.png")  # nosec
+    retrieve_path_spec = os.path.join("..", "stt", f"spec_{audio_id}.png")
     path_waveform = os.path.join(base_dir, f"wavf_{audio_id}.png")  # nosec
+    retrieve_path_waveform = os.path.join("..", "stt", f"wavf_{audio_id}.png")  # nosec
     path_audio = os.path.join(base_dir, f"aud_{audio_id}.wav")  # nosec
+    retrieve_path_audio = os.path.join("..", "stt", f"aud_{audio_id}.wav")  # nosec
 
     audio_numpy = audio.squeeze().cpu().numpy()
     save_spectrogram_plot(audio_numpy, path_spec, sampling_rate=16000)
@@ -131,17 +134,18 @@ def audio_input_visualizer(audio: torch.Tensor) -> str:
         <tbody>
             <tr>
                 <td>
-                    <img src={path_spec} height="150" width="150"></img>
+                    <img src={retrieve_path_spec} height="150" width="150"></img>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <img src={path_waveform} height="75" width="150"></img>
+                    <img src={retrieve_path_waveform} height="75" width="150"></img>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <audio controls src={path_audio} style="display: block;width: 150px">
+                    <audio controls src={retrieve_path_audio} style="display: block;width: 
+                    150px">
                         Your browser does not support the <code>audio</code> element.
                     </audio>
                 </td>

@@ -72,7 +72,7 @@ pytest -s
 
 To generate an html report with graphical illustration for tests (should have `pytest-html` [installed](https://pytest-html.readthedocs.io/en/latest/installing.html)):
 ```shell
-pytest --html=report.html --self-contained-html
+pytest --html=assets/reports/report.html --self-contained-html
 ```
 
 ## Example Upgrade
@@ -148,6 +148,12 @@ Now we have three tests `A`, `B`, and `C` for testing the sine function with the
 2. For test `C`, we want to first negate the input `x` and then shift it. Therefore, we assign the transformation `negate` with `priority=1` and the transformation `shift` with `priority=0`. The transformation with a higher priority number will be applied to the input `x` first.
 3. The `randomized` decorator assigns the declared variable `n` a random number by `RandInt`. The `fixed` decorator simply sets `c` to a constant `0`. They provide a more flexible way to define the transformation function.
 4. Also compatible with `hypothesis` `given` for the input.
+
+## Flask GUI commands
+- Run from project root: `poetry run python web_app/app.py`
+- To use a different port than 5000: `poetry run python web_app/app.py --port <port-number>` or `poetry run python web_app/app.py -p <port-number>`
+- By default, inside the project root, it looks for a `examples` folder which is supposed to contain tests of different modules in different sub-directories. To use a custom base folder: `poetry run python web_app/app.py --test_directory <custom-base-path>` or `poetry run python web_app/app.py -t <custom-base-path>`
+- App should be running on localhost and can be accessed by either http://127.0.0.1:5000/ or http://localhost:5000/ . If some custom port number is used please replace 5000 in the urls with the custom port number
 
 ## Individual Contributor Setup
 - Run `poetry install` to install all requirements.
