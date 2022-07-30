@@ -10,6 +10,7 @@ from jiwer import wer, mer, wil  # type: ignore
 from models.speech_to_text import SpeechToText  # type: ignore
 from audio_visualizer import audio_input_visualizer  # type: ignore
 from utils.stt_utils import stt_read_audio  # type: ignore
+from metamorphic_test.logger import logger
 from metamorphic_test import (
     transformation,
     relation,
@@ -186,7 +187,7 @@ def stt_soft_compare(x: str, y: str) -> bool:
     wer_val = wer(x, y)
     mer_val = mer(x, y)
     wil_val = wil(x, y)
-    print(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")
+    logger.info(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")
     return wer_val <= 0.3 and mer_val <= 0.3 and wil_val <= 0.5  # empirically chosen threshold
 
 # endregion
