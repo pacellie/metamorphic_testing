@@ -187,7 +187,8 @@ def stt_soft_compare(x: str, y: str) -> bool:
     wer_val = wer(x, y)
     mer_val = mer(x, y)
     wil_val = wil(x, y)
-    logger.info(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")
+    # logger.info(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")  # linter breaks
+    logger.info("WER: %0.3f, MER: %0.3f, WIL: %0.3f", wer_val, mer_val, wil_val)
     return wer_val <= 0.3 and mer_val <= 0.3 and wil_val <= 0.5  # empirically chosen threshold
 
 # endregion

@@ -115,7 +115,7 @@ def audio_input_visualizer(audio: torch.Tensor) -> str:
 
     """
     audio_id = str(uuid.uuid4())  # nosec
-    base_dir = "assets/stt"
+    base_dir = Path(".") / "assets" / "stt"
     Path(base_dir).mkdir(parents=True, exist_ok=True)
     path_spec = os.path.join(base_dir, f"spec_{audio_id}.png")  # nosec
     retrieve_path_spec = os.path.join("..", "stt", f"spec_{audio_id}.png")
