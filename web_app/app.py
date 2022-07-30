@@ -1,3 +1,4 @@
+from pathlib import Path
 from flask import Flask, render_template, request, send_from_directory
 from argparse import ArgumentParser
 import glob
@@ -6,11 +7,13 @@ import os
 app = Flask(__name__)
 
 
+if Path.cwd().name == "web_app":
+    # we need to be in the root directory of the repository
+    os.chdir("..")
+
+
 @app.route("/")
 def index():
-    cwd = os.getcwd()
-    if cwd.split(os.sep)[-1] == "web_app":
-        os.chdir("..")
     dirs = glob.glob(f"{args.test_directory}/*/")
     return render_template("index.html",
                            module_list=["all"] + [d.split(os.sep)[-2] for d in dirs])
@@ -24,22 +27,18 @@ def custom_static(filename):
 
 @app.route("/test", methods=["POST"])
 def run_test():
-    cwd = os.getcwd()
-    if cwd.split(os.sep)[-1] == "web_app":
-        os.chdir("..")
     dirs = glob.glob(f"{args.test_directory}/*/")
     report_name = request.form.get("report_name")
-
     selected_module = request.form.get("modules")
     report_name = report_name.replace(".html", "") + ".html" if report_name \
         else f"report_{selected_module}_webapp.html"
+
     if not request.form.get('load_previous_report'):
         command = f"poetry run pytest {args.test_directory}" if selected_module == "all" \
             else f"poetry run pytest {args.test_directory}/{selected_module}"
         command_args = f" --html=assets/reports/{report_name} --self-contained-html"
         os.system(command + command_args)  # nosec
-    if "web_app" not in os.getcwd():
-        os.chdir(os.path.join(os.getcwd(), "web_app"))
+
     return render_template(
         "index.html",
         report_file=f"reports/{report_name}",
