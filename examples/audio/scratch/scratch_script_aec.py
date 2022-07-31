@@ -15,6 +15,9 @@ def get_audio_tagging_result(clipwise_output, top_k=10):
     """Visualization of audio tagging result.
     Args:
       clipwise_output: (classes_num,)
+        output softmax distribution across all classes
+      top_k: int
+        number of top predictions to print
     """
     sorted_indexes = np.argsort(clipwise_output)[::-1]
 
