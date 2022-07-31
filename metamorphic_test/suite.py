@@ -80,14 +80,14 @@ class Suite:
     @staticmethod
     def get_caller_module() -> str:
         """
-        A static method to get the name of the module where the Suite object is created
+        A static method for getting the name of a test module.
 
         Returns
         -------
-        name : str
+        module.__name__ : str
             the module name where the test is created
         """
-        # inspect.stack() Returns a list of frame records for the caller's stack.
+        # inspect.stack() returns a list of frame records for the caller's stack.
         # The first entry in the returned list represents the caller.
         for frame in inspect.stack():
             if str(frame[1]).rsplit('/', maxsplit=1)[-1].startswith('test_'):
