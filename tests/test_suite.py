@@ -128,19 +128,19 @@ def test_set_relation(test_id):
 def test_execute(test_id, args):
     suite = Suite()
 
-    def function_to_be_test():
+    def system():
         pass
 
     with pytest.raises(KeyError):
-        suite.execute(test_id, function_to_be_test, args)
+        suite.execute(test_id, system, args)
 
     test_id = suite.metamorphic(test_id)
     with pytest.raises(ValueError):
-        suite.execute(test_id, function_to_be_test, args)
+        suite.execute(test_id, system, args)
 
     with pytest.raises(AssertionError):
-        suite.execute(None, function_to_be_test, args)
-        assert suite.execute(test_id, function_to_be_test, args)
+        suite.execute(None, system, args)
+        assert suite.execute(test_id, system, args)
 
     suite.execute = Mock(return_value=None)
-    assert suite.execute(test_id, function_to_be_test, args) is None
+    assert suite.execute(test_id, system, args) is None
