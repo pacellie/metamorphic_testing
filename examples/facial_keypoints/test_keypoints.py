@@ -16,7 +16,7 @@ from metamorphic_test import (
     relation,
     metamorphic,
     system,
-    randomized, fixed,
+    randomized
 )
 from metamorphic_test.generators import RandInt, RandFloat
 
@@ -145,29 +145,6 @@ class KeypointVisualizer:
         plt.savefig(path, bbox_inches='tight',pad_inches = 0)
         plt.clf()
         return f"""<img src="{path}" width="100" height="100">"""
-
-
-def save_with_scatter(image, keypoints):
-    transform = transforms.ToTensor()
-    image = (transform(image).clone() * 255).view(96, 96)
-    plt.imshow(image, cmap='gray')
-    keypoints = keypoints.clone() * 48 + 48
-    plt.scatter(keypoints[:, 0], keypoints[:, 1], s=200, marker='.', c='m')
-    plt.axis('off')
-    plt.savefig('result.png', bbox_inches='tight',pad_inches = 0)
-
-
-def visualize_input(image):
-    transform = transforms.ToTensor()
-    image = (transform(image).clone() * 255).view(96, 96)
-    path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
-    try:
-        plt.imsave(path, image, cmap='gray')
-    except Exception as e:
-        print(e)
-    return f"""
-    <img src="{path}" width="53" height="54">
-"""
 
 
 # setup

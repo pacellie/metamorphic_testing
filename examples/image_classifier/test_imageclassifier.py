@@ -175,7 +175,7 @@ def flip_sign(x, y):
 
 
 # setup
-test_images, test_labels = read_traffic_signs()
+test_images = read_traffic_signs()
 classifier_under_test = TrafficSignClassifier()
 
 

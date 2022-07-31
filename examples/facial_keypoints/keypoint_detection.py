@@ -1,16 +1,11 @@
-# deep learning imports
-import pickle
 from pathlib import Path
 import pandas as pd
 import numpy as np
 from typing import List
 
-import matplotlib.pyplot as plt   # type: ignore
-
 import torch
 from numpy import ndarray
 from torch import nn, Tensor
-import torchvision as tv  # type: ignore
 from torchvision import transforms
 
 

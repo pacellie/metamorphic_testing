@@ -20,10 +20,10 @@ def read_traffic_signs(rootpath: str = "data/") -> List[ndarray]:
     images = []  # images
 
     data_dir = Path(__file__).parent / rootpath
-    prefix = data_dir / "GTSRB/Final_Test/Images/"
+    prefix = data_dir / "GTSRB" / "Final_Test" / "Images"
 
-    with open(data_dir / "GTSRB_Final_Test_GT/GT-final_test.csv", encoding="utf-8") as gt_file:
-        gt_reader = csv.reader(gt_file, delimiter=";")  # csv parser for annotations file
+    with open(data_dir / "GTSRB_Final_Test_GT" / "GT-final_test.csv", encoding="utf-8") as gt:
+        gt_reader = csv.reader(gt, delimiter=";")  # csv parser for annotations file
         next(gt_reader)  # skip header
         # loop over all images in current annotations file
         for row in gt_reader:
@@ -77,7 +77,7 @@ class TrafficSignClassifier(nn.Module):
         self.eval()
         self.load_state_dict(
             torch.load(
-                Path(__file__).parent / "model/classifier_pretrained_weights.pth",
+                Path(__file__).parent / "model" / "classifier_pretrained_weights.pth",
                 map_location=torch.device("cpu")
             )
         )
