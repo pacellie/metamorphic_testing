@@ -8,7 +8,7 @@ import cv2  # type: ignore
 import albumentations  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import pytest
-from torchvision import transforms
+from torchvision import transforms  # type: ignore
 
 from .keypoint_detection import read_keypoint_images, KeypointModel
 

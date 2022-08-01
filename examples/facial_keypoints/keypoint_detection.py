@@ -6,7 +6,7 @@ from typing import List
 import torch
 from numpy import ndarray
 from torch import nn, Tensor
-from torchvision import transforms
+from torchvision import transforms  # type: ignore
 
 
 def read_keypoint_images(csv_name: str = "val.csv") -> List[ndarray]:
