@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
-import random
 from typing import List
+import uuid
 
 import numpy as np
 import cv2  # type: ignore
@@ -265,7 +265,7 @@ def visualize_input(image: ndarray) -> str:
     -------
     html string that refers to the saved image
     """
-    path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
+    path = str(Path("assets") / f"img{uuid.uuid4()}.png")
     try:
         plt.imsave(path, image)
     except Exception as e:
@@ -286,7 +286,7 @@ def visualize_input_webapp(image: ndarray) -> str:
     -------
     html string that refers to the saved image
     """
-    image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
+    image_name = f"img{uuid.uuid4()}.png"
     base_dir = Path("web_app/static/reports/assets/img")  # for web app
     base_dir.mkdir(parents=True, exist_ok=True)
     write_path = base_dir / image_name
@@ -313,6 +313,7 @@ def visualize_output(label: int) -> str:
         34: "left turn",
         25: "construction site right",
         27: "construction site left",
+        28: "children crossing",
     }
     return LABEL_NAMES.get(label, f"unknown: {label}")
 

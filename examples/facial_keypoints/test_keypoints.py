@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
-import random
 from typing import Optional, List
+import uuid
 
 import torch
 
@@ -96,7 +96,7 @@ def album_downscale(image: ndarray, scale: float = 0.5) -> ndarray:
     return image_transform.apply(image, scale=scale, interpolation=0)
 
 
-@transformation(gamma)  # not expressive
+@transformation(gamma)
 @randomized("limit", RandInt(70, 130))
 def album_gamma(image: ndarray, limit: int = 101) -> ndarray:
     # some transform need a little different setup
@@ -152,7 +152,7 @@ def error_is_small(x: Tensor, y: Tensor) -> bool:
     True if the keypoints are not far apart, False otherwise.
     """
     loss_fn = torch.nn.MSELoss()
-    loss = loss_fn(y, x)
+    loss = loss_fn(y, x).item()
     return loss < 0.002
 
 
@@ -196,7 +196,7 @@ class KeypointVisualizer:
         html string that refers to the saved image
         """
         image = self.prepare_input_visual(image)
-        path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
+        path = str(Path("assets") / f"img{uuid.uuid4()}.png")
         try:
             plt.imsave(path, image, cmap="gray")
         except Exception as e:
@@ -217,7 +217,7 @@ class KeypointVisualizer:
         html string that refers to the saved image
         """
         image = self.prepare_input_visual(image)
-        image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
+        image_name = f"img{uuid.uuid4()}.png"
         base_dir = Path("web_app/static/reports/assets/img")  # for web app
         base_dir.mkdir(parents=True, exist_ok=True)
         write_path = base_dir / image_name
@@ -254,7 +254,7 @@ class KeypointVisualizer:
         """
         if not self.prepare_output_visual(keypoints):
             return str(keypoints)
-        path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
+        path = str(Path("assets") / f"img{uuid.uuid4()}.png")
         try:
             plt.savefig(path, bbox_inches="tight", pad_inches=0)
         except Exception as e:
@@ -276,7 +276,7 @@ class KeypointVisualizer:
         """
         if not self.prepare_output_visual(keypoints):
             return str(keypoints)
-        image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
+        image_name = f"img{uuid.uuid4()}.png"
         base_dir = Path("web_app/static/reports/assets/img")  # for web app
         base_dir.mkdir(parents=True, exist_ok=True)
         write_path = base_dir / image_name
