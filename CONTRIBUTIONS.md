@@ -1,11 +1,6 @@
 This file lists contributions by the individual team members.
 Our team did a lot of trial & error, so this file is comparatively important.
 
-Name
-===
-- ...
-- ...
-
 Tathagata Bandyopadhyay
 ===
 - Research on machine learning based metamorphic testing examples. See [WiKi Page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Examples-for-Metamorphic-Testing#ml_examples_by_tathagata) (Scroll down to the bottom of the page)
@@ -20,7 +15,6 @@ Tathagata Bandyopadhyay
 - Flask based GUI web app for running the tests module wise. #118, #123, 37102629, !32
 - Flask GUI response caching issue debuging and fixing. See issue #125 and [this wiki page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Issue-%23125-fix,-a-most-interesting-debugging-and-bug-fix)
 - Implementation of Acoustic Event Classification (aec) example with the proposed metamorphic testing framework and corresponding refactoring of audio visualizer. See issues: #61, #64, #126, merge request: !35 and the summary [WiKi Page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Metamorphic-Testing-For-Acoustic-Event-(Scene)-Classification-(idea-and-a-paper-summary))
-
 
 Danny Benlin Oswan
 ===
@@ -53,3 +47,15 @@ Paul Schwind
 - Put a visualization of Metamorphic Testing into pytest-html reports of the tests (#100, #103)
 - Improved how failed tests look in the GUI (#104)
 - Implemented: show function source code in GUI on hover (#110)
+
+Martin Rau
+===
+- Research hypothesis and pytest testing frameworks, in particular dig through all the pytest plugins with focus on pytest-timeout and pytest-xdist ([wiki](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Testing-Frameworks-Quicklinks), [pytest-timeout branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/feature/pytest-timeout), [pytest-xdist branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/feature/pytest-xdist)).
+- Design and implement an initial framework architecture and sin/addition examples ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/feature/architecture-martin), [wiki](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Ideas-on-how-code-using-our-framework-could-look)).
+- Re-design and re-implement the framework architecture ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/feature/decorator-architecture)).
+- Finalize framework design and implementation in pair-programming session with Ting-Yu Lu([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/framework-simon-iris)).
+- Explore A,B,AB,BA approach of Simon. ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/blob/feature/a-b-ab-ba-example/tests/test_a_b_ab_ba.py))
+- Improve Code quality: Docstrings ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/commit/bcc41c69f9b64f2eef23bd220708638688279d5b)), Typing ([branch1](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/68-typing), [branch2](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/68/typing-v2)).
+- Improve failing test output ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/88-89/improve-failing-test)), also in the console ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/106/better-failed-tests-in-console)).
+- Implement one-by-one test execution a few times since we broke it twice again ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/102/one-by-one-test-execution-in-gui)).
+- Implement tests for parts of the core framework ([branch](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/tree/74/framework-tests-decorator-metamorphic)).
