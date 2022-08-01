@@ -46,6 +46,8 @@ Paul Schwind
 - Put a visualization of Metamorphic Testing into pytest-html reports of the tests (#100, #103)
 - Improved how failed tests look in the GUI (#104)
 - Implemented: show function source code in GUI on hover (#110)
+- Wrote tests for the execution report (#74)
+- Team lead
 
 Martin Rau
 ===
