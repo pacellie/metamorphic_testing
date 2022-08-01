@@ -47,6 +47,23 @@ pair = metamorphic('hflip_equalize')
 trio = metamorphic('drop_down_bright', relation=equality)
 
 
+"""
+This example demonstrates MR tests of a traffic sign classifier NN:
+- if the images are pertubed slightly, the prediction should not differ by much.
+- if the perturbation causes the semantic information to change, 
+  e.g. from left to right turn, the prediction should reflect this change.
+
+What follows here are 16 image perturbation functions, all with the same signature: receives
+an image, and one or more parameters that can be used on the perturbation function.
+Consult albumentations documentation for more information on functions that uses them:
+https://albumentations.ai/docs/api_reference/augmentations/transforms/.
+Note that the randomization of some of the parameters are delegated into our own framework
+instead of using the perturbation's own random functionality.
+For demonstration purposes, two MR tests will make use of two or three of these
+perturbations in random sequence.
+"""
+
+
 @transformation(brightness)
 @transformation(both_transform)
 @randomized('beta', RandInt(-1, 1))
@@ -198,6 +215,7 @@ def flip_sign(x: int, y: int) -> bool:
 
 
 class ExceptionLogger:
+    """Class to help log exceptions that occur when saving images for visualization."""
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
@@ -260,6 +278,7 @@ def visualize_input_webapp(image: ndarray) -> str:
 
 
 def visualize_output(label: int) -> str:
+    """Obtain human readable name from a traffic sign class."""
     LABEL_NAMES = {
         16: "truck driving left",
         10: "truck driving right",
@@ -286,4 +305,5 @@ def visualize_output(label: int) -> str:
     visualize_output=visualize_output,
 )
 def test_image_classifier(image: ndarray) -> int:
+    """Predict the traffic sign in an image"""
     return classifier_under_test.evaluate_image(image)

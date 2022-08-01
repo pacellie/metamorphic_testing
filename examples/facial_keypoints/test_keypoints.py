@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt  # type: ignore
 import pytest
 from numpy import ndarray
 from torch import Tensor
-from torchvision import transforms
+from torchvision import transforms  # type: ignore
 
 from .keypoint_detection import read_keypoint_images, KeypointModel
 
@@ -35,6 +35,27 @@ equalize = metamorphic('equalize')
 clahe = metamorphic('clahe')
 blur = metamorphic('blur')
 
+
+"""
+This example demonstrates MR tests of a keypoint prediction NN on human portraits:
+if the portraits are pertubed slightly, the prediction should not differ by much.
+
+Be advised that the relation function makes use of this NN's training error function.
+Other NN MR tests could apply the same principle, where the error between the first and
+second output are small enough, using its own training error function.
+
+What follows here are 9 image perturbation functions, all with the same signature: receives
+an image, and one or more parameters that can be used on the perturbation function.
+Consult albumentations documentation for more information on functions that uses them:
+https://albumentations.ai/docs/api_reference/augmentations/transforms/.
+Note that the randomization of some of the parameters are delegated into our own framework
+instead of using the perturbation's own random functionality.
+Also there are less perturbations that can be used here than the classifier example, as
+there are perturbations that can only be applied on RGB image (portraits here are grayscale).
+Flips are also not included as it is quite complicated to swap the predictions (some will
+have to be mirrored like nose, others have to be swapped like left-right eye), and the
+NN may not work properly from an upside-down portraits, in case of vertical flips
+"""
 
 @transformation(contrast)
 @randomized('alpha', RandFloat(0.6, 1.5))
@@ -107,9 +128,25 @@ def album_blur(image: ndarray, kernel_size: int = 3) -> ndarray:
 
 @relation(contrast, brightness, both_cv2, dropout, downscale, gamma, equalize, clahe, blur)
 def error_is_small(x: Tensor, y: Tensor) -> bool:
+    """
+    Determines if the resulting keypoints pairs are close or too far apart.
+
+    This is measured using Mean-square-error loss function, which is the same loss function
+    that is used to train this neural network by minimizing them.
+
+    Parameters
+    ----------
+    x : Tensor
+        The first set of keypoints
+    y : Tensor
+        The second set of keypoints
+
+    Returns
+    -------
+    True if the keypoints are not far apart, False otherwise.
+    """
     loss_fn = torch.nn.MSELoss()
     loss = loss_fn(y, x)
-    print(loss)   # logger here
     return loss < 0.002
 
 
@@ -186,6 +223,8 @@ class KeypointVisualizer:
         return f"<img src='{read_path}' width='100' height='100'>"
 
     def prepare_input_visual(self, image: ndarray) -> ndarray:
+        """Convert image into tensor of appropriate size, then store it either in
+        the first or second slot."""
         image = (self.transform(image).clone() * 255).view(96, 96)
         if self.first_is_next:
             self.first_input = image
@@ -243,6 +282,20 @@ class KeypointVisualizer:
         return f"<img src='{read_path}' width='100' height='100'>"
 
     def prepare_output_visual(self, keypoints: Tensor) -> bool:
+        """
+        Clear matplotlib's canvas, then plot the keypoints overlaid on either the first
+        or the second stored image, returning
+
+        Parameters
+        ----------
+        keypoints : tensor
+            keypoints to visualize
+
+        Returns
+        -------
+        False if this method is somehow called before 2
+        input images are stored, True otherwise.
+        """
         plt.clf()
         if self.first_is_next:
             image = self.first_input
@@ -268,4 +321,5 @@ predictor_under_test: KeypointModel = KeypointModel()
 @system(contrast, brightness, both_cv2, dropout, downscale, gamma, equalize, clahe, blur,
         visualize_input=visualizer.vis_input_app, visualize_output=visualizer.vis_output_app)
 def test_keypoint_predictor(image: ndarray) -> Tensor:
+    """Predict the facial keypoints of a portrait"""
     return predictor_under_test.predict(image)

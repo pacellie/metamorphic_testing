@@ -6,14 +6,22 @@ from typing import List
 import torch
 from numpy import ndarray
 from torch import nn, Tensor
-from torchvision import transforms
+from torchvision import transforms  # type: ignore
 
 
 def read_keypoint_images(csv_name: str = "val.csv") -> List[ndarray]:
-    """Reads portraits from supplied csv.
+    """
+    Reads portraits from supplied csv.
 
-    Arguments: name of the csv file, defaults to 'val.csv'
-    Returns:   list of portraits"""
+    Parameters
+    ----------
+    csv_name : str
+        name of the csv file, defaults to 'val.csv'
+
+    Returns
+    -------
+    list of portraits
+    """
     images = []
     csv_file = Path(__file__).parent / csv_name
     key_pts_frame = pd.read_csv(csv_file)
@@ -28,10 +36,10 @@ def read_keypoint_images(csv_name: str = "val.csv") -> List[ndarray]:
 
 
 class KeypointModel(nn.Module):
+    """A neural network that receives portraits and determines the location of facial keypoints,
+    e.g. left/right eye, nose, lips, eyebrows, etc."""
     def __init__(self) -> None:
-        """
-        Initialize the keypoint mmodel.
-        """
+        """Initialize the keypoint model."""
         super().__init__()
         self.model: nn.Module = nn.Sequential(
             nn.Conv2d(1, 3, 3),
@@ -41,8 +49,10 @@ class KeypointModel(nn.Module):
             nn.Flatten(),
             nn.Linear(42320, 30)
         )
+        """The architecture (weights, non-linearity, etc) of this neural network"""
 
         self.transform = transforms.ToTensor()
+        """Used to transform ndarray inputs into torch tensors"""
 
         self.eval()
         self.load_state_dict(
@@ -53,10 +63,13 @@ class KeypointModel(nn.Module):
         )
 
     def forward(self, image: ndarray) -> Tensor:
+        """Process the image with the neural network."""
         x: Tensor = self.transform(image)
         if x.dim() == 3:
             x = torch.unsqueeze(x, 0)
         return self.model(x)
 
     def predict(self, img: ndarray) -> Tensor:
+        """Process the image with the neural network, and convert the result to coordinates of
+        15 keypoints."""
         return torch.squeeze(self(img).detach()).view(15, 2)
