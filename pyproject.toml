@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metamorphic_test"
-version = "0.1.4"
+version = "0.1.5"
 description = ""
 authors = ["Python Practicum TUM 2022"]
 
@@ -10,6 +10,7 @@ install-hook = "scripts.install_hook:install_hook"
 lint = "scripts.lint:lint"
 test = "scripts.run_tests:run_tests"
 example = "scripts.run_tests:run_example"
+web-app = "scripts.run_web_app:run_web_app"
 
 [tool.poetry.plugins."pytest11"]
 metamorphic = "metamorphic_test"
@@ -43,6 +44,9 @@ albumentations = "^1.2.1"
 Dijkstar = "^2.6.0"
 matplotlib = "^3.5.2"
 torchlibrosa = "^0.0.9"
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
