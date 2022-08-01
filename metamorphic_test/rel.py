@@ -4,7 +4,7 @@ from typing import TypeVar, Any, Callable
 
 class Comparable(metaclass=ABCMeta):
     """
-    This abstract base class used to mark that any type implementing this
+    This abstract base class is used to mark that any type implementing this
     class must support the common comparison operators.
 
     It is used for exclusively for typing.
@@ -26,14 +26,16 @@ class Comparable(metaclass=ABCMeta):
         ...
 
 
-# Common type variable for unconstrained relations.
 A = TypeVar('A')
+"""Common type variable for unconstrained relations."""
 
 
-# Common type variable for relations which contrain the type to support python's
-# usual comparison operators. Also see the 'Comparable' ABC.
 B = TypeVar('B', bound=Comparable)
+"""
+Common type variable for relations which contrain the type to support python's
+usual comparison operators. Also see the 'Comparable' ABC.
+"""
 
 
-# The general type of an un-constrained relation.
 Relation = Callable[[A, A], bool]
+"""The general type of an un-constrained relation."""

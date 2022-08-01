@@ -55,7 +55,7 @@ def is_less_than(x: B, y: B) -> bool:
 def is_greater_than(x: B, y: B) -> bool:
     """
     Checks if the first argument is strictly greater than the second argument by
-    delegating to python's built-in 'gt'-operator.
+    delegating to python's built-in '>'-operator.
 
     Parameters:
     -----------
