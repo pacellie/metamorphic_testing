@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metamorphic_test"
-version = "0.1.4"
+version = "0.1.5"
 description = ""
 authors = ["Python Practicum TUM 2022"]
 
@@ -42,6 +42,9 @@ jiwer = "^2.3.0"
 albumentations = "^1.2.1"
 Dijkstar = "^2.6.0"
 matplotlib = "^3.5.2"
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
