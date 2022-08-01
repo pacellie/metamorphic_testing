@@ -102,7 +102,8 @@ class MetamorphicExecutionReport:
         This will set the result of the transform at index 0 in the report
         and store raised exceptions, if any.
         """
-        assert 0 <= i < len(self.transforms)
+        if i < 0 or i >= len(self.transform_results):
+            raise IndexError("Index out of range.")
         try:
             def set_(t):
                 self.transform_results[i].output = t
@@ -137,7 +138,9 @@ class MetamorphicExecutionReport:
     def register_relation_result(self):
         """Context manager similar to register_transform_result."""
         try:
-            def set_(r):
+            def set_(r: bool):
+                if not isinstance(r, bool):
+                    raise ValueError("Relation result must be a bool.")
                 self.relation_result.output = r
             yield set_
         except Exception as e:
