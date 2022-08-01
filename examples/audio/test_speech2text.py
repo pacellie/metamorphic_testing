@@ -10,6 +10,7 @@ from jiwer import wer, mer, wil  # type: ignore
 from models.speech_to_text import SpeechToText  # type: ignore
 from audio_visualizer import audio_input_visualizer  # type: ignore
 from utils.stt_utils import stt_read_audio  # type: ignore
+from metamorphic_test.logger import logger
 from metamorphic_test import (
     transformation,
     relation,
@@ -186,7 +187,8 @@ def stt_soft_compare(x: str, y: str) -> bool:
     wer_val = wer(x, y)
     mer_val = mer(x, y)
     wil_val = wil(x, y)
-    print(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")
+    # logger.info(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")  # linter breaks
+    logger.info("WER: %0.3f, MER: %0.3f, WIL: %0.3f", wer_val, mer_val, wil_val)
     return wer_val <= 0.3 and mer_val <= 0.3 and wil_val <= 0.5  # empirically chosen threshold
 
 # endregion
@@ -199,8 +201,12 @@ stt = SpeechToText()
 
 
 # region data_list
-src_audios = (stt_read_audio(f"examples/audio/speech_samples/test_audio_{i}.wav") for i in
-              range(0, 5))
+
+src_audios = (
+    stt_read_audio(
+        str(Path(".") / "examples" / "audio" / "speech_samples" / f"test_audio_{i}.wav")
+    ) for i in range(0, 5)
+)
 # endregion
 
 
