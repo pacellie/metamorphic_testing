@@ -287,10 +287,10 @@ def visualize_input_webapp(image: ndarray) -> str:
     html string that refers to the saved image
     """
     image_name = f"img{uuid.uuid4()}.png"
-    base_dir = Path("web_app/static/reports/assets/img")  # for web app
+    base_dir = Path("assets/img")  # for web app
     base_dir.mkdir(parents=True, exist_ok=True)
     write_path = base_dir / image_name
-    read_path = Path("assets/img") / image_name
+    read_path = Path("../img") / image_name
     try:
         plt.imsave(write_path, image)
     except Exception as e:
