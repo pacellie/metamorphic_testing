@@ -8,7 +8,7 @@ SignatureWrapper = Callable[[Callable], Callable]
 def change_signature(adapt_func: Callable) -> SignatureWrapper:
     """
     Signature changing decorator.
-    Changing from the original function signature to adapt_func function's.
+    Change the original function's signature to adapt_func's.
 
     Parameters
     ----------
