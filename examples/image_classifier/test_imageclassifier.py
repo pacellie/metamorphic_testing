@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import random
 
@@ -35,8 +36,13 @@ downscale = metamorphic('downscale', relation=equality)
 noise = metamorphic('noise', relation=equality)
 clahe = metamorphic('clahe', relation=equality)
 blur = metamorphic('blur', relation=equality)
+dropout = metamorphic('dropout', relation=equality)
+posterize = metamorphic('posterize', relation=equality)
 horizontal_flip = metamorphic('horizontal_flip')
 vertical_flip = metamorphic('vertical_flip')
+
+pair = metamorphic('hflip_equalize')
+trio = metamorphic('drop_down_bright', relation=equality)
 
 
 @transformation(brightness)
@@ -95,34 +101,44 @@ def album_fog(image, fog_coef=0.5, alpha_coef=0.08):
     return image_transform.apply(image)
 
 
-# posterize doesn't seem to work properly, check later
-# poster = metamorphic('poster', relation=equality)
-# @transformation(poster)
-# @randomized('bits', RandInt(5, 7))
-# def album_posterize(image, bits=5):
-#     image_transform = albumentations.Posterize(num_bits=bits, p=1)
-#     return image_transform.apply(image)
-
-
-@transformation(gamma)
-@randomized('limit', RandInt(100, 110))
-def album_gamma(image, limit=101):
-    image_transform = albumentations.RandomGamma(gamma_limit=(limit, limit), p=1)
+@transformation(posterize)
+@randomized('bits', RandInt(5, 7))
+def album_posterize(image, bits=5):
+    image_transform = albumentations.Posterize(num_bits=bits, p=1)
     return image_transform.apply(image)
 
 
+@transformation(gamma)
+@randomized('limit', RandInt(70, 130))
+def album_gamma(image, limit=101):
+    # some transform need a little different setup
+    image_transform = albumentations.Compose([
+        albumentations.RandomGamma(gamma_limit=(limit, limit), p=1)
+    ])
+    return image_transform(image=image)["image"]
+
+
 @transformation(equalize)
+@transformation(pair)
 def album_equalize(image):
     image_transform = albumentations.Equalize(p=1)
     return image_transform.apply(image)
 
 
-# find out: which one doesn't work if just apply
-# add coarse dropout, and change to go via transform since basic apply does nothing
+@transformation(dropout)
+@transformation(trio)
+@randomized('holes', RandInt(4, 6))
+def album_dropout(image, holes=6, height=6, width=6):
+    # some transform need a little different setup
+    image_transform = albumentations.Compose([
+        albumentations.CoarseDropout(max_holes=holes, max_height=height, max_width=width, p=1)
+    ])
+    return image_transform(image=image)["image"]
 
 
 @transformation(downscale)
-@randomized('scale', RandFloat(0.6, 0.8))
+@transformation(trio)
+@randomized('scale', RandFloat(0.5, 0.7))
 def album_downscale(image, scale=0.5):
     image_transform = albumentations.Downscale(p=1)
     return image_transform.apply(image, scale=scale, interpolation=0)
@@ -139,6 +155,7 @@ def album_ISONoise(image, color_shift=0.03, intensity=0.3):
 
 
 @transformation(clahe)
+@transformation(trio)
 @randomized('clip_limit', RandFloat(3.0, 3.5))
 def album_CLAHE(image, clip_limit=3.0, tile_grid_size=8):
     image_transform = albumentations.CLAHE(
@@ -156,6 +173,7 @@ def album_blur(image, kernel_size=3):
 
 
 @transformation(horizontal_flip)
+@transformation(pair)
 def album_horizonflip(image):
     image_transform = albumentations.HorizontalFlip(p=1)
     return image_transform.apply(image)
@@ -167,27 +185,73 @@ def album_verticalflip(image):
     return image_transform.apply(image)
 
 
-@relation(horizontal_flip, vertical_flip)
+@relation(horizontal_flip, vertical_flip, pair)
 def flip_sign(x, y):
     mapping = {16: 10, 10: 16, 38: 39, 39: 38, 33: 34, 34: 33, 25: 27, 27: 25}
     xhat = mapping.get(x, x)
     return equality(xhat, y)
 
 
+class ExceptionLogger:
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.StreamHandler())
+
+    def logexception_geterrorstring(self, e):
+        self.logger.error(e)
+        return f"Failed to save image: {str(e)}"
+
+
 # setup
 test_images = read_traffic_signs()
 classifier_under_test = TrafficSignClassifier()
+e_log = ExceptionLogger()
 
 
 def visualize_input(image):
+    """
+    Use this visualization function if the Flask server is not used
+
+    Parameters
+    ----------
+    image : ndarray
+        image to visualize
+
+    Returns
+    -------
+    html string that refers to the saved image
+    """
     path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
     try:
         plt.imsave(path, image)
     except Exception as e:
-        print(e)
-    return f"""
-    <img src="{path}" width="53" height="54">
-"""
+        return e_log.logexception_geterrorstring(e)
+    return f"<img src='{path}' width='50' height='50'>"
+
+
+def visualize_input_webapp(image):
+    """
+    Use this visualization function if the Flask server is used
+
+    Parameters
+    ----------
+    image : ndarray
+        image to visualize
+
+    Returns
+    -------
+    html string that refers to the saved image
+    """
+    image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
+    base_dir = Path("web_app/static/reports/assets/img")  # for web app
+    base_dir.mkdir(parents=True, exist_ok=True)
+    write_path = base_dir / image_name
+    read_path = Path("assets/img") / image_name
+    try:
+        plt.imsave(write_path, image)
+    except Exception as e:
+        return e_log.logexception_geterrorstring(e)
+    return f"<img src='{read_path}' width='50' height='50'>"
 
 
 def visualize_output(label: int) -> str:
@@ -205,17 +269,15 @@ def visualize_output(label: int) -> str:
         25: "construction site right",
         27: "construction site left"
     }
-    if int(label) in LABEL_NAMES:
-        return LABEL_NAMES[label]
-    return f"unknown: {label}"
+    return LABEL_NAMES.get(label, f"unknown: {label}")
 
 
 @pytest.mark.parametrize('image', test_images)
 @system(
-    brightness, contrast, both_cv2,
-    rain, snow, fog, gamma, equalize, downscale,
-    noise, clahe, blur, horizontal_flip, vertical_flip,
-    visualize_input=visualize_input,
+    brightness, contrast, both_cv2, rain, snow, fog, gamma,
+    equalize, downscale, dropout, posterize, noise, clahe,
+    blur, horizontal_flip, vertical_flip, pair, trio,
+    visualize_input=visualize_input_webapp,
     visualize_output=visualize_output,
 )
 def test_image_classifier(image):

@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 import random
 import torch
@@ -109,42 +110,148 @@ def error_is_small(x, y):
 
 
 class KeypointVisualizer:
+    """
+    Visualizer class for the keypoint prediction.
+
+    Recall that the MR framework provide ONLY the result of the model to the output
+    visualizer, in this case, the Tensor containing the predicted coordinates.
+    Unfortunately, unlike the image classifier visualizer, printing just the output
+    coordinates (even if transformed) isn't exactly helpful. It is best to have it
+    overlaid on top of the input image. The framework will call the input visualizer
+    twice, one for the base, and another for the follow-up input, then the output
+    visualizer twice with the same order. This class will keep track of the last
+    two input image to use along with the output visualizer.
+    """
+
     def __init__(self):
         self.transform = transforms.ToTensor()
         self.first_input = None
         self.second_input = None
         self.first_is_next = True
+        self.logger = logging.getLogger(__name__)
+        self.logger.addHandler(logging.StreamHandler())
+
+    def logexception_geterrorstring(self, e):
+        self.logger.error(e)
+        return f"Failed to save image: {str(e)}"
 
     def vis_input(self, image):
+        """
+        Use this visualization function if the Flask server is not used
+
+        Parameters
+        ----------
+        image : ndarray
+            image to visualize
+
+        Returns
+        -------
+        html string that refers to the saved image
+        """
+        image = self.prepare_input_visual(image)
+        path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
+        try:
+            plt.imsave(path, image, cmap='gray')
+        except Exception as e:
+            return self.logexception_geterrorstring(e)
+        return f"<img src='{path}' width='100' height='100'>"
+
+    def vis_input_app(self, image):
+        """
+        Use this visualization function if the Flask server is used
+
+        Parameters
+        ----------
+        image : ndarray
+            image to visualize
+
+        Returns
+        -------
+        html string that refers to the saved image
+        """
+        image = self.prepare_input_visual(image)
+        image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
+        base_dir = Path("web_app/static/reports/assets/img")  # for web app
+        base_dir.mkdir(parents=True, exist_ok=True)
+        write_path = base_dir / image_name
+        read_path = Path("assets/img") / image_name
+        try:
+            plt.imsave(write_path, image, cmap='gray')
+        except Exception as e:
+            return self.logexception_geterrorstring(e)
+        return f"<img src='{read_path}' width='100' height='100'>"
+
+    def prepare_input_visual(self, image):
         image = (self.transform(image).clone() * 255).view(96, 96)
         if self.first_is_next:
             self.first_input = image
         else:
             self.second_input = image
         self.first_is_next = not self.first_is_next
-        path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
-        try:
-            plt.imsave(path, image, cmap='gray')
-        except Exception as e:
-            print(e)
-        return f"""<img src="{path}" width="100" height="100">"""
+        return image
 
     def vis_output(self, keypoints):
+        """
+        Use this visualization function if the Flask server is not used
+
+        Parameters
+        ----------
+        keypoints : tensor
+            keypoints to visualize
+
+        Returns
+        -------
+        html string that refers to the saved image
+        """
+        if not self.prepare_output_visual(keypoints):
+            return str(keypoints)
+        path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
+        try:
+            plt.savefig(path, bbox_inches='tight', pad_inches=0)
+        except Exception as e:
+            return self.logexception_geterrorstring(e)
+        return f"<img src='{path}' width='100' height='100'>"
+
+    def vis_output_app(self, keypoints):
+        """
+        Use this visualization function if the Flask server is used
+
+        Parameters
+        ----------
+        keypoints : tensor
+            keypoints to visualize
+
+        Returns
+        -------
+        html string that refers to the saved image
+        """
+        if not self.prepare_output_visual(keypoints):
+            return str(keypoints)
+        image_name = f"img{random.randint(0, 1e10)}.png"  # nosec
+        base_dir = Path("web_app/static/reports/assets/img")  # for web app
+        base_dir.mkdir(parents=True, exist_ok=True)
+        write_path = base_dir / image_name
+        read_path = Path("assets/img") / image_name
+        try:
+            plt.savefig(write_path, bbox_inches='tight', pad_inches=0)
+        except Exception as e:
+            return self.logexception_geterrorstring(e)
+        return f"<img src='{read_path}' width='100' height='100'>"
+
+    def prepare_output_visual(self, keypoints):
+        plt.clf()
         if self.first_is_next:
             image = self.first_input
         else:
             image = self.second_input
         self.first_is_next = not self.first_is_next
         if image is None:
-            return str(keypoints)
-        path = str(Path("assets") / f"img{random.randint(0, 1e10)}.png")  # nosec
+            return False
         plt.imshow(image, cmap="gray")
         keypoints = keypoints.clone() * 48 + 48
         plt.scatter(keypoints[:, 0], keypoints[:, 1], s=200, marker='.', c='m')
         plt.axis("off")
-        plt.savefig(path, bbox_inches='tight',pad_inches = 0)
-        plt.clf()
-        return f"""<img src="{path}" width="100" height="100">"""
+        return True
 
 
 # setup
@@ -155,6 +262,6 @@ predictor_under_test = KeypointModel()
 
 @pytest.mark.parametrize('image', test_images)
 @system(contrast, brightness, both_cv2, dropout, downscale, gamma, equalize, clahe, blur,
-        visualize_input=visualizer.vis_input, visualize_output=visualizer.vis_output)
+        visualize_input=visualizer.vis_input_app, visualize_output=visualizer.vis_output_app)
 def test_keypoint_predictor(image):
     return predictor_under_test.predict(image)
