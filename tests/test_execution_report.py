@@ -40,7 +40,7 @@ def test_register_transform_result(
 ):
     test_transforms = [generic_p_transform for _ in range(5)]
     generic_m_report.transforms = test_transforms
-    for i in (0, 3, 4):
+    for i in range(len(test_transforms)):
         with generic_m_report.register_transform_result(i) as set_:
             set_("test")
         assert generic_m_report.transform_results[i].output == "test", \
@@ -53,7 +53,8 @@ def test_register_transform_result_out_of_range(
     test_transforms = [generic_p_transform for _ in range(5)]
     generic_m_report.transforms = test_transforms
     with pytest.raises(IndexError):
-        with generic_m_report.register_transform_result(15):
+        SOME_OUT_OF_INDEX = 15
+        with generic_m_report.register_transform_result(SOME_OUT_OF_INDEX):
             pass
 
 class _TestException(Exception):
@@ -65,7 +66,7 @@ def test_register_transform_error(
 ):
     test_transforms = [generic_p_transform for _ in range(5)]
     generic_m_report.transforms = test_transforms
-    for i in (0, 3, 4):
+    for i in range(len(test_transforms)):
         with pytest.raises(_TestException):
             with generic_m_report.register_transform_result(i):
                 raise _TestException("test")
