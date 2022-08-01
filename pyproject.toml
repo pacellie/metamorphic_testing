@@ -10,6 +10,7 @@ install-hook = "scripts.install_hook:install_hook"
 lint = "scripts.lint:lint"
 test = "scripts.run_tests:run_tests"
 example = "scripts.run_tests:run_example"
+web-app = "scripts.run_web_app:run_web_app"
 
 [tool.poetry.plugins."pytest11"]
 metamorphic = "metamorphic_test"
