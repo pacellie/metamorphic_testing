@@ -90,12 +90,14 @@ class Suite:
         # inspect.stack() returns a list of frame records for the caller's stack.
         # The first entry in the returned list represents the caller.
         for frame in inspect.stack():
-            if str(frame[1]).rsplit('/', maxsplit=1)[-1].startswith('test_'):
+            test_module_path = str(frame[1]).rsplit('/', maxsplit=1)[-1]
+            if test_module_path.startswith('test_') or test_module_path.endswith('_test.py'):
                 module = inspect.getmodule(frame[0])
                 if module is not None:
                     return module.__name__
         raise ValueError('Internal Error: no calling module. '
-                         'Test module name should start with "test_*".')
+                         'Test module name should start with "test_*" '
+                         'or end with "*_test.')
 
     @staticmethod
     def fixed_generator(transform: Transform, arg: str, value: A) -> Transform:
