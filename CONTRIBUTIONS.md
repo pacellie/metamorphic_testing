@@ -1,11 +1,6 @@
 This file lists contributions by the individual team members.
 Our team did a lot of trial & error, so this file is comparatively important.
 
-Name
-===
-- ...
-- ...
-
 Tathagata Bandyopadhyay
 ===
 - Research on machine learning based metamorphic testing examples. See [WiKi Page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Examples-for-Metamorphic-Testing#ml_examples_by_tathagata) (Scroll down to the bottom of the page)
@@ -52,3 +47,5 @@ Paul Schwind
 - Put a visualization of Metamorphic Testing into pytest-html reports of the tests (#100, #103)
 - Improved how failed tests look in the GUI (#104)
 - Implemented: show function source code in GUI on hover (#110)
+- Wrote tests for the execution report (#74)
+- Team lead
