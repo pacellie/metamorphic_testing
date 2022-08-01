@@ -44,4 +44,4 @@ def transform(x, increase_rooms_by: int) -> np.ndarray:
 @system(HousePriceTest)
 def test_house_pricing_more_rooms(x) -> float:
     assert all(x["total_rooms"] % 1 == 0)
-    return p.predict(x)
+    return p.predict(x).item()

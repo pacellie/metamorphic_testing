@@ -3,7 +3,7 @@ from pathlib import Path
 import csv
 from typing import List
 
-import matplotlib.pyplot as plt   # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
 
 import torch
 from numpy import ndarray
@@ -13,16 +13,26 @@ import torchvision as tv  # type: ignore
 
 
 def read_traffic_signs(rootpath: str = "data/") -> List[ndarray]:
-    """Reads traffic sign pictures for German Traffic Sign Recognition Benchmark.
+    """
+    Reads traffic sign pictures for German Traffic Sign Recognition Benchmark.
 
-    Arguments: path to the traffic sign data, for example './GTSRB/Training'
-    Returns:   list of images"""
+    Parameters
+    ----------
+    rootpath : str
+        path to the traffic sign data, defaults to 'data/'
+
+    Returns
+    -------
+    list of images
+    """
     images = []  # images
 
     data_dir = Path(__file__).parent / rootpath
     prefix = data_dir / "GTSRB" / "Final_Test" / "Images"
 
-    with open(data_dir / "GTSRB_Final_Test_GT" / "GT-final_test.csv", encoding="utf-8") as gt:
+    with open(
+        data_dir / "GTSRB_Final_Test_GT" / "GT-final_test.csv", encoding="utf-8"
+    ) as gt:
         gt_reader = csv.reader(gt, delimiter=";")  # csv parser for annotations file
         next(gt_reader)  # skip header
         # loop over all images in current annotations file
@@ -32,7 +42,15 @@ def read_traffic_signs(rootpath: str = "data/") -> List[ndarray]:
 
 
 class TrafficSignClassifier(nn.Module):
+    """
+    A neural network that receives images and determines the traffic sign in that image,
+    e.g. left/right turn, priority, warning, etc.
+    """
+
     def __init__(self) -> None:
+        """
+        Initialize the traffic sign classifier model.
+        """
         super().__init__()
 
         # CNN layers
@@ -73,17 +91,18 @@ class TrafficSignClassifier(nn.Module):
                 tv.transforms.ToTensor(),
             ]
         )
+        """Used to transform ndarray inputs into tensors of appropriate size and format"""
 
         self.eval()
         self.load_state_dict(
             torch.load(
                 Path(__file__).parent / "model" / "classifier_pretrained_weights.pth",
-                map_location=torch.device("cpu")
+                map_location=torch.device("cpu"),
             )
         )
 
-    # Spatial transformer network forward function
     def stn(self, x: Tensor) -> Tensor:
+        """Spatial transformer network forward function"""
         xs = self.localization(x)
         xs = xs.view(-1, 10 * 4 * 4)
         theta = self.fc_loc(xs)
@@ -93,6 +112,7 @@ class TrafficSignClassifier(nn.Module):
         return x
 
     def forward(self, x: Tensor) -> Tensor:
+        """Process the image with the neural network."""
         # transform the input
         x = fun.interpolate(x, size=(32, 32), mode="bilinear")
         x = self.stn(x)
@@ -111,6 +131,7 @@ class TrafficSignClassifier(nn.Module):
         return fun.log_softmax(x, dim=1)
 
     def evaluate_image(self, img: ndarray) -> int:
+        """Process the image with the neural network, and return the most likely class."""
         tensor_img = self.input_preprocessing_pipeline(img)[None, :]
         logits = self(tensor_img)
         return fun.softmax(logits, dim=1).max(dim=1)[1].item()
