@@ -1,44 +1,47 @@
+from typing import Tuple
 import pytest
-
-from dijkstar import Graph, find_path
-
+from dijkstar import Graph, find_path   # type: ignore
 from metamorphic_test import (
     transformation,
     metamorphic,
-    system, relation, randomized,
+    system,
+    relation,
+    randomized,
 )
 from metamorphic_test.generators import RandInt
 
 
-start_end = metamorphic('start_end')
-random_cheap = metamorphic('random_cheap')
+start_end = metamorphic("start_end")
+random_cheap = metamorphic("random_cheap")
 
 
 @transformation(start_end)
-def switch_startend(graph, start, end):
+def switch_startend(graph: Graph, start: int, end: int) -> Tuple[Graph, int, int]:
     return graph, end, start
 
 
 @transformation(random_cheap)
-@randomized('newedge_start', RandInt(1, 4))
-@randomized('newedge_end', RandInt(1, 4))
-def add_random_cheap_edge(graph, start, end, newedge_start, newedge_end):
+@randomized("newedge_start", RandInt(1, 4))
+@randomized("newedge_end", RandInt(1, 4))
+def add_random_cheap_edge(
+    graph: Graph, start: int, end: int, newedge_start: int, newedge_end: int
+) -> Tuple[Graph, int, int]:
     graph_new = Graph(data=graph.get_data(), undirected=True)
     graph_new.add_edge(newedge_start, newedge_end, 1)
     return graph_new, start, end
 
 
 @relation(start_end)
-def cost_equal(x, y):
+def cost_equal(x, y) -> bool:
     return x.total_cost == y.total_cost
 
 
 @relation(random_cheap)
-def cost_greater_equal(x, y):
+def cost_greater_equal(x, y) -> bool:
     return x.total_cost >= y.total_cost
 
 
-def vis_output(result):
+def vis_output(result) -> int:
     return result.total_cost
 
 
@@ -58,5 +61,5 @@ graph2.add_edge(3, 4, 17)
 @pytest.mark.parametrize("start", [2, 1])
 @pytest.mark.parametrize("end", [4, 3])
 @system(start_end, random_cheap, visualize_output=vis_output)
-def test_add_pytest(graph, start, end):
+def test_add_pytest(graph: Graph, start: int, end: int):
     return find_path(graph, start, end)

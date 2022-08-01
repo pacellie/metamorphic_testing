@@ -33,8 +33,7 @@ class KeypointModel(nn.Module):
         Initialize the keypoint mmodel.
         """
         super().__init__()
-        self.hparams = {"batch_size": 256, "learning_rate": 1e-3}
-        self.model = nn.Sequential(
+        self.model: nn.Module = nn.Sequential(
             nn.Conv2d(1, 3, 3),
             nn.ReLU(),
             nn.Conv2d(3, 5, 3),
@@ -54,7 +53,7 @@ class KeypointModel(nn.Module):
         )
 
     def forward(self, image: ndarray) -> Tensor:
-        x = self.transform(image)
+        x: Tensor = self.transform(image)
         if x.dim() == 3:
             x = torch.unsqueeze(x, 0)
         return self.model(x)

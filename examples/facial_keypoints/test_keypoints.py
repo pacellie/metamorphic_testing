@@ -1,6 +1,8 @@
 import logging
 from pathlib import Path
 import random
+from typing import Optional, List
+
 import torch
 
 import numpy as np
@@ -8,6 +10,8 @@ import cv2  # type: ignore
 import albumentations  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import pytest
+from numpy import ndarray
+from torch import Tensor
 from torchvision import transforms
 
 from .keypoint_detection import read_keypoint_images, KeypointModel
@@ -34,26 +38,26 @@ blur = metamorphic('blur')
 
 @transformation(contrast)
 @randomized('alpha', RandFloat(0.6, 1.5))
-def contrast_adjustments(image, alpha):
+def contrast_adjustments(image: ndarray, alpha: float) -> ndarray:
     return np.clip(alpha * image, 0, 255).astype(np.uint8)
 
 
 @transformation(brightness)
 @randomized('beta', RandInt(-30, 30))
-def brightness_adjustments(image, beta):
+def brightness_adjustments(image: ndarray, beta: int) -> ndarray:
     return np.clip(image + beta, 0, 255).astype(np.uint8)
 
 
 @transformation(both_cv2)
 @randomized('alpha', RandFloat(0.6, 1.5))
 @randomized('beta', RandInt(-30, 30))
-def cv2_brightness_and_contrast_adjustments(image, alpha, beta):
+def cv2_brightness_contrast_adjustments(image: ndarray, alpha: float, beta: int) -> ndarray:
     return cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
 
 
 @transformation(dropout)
 @randomized('holes', RandInt(4, 6))
-def album_dropout(image, holes=6, height=6, width=6):
+def album_dropout(image: ndarray, holes: int = 6, height: int = 6, width: int = 6) -> ndarray:
     # some transform need a little different setup
     image_transform = albumentations.Compose([
         albumentations.CoarseDropout(max_holes=holes, max_height=height, max_width=width, p=1)
@@ -63,14 +67,14 @@ def album_dropout(image, holes=6, height=6, width=6):
 
 @transformation(downscale)
 @randomized('scale', RandFloat(0.5, 0.7))
-def album_downscale(image, scale=0.5):
+def album_downscale(image: ndarray, scale: float = 0.5) -> ndarray:
     image_transform = albumentations.Downscale(p=1)
     return image_transform.apply(image, scale=scale, interpolation=0)
 
 
 @transformation(gamma)  # not expressive
 @randomized('limit', RandInt(70, 130))
-def album_gamma(image, limit=101):
+def album_gamma(image: ndarray, limit: int = 101) -> ndarray:
     # some transform need a little different setup
     image_transform = albumentations.Compose([
         albumentations.RandomGamma(gamma_limit=(limit, limit), p=1)
@@ -79,14 +83,14 @@ def album_gamma(image, limit=101):
 
 
 @transformation(equalize)
-def album_equalize(image):
+def album_equalize(image: ndarray) -> ndarray:
     image_transform = albumentations.Equalize(p=1)
     return image_transform.apply(image)
 
 
 @transformation(clahe)
 @randomized('clip_limit', RandFloat(3.0, 3.5))
-def album_CLAHE(image, clip_limit=3.0, tile_grid_size=8):
+def album_CLAHE(image: ndarray, clip_limit=3.0, tile_grid_size: int = 8) -> ndarray:
     image_transform = albumentations.CLAHE(
         clip_limit=(clip_limit, clip_limit),
         tile_grid_size=(tile_grid_size, tile_grid_size),
@@ -96,13 +100,13 @@ def album_CLAHE(image, clip_limit=3.0, tile_grid_size=8):
 
 @transformation(blur)
 @randomized('kernel_size', RandInt(5, 7))
-def album_blur(image, kernel_size=3):
+def album_blur(image: ndarray, kernel_size: int = 3) -> ndarray:
     image_transform = albumentations.Blur(blur_limit=[kernel_size, kernel_size], p=1)
     return image_transform.apply(image)
 
 
 @relation(contrast, brightness, both_cv2, dropout, downscale, gamma, equalize, clahe, blur)
-def error_is_small(x, y):
+def error_is_small(x: Tensor, y: Tensor) -> bool:
     loss_fn = torch.nn.MSELoss()
     loss = loss_fn(y, x)
     print(loss)   # logger here
@@ -123,19 +127,19 @@ class KeypointVisualizer:
     two input image to use along with the output visualizer.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.transform = transforms.ToTensor()
-        self.first_input = None
-        self.second_input = None
-        self.first_is_next = True
-        self.logger = logging.getLogger(__name__)
+        self.first_input: Optional[ndarray] = None
+        self.second_input: Optional[ndarray] = None
+        self.first_is_next: bool = True
+        self.logger: logging.Logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
 
-    def logexception_geterrorstring(self, e):
+    def logexception_geterrorstring(self, e: Exception) -> str:
         self.logger.error(e)
         return f"Failed to save image: {str(e)}"
 
-    def vis_input(self, image):
+    def vis_input(self, image: ndarray) -> str:
         """
         Use this visualization function if the Flask server is not used
 
@@ -156,7 +160,7 @@ class KeypointVisualizer:
             return self.logexception_geterrorstring(e)
         return f"<img src='{path}' width='100' height='100'>"
 
-    def vis_input_app(self, image):
+    def vis_input_app(self, image: ndarray) -> str:
         """
         Use this visualization function if the Flask server is used
 
@@ -181,7 +185,7 @@ class KeypointVisualizer:
             return self.logexception_geterrorstring(e)
         return f"<img src='{read_path}' width='100' height='100'>"
 
-    def prepare_input_visual(self, image):
+    def prepare_input_visual(self, image: ndarray) -> ndarray:
         image = (self.transform(image).clone() * 255).view(96, 96)
         if self.first_is_next:
             self.first_input = image
@@ -190,7 +194,7 @@ class KeypointVisualizer:
         self.first_is_next = not self.first_is_next
         return image
 
-    def vis_output(self, keypoints):
+    def vis_output(self, keypoints: Tensor) -> str:
         """
         Use this visualization function if the Flask server is not used
 
@@ -212,7 +216,7 @@ class KeypointVisualizer:
             return self.logexception_geterrorstring(e)
         return f"<img src='{path}' width='100' height='100'>"
 
-    def vis_output_app(self, keypoints):
+    def vis_output_app(self, keypoints: Tensor) -> str:
         """
         Use this visualization function if the Flask server is used
 
@@ -238,7 +242,7 @@ class KeypointVisualizer:
             return self.logexception_geterrorstring(e)
         return f"<img src='{read_path}' width='100' height='100'>"
 
-    def prepare_output_visual(self, keypoints):
+    def prepare_output_visual(self, keypoints: Tensor) -> bool:
         plt.clf()
         if self.first_is_next:
             image = self.first_input
@@ -255,13 +259,13 @@ class KeypointVisualizer:
 
 
 # setup
-test_images = read_keypoint_images()
-visualizer = KeypointVisualizer()
-predictor_under_test = KeypointModel()
+test_images: List[ndarray] = read_keypoint_images()
+visualizer: KeypointVisualizer = KeypointVisualizer()
+predictor_under_test: KeypointModel = KeypointModel()
 
 
 @pytest.mark.parametrize('image', test_images)
 @system(contrast, brightness, both_cv2, dropout, downscale, gamma, equalize, clahe, blur,
         visualize_input=visualizer.vis_input_app, visualize_output=visualizer.vis_output_app)
-def test_keypoint_predictor(image):
+def test_keypoint_predictor(image: ndarray) -> Tensor:
     return predictor_under_test.predict(image)
