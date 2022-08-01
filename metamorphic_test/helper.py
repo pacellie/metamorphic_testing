@@ -13,7 +13,7 @@ def change_signature(adapt_func: Callable) -> SignatureWrapper:
     Parameters
     ----------
     adapt_func : Callable
-        The function with the argument specification as a prototype will be sourced.
+        The function which will be used as source of the argument specification.
 
     Returns
     -------
