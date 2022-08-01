@@ -1,6 +1,6 @@
 from typing import Tuple
 import pytest
-from dijkstar import Graph, find_path   # type: ignore
+from dijkstar import Graph, find_path  # type: ignore
 from metamorphic_test import (
     transformation,
     metamorphic,
@@ -11,16 +11,16 @@ from metamorphic_test import (
 from metamorphic_test.generators import RandInt
 
 
+start_end = metamorphic("start_end")
+random_cheap = metamorphic("random_cheap")
+
+
 """
 This example demonstrates two MR test of a shortest path algorithm of an undirected graph.
 - If the start and end nodes are swapped, the cost of the shortest path should remain the same.
 - If an edge that is much cheaper than any other is added between two nodes / overwrites an
  existing edge, the cost of the shortest path should be less or equal than before.
 """
-
-
-start_end = metamorphic("start_end")
-random_cheap = metamorphic("random_cheap")
 
 
 @transformation(start_end)

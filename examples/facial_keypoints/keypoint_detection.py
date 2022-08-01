@@ -28,7 +28,7 @@ def read_keypoint_images(csv_name: str = "val.csv") -> List[ndarray]:
     key_pts_frame.dropna(inplace=True)
     key_pts_frame.reset_index(drop=True, inplace=True)
     for idx in range(key_pts_frame.shape[0]):
-        img_str = key_pts_frame.loc[idx]['Image']
+        img_str = key_pts_frame.loc[idx]["Image"]
         img = np.array([int(item) for item in img_str.split()]).reshape((96, 96))
         image = np.expand_dims(img, axis=2).astype(np.uint8)
         images.append(image)
@@ -36,8 +36,9 @@ def read_keypoint_images(csv_name: str = "val.csv") -> List[ndarray]:
 
 
 class KeypointModel(nn.Module):
-    """A neural network that receives portraits and determines the location of facial keypoints,
-    e.g. left/right eye, nose, lips, eyebrows, etc."""
+    """A neural network that receives portraits and determines the location of facial
+    keypoints, e.g. left/right eye, nose, lips, eyebrows, etc."""
+
     def __init__(self) -> None:
         """Initialize the keypoint model."""
         super().__init__()
@@ -47,7 +48,7 @@ class KeypointModel(nn.Module):
             nn.Conv2d(3, 5, 3),
             nn.ReLU(),
             nn.Flatten(),
-            nn.Linear(42320, 30)
+            nn.Linear(42320, 30),
         )
         """The architecture (weights, non-linearity, etc) of this neural network"""
 
@@ -58,7 +59,7 @@ class KeypointModel(nn.Module):
         self.load_state_dict(
             torch.load(
                 Path(__file__).parent / "keypoint_pretrain_weights.pth",
-                map_location=torch.device("cpu")
+                map_location=torch.device("cpu"),
             )
         )
 

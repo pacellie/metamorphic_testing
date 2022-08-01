@@ -8,6 +8,7 @@ import cv2  # type: ignore
 import albumentations  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import pytest
+
 # mypy complains that cv2 (and torchvision) has no stubs / not PEP 561-compliant
 # thus is skipped. Same with matplotlib in classifier. Should we ignore?
 # more info: https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
@@ -25,26 +26,26 @@ from metamorphic_test import (
 from metamorphic_test.generators import RandInt, RandFloat
 from metamorphic_test.relations import equality
 
-brightness = metamorphic('brightness', relation=equality)
-contrast = metamorphic('contrast', relation=equality)
-both_transform = metamorphic('both_transform', relation=equality)
-both_cv2 = metamorphic('both_cv2', relation=equality)
-rain = metamorphic('rain', relation=equality)
-snow = metamorphic('snow', relation=equality)
-fog = metamorphic('fog', relation=equality)
-gamma = metamorphic('gamma', relation=equality)
-equalize = metamorphic('equalize', relation=equality)
-downscale = metamorphic('downscale', relation=equality)
-noise = metamorphic('noise', relation=equality)
-clahe = metamorphic('clahe', relation=equality)
-blur = metamorphic('blur', relation=equality)
-dropout = metamorphic('dropout', relation=equality)
-posterize = metamorphic('posterize', relation=equality)
-horizontal_flip = metamorphic('horizontal_flip')
-vertical_flip = metamorphic('vertical_flip')
+brightness = metamorphic("brightness", relation=equality)
+contrast = metamorphic("contrast", relation=equality)
+both_transform = metamorphic("both_transform", relation=equality)
+both_cv2 = metamorphic("both_cv2", relation=equality)
+rain = metamorphic("rain", relation=equality)
+snow = metamorphic("snow", relation=equality)
+fog = metamorphic("fog", relation=equality)
+gamma = metamorphic("gamma", relation=equality)
+equalize = metamorphic("equalize", relation=equality)
+downscale = metamorphic("downscale", relation=equality)
+noise = metamorphic("noise", relation=equality)
+clahe = metamorphic("clahe", relation=equality)
+blur = metamorphic("blur", relation=equality)
+dropout = metamorphic("dropout", relation=equality)
+posterize = metamorphic("posterize", relation=equality)
+horizontal_flip = metamorphic("horizontal_flip")
+vertical_flip = metamorphic("vertical_flip")
 
-pair = metamorphic('hflip_equalize')
-trio = metamorphic('drop_down_bright', relation=equality)
+pair = metamorphic("hflip_equalize")
+trio = metamorphic("drop_down_bright", relation=equality)
 
 
 """
@@ -66,76 +67,86 @@ perturbations in random sequence.
 
 @transformation(brightness)
 @transformation(both_transform)
-@randomized('beta', RandInt(-1, 1))
+@randomized("beta", RandInt(-1, 1))
 def brightness_adjustments(image: ndarray, beta: int) -> ndarray:
     return np.clip(image + beta, 0, 255).astype(np.uint8)
 
 
 @transformation(contrast)
 @transformation(both_transform)
-@randomized('alpha', RandFloat(0.6, 1.5))
+@randomized("alpha", RandFloat(0.6, 1.5))
 def contrast_adjustments(image: ndarray, alpha: float) -> ndarray:
     return np.clip(alpha * image, 0, 255).astype(np.uint8)
 
 
 @transformation(both_cv2)
-@randomized('alpha', RandFloat(0.6, 1.5))
-@randomized('beta', RandInt(-1, 1))
-def cv2_brightness_contrast_adjustments(image: ndarray, alpha: float, beta: int) -> ndarray:
+@randomized("alpha", RandFloat(0.6, 1.5))
+@randomized("beta", RandInt(-1, 1))
+def cv2_brightness_contrast_adjustments(
+    image: ndarray, alpha: float, beta: int
+) -> ndarray:
     return cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
 
 
 @transformation(rain)
-@randomized('slant', RandInt(-5, 5))
-def album_rain(image: ndarray, slant: int = 0, drop_length: int = 9,
-               drop_width: int = 1, blur_value: int = 3) -> ndarray:
+@randomized("slant", RandInt(-5, 5))
+def album_rain(
+    image: ndarray,
+    slant: int = 0,
+    drop_length: int = 9,
+    drop_width: int = 1,
+    blur_value: int = 3,
+) -> ndarray:
     image_transform = albumentations.RandomRain(
         slant_lower=slant,
         slant_upper=slant,
         drop_length=drop_length,
         drop_width=drop_width,
         blur_value=blur_value,
-        p=1)
+        p=1,
+    )
     return image_transform.apply(image)
 
 
 @transformation(snow)
-@randomized('snow_point', RandFloat(0.1, 0.2))
-def album_snow(image: ndarray, snow_point: float = 0.2,
-               brightness_coeff: float = 2) -> ndarray:
+@randomized("snow_point", RandFloat(0.1, 0.2))
+def album_snow(
+    image: ndarray, snow_point: float = 0.2, brightness_coeff: float = 2
+) -> ndarray:
     image_transform = albumentations.RandomSnow(
         snow_point_lower=snow_point,
         snow_point_upper=snow_point,
         brightness_coeff=brightness_coeff,
-        p=1)
+        p=1,
+    )
     return image_transform.apply(image)
 
 
 @transformation(fog)
-@randomized('fog_coef', RandFloat(0.3, 0.5))
-def album_fog(image: ndarray, fog_coef: float = 0.5, alpha_coef: float = 0.08) -> ndarray:
+@randomized("fog_coef", RandFloat(0.3, 0.5))
+def album_fog(
+    image: ndarray, fog_coef: float = 0.5, alpha_coef: float = 0.08
+) -> ndarray:
     image_transform = albumentations.RandomFog(
-        fog_coef_lower=fog_coef,
-        fog_coef_upper=fog_coef,
-        alpha_coef=alpha_coef,
-        p=1)
+        fog_coef_lower=fog_coef, fog_coef_upper=fog_coef, alpha_coef=alpha_coef, p=1
+    )
     return image_transform.apply(image)
 
 
 @transformation(posterize)
-@randomized('bits', RandInt(5, 7))
+@randomized("bits", RandInt(5, 7))
 def album_posterize(image: ndarray, bits: int = 5) -> ndarray:
     image_transform = albumentations.Posterize(num_bits=bits, p=1)
     return image_transform.apply(image)
 
 
 @transformation(gamma)
-@randomized('limit', RandInt(70, 130))
+@randomized("limit", RandInt(70, 130))
 def album_gamma(image: ndarray, limit: int = 101) -> ndarray:
     # some transform need a little different setup
-    image_transform = albumentations.Compose([
-        albumentations.RandomGamma(gamma_limit=(limit, limit), p=1)
-    ])
+    image_transform = albumentations.Compose(
+        [albumentations.RandomGamma(gamma_limit=(limit, limit), p=1)]
+    )
     return image_transform(image=image)["image"]
 
 
@@ -148,47 +159,56 @@ def album_equalize(image: ndarray) -> ndarray:
 
 @transformation(dropout)
 @transformation(trio)
-@randomized('holes', RandInt(4, 6))
-def album_dropout(image: ndarray, holes: int = 6, height: int = 6, width: int = 6) -> ndarray:
+@randomized("holes", RandInt(4, 6))
+def album_dropout(
+    image: ndarray, holes: int = 6, height: int = 6, width: int = 6
+) -> ndarray:
     # some transform need a little different setup
-    image_transform = albumentations.Compose([
-        albumentations.CoarseDropout(max_holes=holes, max_height=height, max_width=width, p=1)
-    ])
+    image_transform = albumentations.Compose(
+        [
+            albumentations.CoarseDropout(
+                max_holes=holes, max_height=height, max_width=width, p=1
+            )
+        ]
+    )
     return image_transform(image=image)["image"]
 
 
 @transformation(downscale)
 @transformation(trio)
-@randomized('scale', RandFloat(0.5, 0.7))
+@randomized("scale", RandFloat(0.5, 0.7))
 def album_downscale(image: ndarray, scale: float = 0.5) -> ndarray:
     image_transform = albumentations.Downscale(p=1)
     return image_transform.apply(image, scale=scale, interpolation=0)
 
 
 @transformation(noise)
-@randomized('color_shift', RandFloat(0.02, 0.04))
-def album_ISONoise(image: ndarray, color_shift: float = 0.03,
-                   intensity: float = 0.3) -> ndarray:
+@randomized("color_shift", RandFloat(0.02, 0.04))
+def album_ISONoise(
+    image: ndarray, color_shift: float = 0.03, intensity: float = 0.3
+) -> ndarray:
     image_transform = albumentations.ISONoise(
-        color_shift=(color_shift, color_shift),
-        intensity=(intensity, intensity),
-        p=1)
+        color_shift=(color_shift, color_shift), intensity=(intensity, intensity), p=1
+    )
     return image_transform.apply(image)
 
 
 @transformation(clahe)
 @transformation(trio)
-@randomized('clip_limit', RandFloat(3.0, 3.5))
-def album_CLAHE(image: ndarray, clip_limit: float = 3.0, tile_grid_size: int = 8) -> ndarray:
+@randomized("clip_limit", RandFloat(3.0, 3.5))
+def album_CLAHE(
+    image: ndarray, clip_limit: float = 3.0, tile_grid_size: int = 8
+) -> ndarray:
     image_transform = albumentations.CLAHE(
         clip_limit=(clip_limit, clip_limit),
         tile_grid_size=(tile_grid_size, tile_grid_size),
-        p=1)
+        p=1,
+    )
     return image_transform.apply(image)
 
 
 @transformation(blur)
-@randomized('kernel_size', RandInt(3, 5))
+@randomized("kernel_size", RandInt(3, 5))
 def album_blur(image: ndarray, kernel_size: int = 3) -> ndarray:
     image_transform = albumentations.Blur(blur_limit=[kernel_size, kernel_size], p=1)
     return image_transform.apply(image)
@@ -216,6 +236,7 @@ def flip_sign(x: int, y: int) -> bool:
 
 class ExceptionLogger:
     """Class to help log exceptions that occur when saving images for visualization."""
+
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
@@ -291,16 +312,31 @@ def visualize_output(label: int) -> str:
         33: "right turn",
         34: "left turn",
         25: "construction site right",
-        27: "construction site left"
+        27: "construction site left",
     }
     return LABEL_NAMES.get(label, f"unknown: {label}")
 
 
-@pytest.mark.parametrize('image', test_images)
+@pytest.mark.parametrize("image", test_images)
 @system(
-    brightness, contrast, both_cv2, rain, snow, fog, gamma,
-    equalize, downscale, dropout, posterize, noise, clahe,
-    blur, horizontal_flip, vertical_flip, pair, trio,
+    brightness,
+    contrast,
+    both_cv2,
+    rain,
+    snow,
+    fog,
+    gamma,
+    equalize,
+    downscale,
+    dropout,
+    posterize,
+    noise,
+    clahe,
+    blur,
+    horizontal_flip,
+    vertical_flip,
+    pair,
+    trio,
     visualize_input=visualize_input_webapp,
     visualize_output=visualize_output,
 )

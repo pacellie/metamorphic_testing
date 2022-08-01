@@ -3,7 +3,7 @@ from pathlib import Path
 import csv
 from typing import List
 
-import matplotlib.pyplot as plt   # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
 
 import torch
 from numpy import ndarray
@@ -30,7 +30,9 @@ def read_traffic_signs(rootpath: str = "data/") -> List[ndarray]:
     data_dir = Path(__file__).parent / rootpath
     prefix = data_dir / "GTSRB" / "Final_Test" / "Images"
 
-    with open(data_dir / "GTSRB_Final_Test_GT" / "GT-final_test.csv", encoding="utf-8") as gt:
+    with open(
+        data_dir / "GTSRB_Final_Test_GT" / "GT-final_test.csv", encoding="utf-8"
+    ) as gt:
         gt_reader = csv.reader(gt, delimiter=";")  # csv parser for annotations file
         next(gt_reader)  # skip header
         # loop over all images in current annotations file
@@ -44,6 +46,7 @@ class TrafficSignClassifier(nn.Module):
     A neural network that receives images and determines the traffic sign in that image,
     e.g. left/right turn, priority, warning, etc.
     """
+
     def __init__(self) -> None:
         """
         Initialize the traffic sign classifier model.
@@ -94,7 +97,7 @@ class TrafficSignClassifier(nn.Module):
         self.load_state_dict(
             torch.load(
                 Path(__file__).parent / "model" / "classifier_pretrained_weights.pth",
-                map_location=torch.device("cpu")
+                map_location=torch.device("cpu"),
             )
         )
 
