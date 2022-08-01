@@ -24,13 +24,12 @@ Tathagata Bandyopadhyay
 
 Danny Benlin Oswan
 ===
-- Gathered examples, see wiki page (mainly issue 13), including chains and uneven relations.
-- Investigated how Hypothesis is related to pytest (issue 10).
-- Evaluate 3 old frameworks on chaining (issue 41).
-- Code the examples for image MR (in examples/image_classifier), then fix it for pipeline.
-- Added basics of logging, exception, and docstring (72, 65, 67).
-- Merge image examples to main.
-- Prepared image demos.
+- Gathered examples, see [wiki page](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Examples-for-Metamorphic-Testing) (mainly [issue 13](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/13), including chains and uneven relations.
+- Investigated how Hypothesis is related to pytest and the pytest hooks, [issue 10](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/13) or [first section in this wiki](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/Inspiration-from-hypothesis).
+- Evaluate 3 old frameworks on chaining, [issue 41](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/41), experimented on 3 branches named `experiment-from*-danny`.
+- Code the examples for image MR (in examples/image_classifier and facial_keypoints) and shortest path algorithm, incl. the logging and docstrings in it (except the visualizer in classifier, that was Paul's).
+- Added basics of [logging](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/72), [exception](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/65), and [docstring](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/67).
+- Prepared demo machine, including [wiki for audio setup](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/How-to-run-audio-examples-(Windows)).
 
 Ting-Yu Lu
 ===
