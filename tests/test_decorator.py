@@ -46,13 +46,12 @@ def test_metamorphic():
     d.suite = Suite()
 
     prio_transform = PrioritizedTransform(identity)
-    meta = metamorphic(NAME, transform=identity, relation=equal)
-
-    assert meta == module_namify(NAME)
+    metamorphic(NAME, transform=identity, relation=equal)
 
     meta_test = MetamorphicTest(NAME, transforms=[prio_transform], relation=equal)
 
-    assert d.suite.get_test(module_namify(NAME)) == meta_test
+    assert d.suite.get_test(module_namify(NAME)) == meta_test, \
+        'calling metamorphic should register an instance of MetamorphicTest'
 
 
 @given(integers())
@@ -60,14 +59,18 @@ def test_randomized(x):
     generator = FixedGenerator()
     rand_transform = randomized(ARG, generator)(multiply_by_n)
 
-    assert rand_transform(x) == x * INT
+    assert rand_transform(x) == x * INT, \
+        'randomizing a function is equivalent to calling it with a random value' \
+        'for the same argument'
 
 
 @given(integers())
 def test_fixed(x):
     fixed_transform = fixed(ARG, INT)(multiply_by_n)
 
-    assert fixed_transform(x) == x * INT
+    assert fixed_transform(x) == x * INT, \
+        'fixing a function is equivalent to calling it with a fixed value' \
+        'for the same argument'
 
 
 def test_transformation():
@@ -81,7 +84,10 @@ def test_transformation():
     prio_transform = PrioritizedTransform(identity)
     meta_test = MetamorphicTest(NAME, transforms=[prio_transform])
 
-    assert d.suite.get_test(module_namify(NAME)) == meta_test
+    assert d.suite.get_test(module_namify(NAME)) == meta_test, \
+        'calling transformation should return the same transform and register' \
+        'it in the metamorphic test instance'
+
 
 
 def test_relation():
@@ -94,7 +100,9 @@ def test_relation():
 
     meta_test = MetamorphicTest(NAME, relation=equal)
 
-    assert d.suite.get_test(module_namify(NAME)) == meta_test
+    assert d.suite.get_test(module_namify(NAME)) == meta_test, \
+        'calling relation should return the same relation and register' \
+        'it in the metamorphic test instance'
 
 
 @given(integers())
@@ -103,4 +111,4 @@ def test_system(x):
 
     meta = metamorphic(NAME, transform=identity, relation=equal)
 
-    system(meta)(identity)(module_namify(NAME), x) # system already asserts
+    system(meta)(identity)(module_namify(NAME), x)  # system already asserts

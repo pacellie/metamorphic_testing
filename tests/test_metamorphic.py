@@ -35,7 +35,9 @@ def test_add_transform():
     index = meta_test.transforms.index(prio_transform)
     actual_prio_transform = meta_test.transforms[index]
 
-    assert actual_prio_transform.transform == double # pylint: disable=comparison-with-callable
+    # pylint: disable=comparison-with-callable
+    assert actual_prio_transform.transform == double, \
+        'adding a tranformation to a metamorphic test should always succeed'
 
 
 # 'set_relation':
@@ -45,13 +47,18 @@ def test_set_relation():
     meta_test = MetamorphicTest()
     meta_test.set_relation(equal)
 
-    assert meta_test.relation == equal # pylint: disable=comparison-with-callable
+    # pylint: disable=comparison-with-callable
+    assert meta_test.relation == equal, \
+        'adding a relation to a metamorphic test should succeed if there was' \
+        'no prior relation'
 
 
 def test_set_relation_error():
     meta_test = MetamorphicTest()
     meta_test.set_relation(equal)
 
+    # adding a relation to a metamorphic test should succeed if there was no
+    # prior relation
     with pytest.raises(ValueError):
         meta_test.set_relation(equal)
 
@@ -71,12 +78,13 @@ def test_execute():
     meta_test.add_transform(add2, 2)
     meta_test.add_transform(double, 1)
 
-    meta_test.execute(lambda x: x, 10)
+    meta_test.execute(lambda x: x, 10)  # execute already asserts
 
 
-def test_exexute_no_relation():
+def test_execute_no_relation():
     meta_test = MetamorphicTest()
 
+    # a metamorphic test needs a relation to be executed
     with pytest.raises(ValueError):
         meta_test.execute(lambda x: x, 42)
 
@@ -88,6 +96,7 @@ def test_execute_system_raises():
     def system(x):
         raise ValueError
 
+    # a metamorphic test fails and propagates any exceptions of the system
     with pytest.raises(ValueError):
         meta_test.execute(system, 42)
 
@@ -100,6 +109,7 @@ def test_execute_relation_raises():
 
     meta_test.set_relation(relation)
 
+    # a metamorphic test fails and propagates any exceptions of the relation
     with pytest.raises(ValueError):
         meta_test.execute(lambda x: x, 42)
 
@@ -113,5 +123,6 @@ def test_execute_transform_raises():
     meta_test.set_relation(equal)
     meta_test.add_transform(transform)
 
+    # a metamorphic test fails and propagates any exceptions of the transforms
     with pytest.raises(ValueError):
         meta_test.execute(lambda x: x, 42)
