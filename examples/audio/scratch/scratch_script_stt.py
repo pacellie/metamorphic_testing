@@ -1,3 +1,6 @@
+###############################################################################################
+#     This script is just an experimental prototype, and not a core part of the examples.     #
+###############################################################################################
 import os
 import warnings
 import torch
@@ -18,7 +21,7 @@ def write_audio(audio, sr, file_name, dir_path):
 
 
 def transform(source_audio, source_sample_rate, n_out_puts=5,
-              out_dir="transformed_audios", verbose=False):
+              out_dir="", verbose=False):
     if isinstance(source_audio, torch.Tensor):
         source_audio = source_audio.numpy()
     source_audio = source_audio.reshape((-1,))  # only for mono audio
@@ -47,8 +50,8 @@ if __name__ == "__main__":
     # download a single file in any format compatible with TorchAudio
     torch.hub.download_url_to_file(
         'https://opus-codec.org/static/examples/samples/speech_orig.wav',
-        dst='audio_examples/speech_orig.wav', progress=True)
-    test_files = glob('audio_examples/speech_orig.wav')
+        dst='speech_orig.wav', progress=True)
+    test_files = glob('speech_orig.wav')
     batches = split_into_batches(test_files, batch_size=10)
 
     input_ = prepare_model_input(read_batch(batches[0]),
@@ -56,10 +59,7 @@ if __name__ == "__main__":
 
     augment = Compose([
         AddGaussianNoise(min_amplitude=0.0001, max_amplitude=0.001, p=0.3),
-        # AddGaussianSNR(min_snr_in_db=12, max_snr_in_db=35, p=0.3),
-        AddBackgroundNoise(sounds_path=["audio_examples/background_noises"], p=0.7),
-        # LoudnessNormalization(p=0.5),
-        # TimeStretch(min_rate=1, max_rate=1.5, p=0.8, leave_length_unchanged=True),
+        AddBackgroundNoise(sounds_path=["../background_noises"], p=0.7),
         PitchShift(min_semitones=-2, max_semitones=+2, p=0.5),
     ], shuffle=True)
 

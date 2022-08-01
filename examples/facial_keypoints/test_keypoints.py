@@ -2,9 +2,7 @@ import logging
 from pathlib import Path
 from typing import Optional, List
 import uuid
-
 import torch
-
 import numpy as np
 import cv2  # type: ignore
 import albumentations  # type: ignore
@@ -15,7 +13,6 @@ from torch import Tensor
 from torchvision import transforms  # type: ignore
 
 from .keypoint_detection import read_keypoint_images, KeypointModel
-
 from metamorphic_test import transformation, relation, metamorphic, system, randomized
 from metamorphic_test.generators import RandInt, RandFloat
 

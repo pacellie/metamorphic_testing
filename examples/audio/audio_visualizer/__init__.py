@@ -1,3 +1,3 @@
-from .visualize import audio_input_visualizer  # type: ignore
+from .visualize import AudioVisualizer  # type: ignore
 
-__all__ = ['audio_input_visualizer']
+__all__ = ['AudioVisualizer']

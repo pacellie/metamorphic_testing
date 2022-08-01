@@ -1,6 +1,8 @@
 from typing import Tuple
 import pytest
 from dijkstar import Graph, find_path  # type: ignore
+
+
 from metamorphic_test import (
     transformation,
     metamorphic,
