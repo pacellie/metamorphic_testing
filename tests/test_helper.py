@@ -4,7 +4,7 @@ import inspect
 from metamorphic_test.helper import change_signature
 
 
-# The prototype function provides the argument specification to be sourced
+# The prototype function provides the argument specification to be used as source
 def prototype(arg1, arg2):  # pylint: disable=unused-argument
     pass
 
