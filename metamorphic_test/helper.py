@@ -34,22 +34,22 @@ def change_signature(adapt_func: Callable) -> SignatureWrapper:
 
     @wrapt.decorator(adapter=fullargspec)
     def change(wrapped, instance, args, kwargs):
-        if instance is None:
-            if inspect.isclass(wrapped):
-                # Decorator was applied to a class.
-                raise RuntimeError("'change_signature' decorator should not "
-                                   "be applied to a class.")
+        def _raise_runtime_err(applied_type):
+            raise RuntimeError(f"'change_signature' decorator should not"
+                               f" be applied to a {applied_type}.")
 
-            # Decorator was applied to a function or staticmethod.
-            return wrapped(*args, **kwargs)
+        if instance is None:
+            if not inspect.isclass(wrapped):
+                # Decorator was applied to a function or staticmethod.
+                return wrapped(*args, **kwargs)
+            # Decorator was applied to a class.
+            return _raise_runtime_err('class')
 
         if inspect.isclass(instance):
             # Decorator was applied to a classmethod.
-            raise RuntimeError("'change_signature' decorator should not "
-                               "be applied to a classmethod.")
+            return _raise_runtime_err('classmethod')
 
         # Decorator was applied to an instancemethod.
-        raise RuntimeError("'change_signature' decorator should not "
-                           "be applied to an instancemethod.")
+        return _raise_runtime_err('instancemethod')
 
     return change
