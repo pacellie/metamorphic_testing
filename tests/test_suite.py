@@ -1,6 +1,6 @@
 import pytest
 import inspect
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from hypothesis import given
 import hypothesis.strategies as st
 
@@ -45,10 +45,12 @@ def test_get_caller_module(current_module_name):
     assert isinstance(suite.get_caller_module(), str)
     assert suite.get_caller_module() == current_module_name
 
-    # TODO: how to change the module name to test ValueError?
-    suite.get_caller_module = Mock(side_effect=ValueError())
-    with pytest.raises(ValueError):
-        suite.get_caller_module()
+
+def test_get_caller_module_error(current_module_name):
+    suite = Suite()
+    with patch('inspect.stack', lambda: []):
+        with pytest.raises(ValueError):
+            suite.get_caller_module()
 
 
 @given(st.integers(-5, 5), st.integers(-5, 5))
