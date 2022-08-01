@@ -18,7 +18,7 @@ def change_signature(adapt_func: Callable) -> SignatureWrapper:
     Returns
     -------
     change : SignatureWrapper
-        Returns a function that its signature has been dynamically
+        Returns a function whose signature has been dynamically
         changed with annotations based on the adapt_func function.
 
     Examples
