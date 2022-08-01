@@ -74,7 +74,7 @@ graph2.add_edge(3, 4, 17)
 @pytest.mark.parametrize("graph", [graph1, graph2])
 @pytest.mark.parametrize("start", [2, 1])
 @pytest.mark.parametrize("end", [4, 3])
-@system(start_end, random_cheap, visualize_output=vis_output)
+@system(visualize_output=vis_output)
 def test_add_pytest(graph: Graph, start: int, end: int):
     """Find a shortest path between two nodes in a graph"""
     return find_path(graph, start, end)

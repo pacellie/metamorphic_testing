@@ -319,28 +319,7 @@ def visualize_output(label: int) -> str:
 
 
 @pytest.mark.parametrize("image", test_images)
-@system(
-    brightness,
-    contrast,
-    both_cv2,
-    rain,
-    snow,
-    fog,
-    gamma,
-    equalize,
-    downscale,
-    dropout,
-    posterize,
-    noise,
-    clahe,
-    blur,
-    horizontal_flip,
-    vertical_flip,
-    pair,
-    trio,
-    visualize_input=visualize_input_webapp,
-    visualize_output=visualize_output,
-)
+@system(visualize_input=visualize_input_webapp, visualize_output=visualize_output)
 def test_image_classifier(image: ndarray) -> int:
     """Predict the traffic sign in an image"""
     return classifier_under_test.evaluate_image(image)

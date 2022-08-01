@@ -32,7 +32,7 @@ blur = metamorphic("blur")
 
 """
 This example demonstrates MR tests of a keypoint prediction NN on human portraits:
-if the portraits are pertubed slightly, the prediction should not differ by much.
+if the portraits are perturbed slightly, the prediction should not differ by much.
 
 Be advised that the relation function makes use of this NN's training error function.
 Other NN MR tests could apply the same principle, where the error between the first and
@@ -324,19 +324,7 @@ predictor_under_test: KeypointModel = KeypointModel()
 
 
 @pytest.mark.parametrize("image", test_images)
-@system(
-    contrast,
-    brightness,
-    both_cv2,
-    dropout,
-    downscale,
-    gamma,
-    equalize,
-    clahe,
-    blur,
-    visualize_input=visualizer.vis_input_app,
-    visualize_output=visualizer.vis_output_app,
-)
+@system(visualize_input=visualizer.vis_input_app, visualize_output=visualizer.vis_output_app)
 def test_keypoint_predictor(image: ndarray) -> Tensor:
     """Predict the facial keypoints of a portrait"""
     return predictor_under_test.predict(image)
