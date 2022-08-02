@@ -78,7 +78,8 @@ To generate an html report with graphical illustration for tests (should have `p
 pytest --html=assets/reports/report.html --self-contained-html
 ```
 ### Run the test in a class
-Mark the test function with `@staticmethod` decorator
+- Mark the test function with `@staticmethod` decorator
+- The test does not work with `classmethod` and `instancemethod`
 ```python
 class TestIt():
     @staticmethod  # must be outermost
