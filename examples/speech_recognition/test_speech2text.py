@@ -1,15 +1,16 @@
-import librosa  # type: ignore
-import numpy as np
+import numpy
 from audiomentations import Compose, AddGaussianNoise  # type: ignore
-from audiomentations import PitchShift, TimeStretch  # type: ignore
+from audiomentations import PitchShift, AddBackgroundNoise  # type: ignore
 from typing import Union, List
 from pathlib import Path
 import torch
 import pytest
+from jiwer import wer, mer, wil  # type: ignore
 
-from metamorphic_test.logger import logger
-from models.aec_inference import AudioTagging, labels  # type: ignore
+from models.speech_to_text import SpeechToText  # type: ignore
 from audio_visualizer import AudioVisualizer  # type: ignore
+from utils.stt_utils import stt_read_audio  # type: ignore
+from metamorphic_test.logger import logger
 from metamorphic_test import (
     transformation,
     relation,
@@ -21,13 +22,11 @@ from metamorphic_test import (
 # region test_names
 # register the metamorphic testcases for speech recognition
 with_gaussian_noise = metamorphic('with_gaussian_noise')
-with_time_stretch = metamorphic('with_time_stretch')
+with_background_noise = metamorphic('with_background_noise')
 with_altered_pitch = metamorphic('with_altered_pitch')
 with_combined_effect = metamorphic('with_combined_effect')
 with_chained_transform_a = metamorphic('with_chained_transform_a')
 with_chained_transform_b = metamorphic('with_chained_transform_b')
-
-
 # endregion
 
 
@@ -37,11 +36,11 @@ with_chained_transform_b = metamorphic('with_chained_transform_b')
 # transformation to add Gaussian noise:
 @transformation(with_chained_transform_a)
 @transformation(with_gaussian_noise)
-@fixed('min_amplitude', 0.001)
-@fixed('max_amplitude', 0.01)
+@fixed('min_amplitude', 0.0001)
+@fixed('max_amplitude', 0.001)
 @fixed('p', 1.)
 def add_gaussian_noise(
-        source_audio: Union[np.ndarray, torch.Tensor],
+        source_audio: Union[numpy.ndarray, torch.Tensor],
         min_amplitude: float,
         max_amplitude: float,
         p: float
@@ -61,17 +60,19 @@ def add_gaussian_noise(
     """
     transform = AddGaussianNoise(min_amplitude=min_amplitude, max_amplitude=max_amplitude, p=p)
     if not torch.is_tensor(source_audio):
-        return torch.from_numpy(transform(source_audio, 32000))
-    return torch.from_numpy(transform(source_audio.numpy(), 32000))  # type: ignore
+        return torch.from_numpy(transform(source_audio, 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 
 # transformation to add background noise
-@transformation(with_time_stretch)
+@transformation(with_background_noise)
 @transformation(with_chained_transform_a)
 @transformation(with_chained_transform_b)
+@fixed('sounds_path', 'examples/speech_recognition/background_noises')
 @fixed('p', 1.)
-def stretch_time(
-        source_audio: Union[np.ndarray, torch.Tensor],
+def add_background_noise(
+        source_audio: Union[numpy.ndarray, torch.Tensor],
+        sounds_path: Union[List[Path], List[str], Path, str],
         p: float
 ) -> torch.Tensor:
     """
@@ -80,25 +81,28 @@ def stretch_time(
 
     params:
         source_audio: numpy ndarray of shape (<number of samples>,): the input audio
+        sounds_path: A path or list of paths to audio file(s) and/or folder(s) with
+            audio files. Can be str or Path instance(s). The audio files given here are
+            supposed to be background noises.
         p: float: probability of applying the transformation
 
     returns:
         torch tensor of shape (<number of samples>,) (same shape of input)
     """
-    transform = TimeStretch(p=p)
+    transform = AddBackgroundNoise(sounds_path=sounds_path, p=p)
     if not torch.is_tensor(source_audio):
-        return torch.from_numpy(transform(source_audio, 32000))
-    return torch.from_numpy(transform(source_audio.numpy(), 32000))  # type: ignore
+        return torch.from_numpy(transform(source_audio, 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 
 # transformation to alter pitch
 @transformation(with_chained_transform_b)
 @transformation(with_altered_pitch)
-@fixed('min_semitones', -3)
-@fixed('max_semitones', 3)
+@fixed('min_semitones', -2)
+@fixed('max_semitones', 2)
 @fixed('p', 1.)
 def alter_pitch(
-        source_audio: Union[np.ndarray, torch.Tensor],
+        source_audio: Union[numpy.ndarray, torch.Tensor],
         min_semitones: int,
         max_semitones: int,
         p: float
@@ -119,14 +123,14 @@ def alter_pitch(
     """
     transform = PitchShift(min_semitones=min_semitones, max_semitones=max_semitones, p=p)
     if not torch.is_tensor(source_audio):
-        return torch.from_numpy(transform(source_audio, 32000))
-    return torch.from_numpy(transform(source_audio.numpy(), 32000))  # type: ignore
+        return torch.from_numpy(transform(source_audio, 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 
 # combined transformation
 @transformation(with_combined_effect)
 def composite_transformation(
-        source_audio: Union[np.ndarray, torch.Tensor]
+        source_audio: Union[numpy.ndarray, torch.Tensor]
 ) -> torch.Tensor:
     """
     This composite transformation probabilistically combines the above three transformations
@@ -143,13 +147,15 @@ def composite_transformation(
     transform = Compose(
         [
             AddGaussianNoise(min_amplitude=0.001, max_amplitude=0.01, p=0.5),
-            TimeStretch(p=0.5),
+            AddBackgroundNoise(
+                sounds_path=["examples/speech_recognition/background_noises"],
+                p=0.5
+            ),
             PitchShift(min_semitones=-3, max_semitones=+3, p=0.5),
         ], shuffle=True)
     if not torch.is_tensor(source_audio):
-        return torch.from_numpy(transform(source_audio, 32000))
-    return torch.from_numpy(transform(source_audio.numpy(), 32000))  # type: ignore
-
+        return torch.from_numpy(transform(source_audio, 16000))
+    return torch.from_numpy(transform(source_audio.numpy(), 16000))  # type: ignore
 
 # endregion
 
@@ -158,85 +164,65 @@ def composite_transformation(
 
 @relation(
     with_gaussian_noise,
-    with_time_stretch,
+    with_background_noise,
     with_altered_pitch,
     with_combined_effect,
     with_chained_transform_a,
     with_chained_transform_b
 )
-def aec_top_k_compare(x: List[str], y: List[str]) -> bool:
+def stt_soft_compare(x: str, y: str) -> bool:
     """
-    This is a custom metamorphic comparison relation designed specifically for acoustic
-    event classification algorithms. There can be multiple class label predictions for a given
-    audio. So, instead of comparing the class labels one by one, we consider top k (say k=5)
-    predictions for both source input and followup inputs and try to see if there is any
-    intersection between them. Test passes if there is intersection, fails otherwise.
+    This is a custom metamorphic comparison relation designed specifically for speech2text
+    algorithms. Direct string comparison for recognized texts from source and followup cases
+    can be to restrictive and too harsh on the speech recognition algorithm under test.
+
+    So, we use standard metrics for speech recognition algorithms, namely:
+    Word Error Rate (WER), Matching Error Rate (MER) and Word Information Loss (WIL) and
+    consider our test to be passing if those metrics are below certain predefined threshold.
 
     params:
-        x: List[str]: list of top k labels predicted for source input
-        y: List[str]: list of top k labels predicted for followup input
+        x: str: recognize text from source test case
+        y: str: recognized text from follow up test case
 
     returns:
         bool: True refers to a passing test
     """
-    logger.info("Source Input Predictions: %s", str(x))
-    logger.info("Followup Input Predictions: %s", str(y))
-
-    return bool(set(x) & set(y))
+    wer_val = wer(x, y)
+    mer_val = mer(x, y)
+    wil_val = wil(x, y)
+    # logger.info(f"WER:{wer_val}, MER:{mer_val}, WIL:{wil_val}")  # linter breaks
+    logger.info("WER: %0.3f, MER: %0.3f, WIL: %0.3f", wer_val, mer_val, wil_val)
+    return wer_val <= 0.3 and mer_val <= 0.3 and wil_val <= 0.5  # empirically chosen threshold
 
 # endregion
 
 
 # region model
 # creating this model object outside the test not to load it again and again for each test
-DEVICE = 'cpu'
-at = AudioTagging(device=DEVICE)
+stt = SpeechToText()
 # endregion
 
 
-# region data
+# region data_list
+
 src_audios = (
-    librosa.core.load(
+    stt_read_audio(
         str(
-            Path(".") /
-            "examples" /
-            "audio" /
-            "acoustic_event_samples" /
-            f"test_aec_audio_{i}.wav"
-        ),
-        sr=32000,
-        mono=True
-    )[0] for i in range(0, 10)  # [0] Indicates we are loading only the audio data (1st output)
+            Path(".") / "examples" / "speech_recognition" / "speech_samples" /
+            f"test_audio_{i}.wav"
+        )
+    ) for i in range(0, 5)
 )
 # endregion
 
 
-# region auxiliary function
-def get_top_k_labels(clip_wise_output: np.ndarray, top_k: int = 5) -> List[str]:
-    """
-    Returns a list of top k predicted labels
+# region visualizer
 
-    Args
-    ----
-    clip_wise_output: np.ndarray
-        Numpy array of shape (number of classes, ) containing soft-max probabilities of all
-        possible class labels.
-    top_k: int
-        number upto which the sorted label probabilities needs to be considered for comparison
-
-    Returns
-    -------
-    list of top k labels: List[str]
-    """
-    sorted_indexes = np.argsort(clip_wise_output)[::-1]
-    return [np.array(labels)[sorted_indexes[k]] for k in range(top_k)]
-
-
-# audio visualizer for aec
-aec_audio_visualizer = AudioVisualizer(
-    sampling_rate=32000,
-    base_dir=str(Path(".") / "assets" / "aec")
+stt_audio_visualizer = AudioVisualizer(
+    sampling_rate=16000,
+    base_dir=str(Path(".") / "assets" / "stt")
 )
+
 # endregion
 
 
@@ -246,16 +232,13 @@ aec_audio_visualizer = AudioVisualizer(
 # Mark this function as the system under test
 @system(
     with_gaussian_noise,
-    with_time_stretch,
+    with_background_noise,
     with_altered_pitch,
     with_combined_effect,
-    with_chained_transform_a,  # gaussian noise + time stretch (random order)
-    with_chained_transform_b,  # time stretch + altered pitch (random order)
-    visualize_input=aec_audio_visualizer
+    with_chained_transform_a,  # gaussian noise + background noise (random order)
+    with_chained_transform_b,  # background noise + altered pitch (random order)
+    visualize_input=stt_audio_visualizer
 )
-def test_aec(audio):  # acoustic event classification (aec) test
-    audio = audio[None, :]
-    (clip_wise_output, _) = at.inference(audio)
-    predictions = get_top_k_labels(np.squeeze(clip_wise_output), top_k=5)
-    return predictions
+def test_stt(audio):
+    return stt.recognize(audio)
 # endregion

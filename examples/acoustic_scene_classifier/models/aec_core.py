@@ -6,7 +6,7 @@ from torch import nn
 import torch.nn.functional as F
 from torchlibrosa.stft import Spectrogram, LogmelFilterBank  # type: ignore
 from torchlibrosa.augmentation import SpecAugmentation  # type: ignore
-from examples.audio.utils.aec_utils import do_mixup  # type: ignore
+from examples.acoustic_scene_classifier.utils.aec_utils import do_mixup  # type: ignore
 
 
 def init_layer(layer):
