@@ -14,29 +14,29 @@ class FunctionOutput(Generic[T]):
         self._set = False
         self._output: T = None
         self._error: Exception = None
-    
+
     @property
     def output(self) -> T:
         return self._output
-    
+
     @output.setter
     def output(self, value: T):
         if self._set:
             raise ValueError("Output already set.")
         self._set = True
         self._output = value
-    
+
     @property
     def error(self) -> Exception:
         return self._error
-    
+
     @error.setter
     def error(self, value: Exception):
         if self._set:
             raise ValueError("Output already set.")
         self._set = True
         self._error = value
-    
+
     def __str__(self):
         if self._set:
             if self.error:
@@ -77,17 +77,17 @@ class MetamorphicExecutionReport:
         self.output_y: SystemOutput = SystemOutput()
         self.relation = relation
         self.relation_result = RelationOutput()
-    
+
     @property
     def transforms(self) -> List[PrioritizedTransform]:
         return self._transforms
-    
+
     @transforms.setter
     def transforms(self, value: List[PrioritizedTransform]):
         """List of PrioritizedTransform-s for the metamorphic test."""
         self._transforms = value
         self.transform_results = [TransformOutput() for _ in value]
-    
+
     @contextmanager
     def register_transform_result(self, i: int):
         """
@@ -98,7 +98,7 @@ class MetamorphicExecutionReport:
                 # do the transformation
                 result = transform(something)
                 set_(result)
-        
+
         This will set the result of the transform at index 0 in the report
         and store raised exceptions, if any.
         """
@@ -111,7 +111,7 @@ class MetamorphicExecutionReport:
         except Exception as e:
             self.transform_results[i].error = e
             raise e
-    
+
     @contextmanager
     def register_output_x(self):
         """Context manager similar to register_transform_result."""
@@ -133,7 +133,7 @@ class MetamorphicExecutionReport:
         except Exception as e:
             self.output_y.error = e
             raise e
-    
+
     @contextmanager
     def register_relation_result(self):
         """Context manager similar to register_transform_result."""

@@ -24,28 +24,28 @@ pip install metamorphic-test --extra-index-url https://__token__:<your_personal_
 Create a file named `test_sin.py`:
 ```python
 # content of test_sin.py
-import math  
-import pytest  
+import math
+import pytest
 from metamorphic_test import (  # 1
-    transformation,  
-    relation,  
-    metamorphic,  
-    system,  
-)  
-  
+    transformation,
+    relation,
+    metamorphic,
+    system,
+)
+
 A = metamorphic('shift')  # 2
-  
+
 
 @transformation(A)  # 3
-def shift(x):  
-    return x + 2 * math.pi  
-  
-  
+def shift(x):
+    return x + 2 * math.pi
+
+
 @relation(A)  # 3
-def approximately_equal(output_x, output_y):  
-    return output_x == pytest.approx(output_y)  
-  
-  
+def approximately_equal(output_x, output_y):
+    return output_x == pytest.approx(output_y)
+
+
 @pytest.mark.parametrize('x', range(-1, 1))  # 4
 @system(A)  # 5
 def test_sin(x):  # 6
@@ -113,56 +113,56 @@ Restart the command line / IDE to reload PATH variable.
 Extend the content of `test_sin.py` to test with multiple metamorphic relations.
 ```python
 # content of test_sin.py
-import math  
-import pytest  
-from hypothesis import given  
+import math
+import pytest
+from hypothesis import given
 import hypothesis.strategies as st
 
-from metamorphic_test import (  
-    transformation,  
-    relation,  
-    metamorphic,  
-    system,  
-    fixed,  
-    randomized,  
-)  
-from metamorphic_test.generators import RandInt  
+from metamorphic_test import (
+    transformation,
+    relation,
+    metamorphic,
+    system,
+    fixed,
+    randomized,
+)
+from metamorphic_test.generators import RandInt
 from metamorphic_test.relations import approximately
-  
-  
-A = metamorphic('shift', relation=approximately) # 1 
-B = metamorphic('negate')  
-C = metamorphic('negate then shift')  
-  
-  
-@transformation(A)  
+
+
+A = metamorphic('shift', relation=approximately) # 1
+B = metamorphic('negate')
+C = metamorphic('negate then shift')
+
+
+@transformation(A)
 @transformation(C, priority=0)  # 2
 @randomized('n', RandInt(1, 10))  # 3
 @fixed('c', 0)  # 3
-def shift(x, n, c):  
-    return x + 2 * n * math.pi + c  
-  
-  
-@transformation(B)  
+def shift(x, n, c):
+    return x + 2 * n * math.pi + c
+
+
+@transformation(B)
 @transformation(C, priority=1)  # 2
-def negate(x):  
-    return -x  
-  
-  
-@relation(B, C)  
-def approximately_negate(x, y):  
-    return approximately(-x, y)  
-  
-  
-@pytest.mark.parametrize('x', range(-1, 1))  
-@system(A, B, C)  
-def test_sin(x):  
+def negate(x):
+    return -x
+
+
+@relation(B, C)
+def approximately_negate(x, y):
+    return approximately(-x, y)
+
+
+@pytest.mark.parametrize('x', range(-1, 1))
+@system(A, B, C)
+def test_sin(x):
     return math.sin(x)
 
 
 @given(st.floats(-1, 1))  # 4
-@system(C)  
-def test_sin_2(x):  
+@system(C)
+def test_sin_2(x):
     return math.sin(x)
 ```
 Now we have three tests `A`, `B`, and `C` for testing the sine function with the relations as follows:

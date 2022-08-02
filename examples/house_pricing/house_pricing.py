@@ -73,7 +73,7 @@ def get_training_and_test_set(housing):
     for train_index, test_index in split.split(housing, housing["income_cat"]):
         strat_train_set = housing.loc[train_index]
         strat_test_set = housing.loc[test_index]
-    
+
     remove_income_category(housing)
     return strat_train_set, strat_test_set
 

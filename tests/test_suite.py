@@ -46,7 +46,7 @@ def test_get_caller_module(current_module_name):
     assert suite.get_caller_module() == current_module_name
 
 
-def test_get_caller_module_error(current_module_name):
+def test_get_caller_module_error():
     suite = Suite()
     with patch('inspect.stack', lambda: []):
         with pytest.raises(ValueError):
