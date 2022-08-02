@@ -129,4 +129,6 @@ class HousingPricePredictor:
 if __name__ == '__main__':
     training_set, test_set = get_training_and_test_set(get_housing_data())
     p = HousingPricePredictor(training_set)
-    print("Predictions: ", p.predict(test_set))
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logging.info("Predictions: %s", p.predict(test_set))

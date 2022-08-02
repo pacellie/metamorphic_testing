@@ -2,7 +2,7 @@ import inspect
 from pathlib import Path
 from typing import Callable, List
 import traceback
-import random
+import uuid
 
 from .execution_report import MetamorphicExecutionReport
 from .report_generator import ReportGenerator
@@ -58,7 +58,7 @@ def error_html(error: Exception) -> str:
     full_error_str = ''.join(
         traceback.format_exception(type(error), error, error.__traceback__))
     error_str = traceback.format_tb(error.__traceback__)[-1]
-    error_id = f'metamorphic_error_{random.randint(0, 1000000000)}'  # nosec
+    error_id = f'metamorphic_error_{uuid.uuid4()}'
     return f'''
     <span id="{error_id}" class="metamorphic__error">
         {_prepare_html(error_str)}

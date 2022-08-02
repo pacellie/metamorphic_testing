@@ -73,7 +73,7 @@ class Suite:
         module = self.get_caller_module()
         test_id_list = [
             k for k, _ in self.tests.items()
-            if '.'.join(str(k).split('.')[:-1]) == module
+            if str(k).rsplit('.', maxsplit=1)[0] == module
         ]
         return tuple(test_id_list)
 
