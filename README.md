@@ -77,6 +77,17 @@ To generate an html report with graphical illustration for tests (should have `p
 ```shell
 pytest --html=assets/reports/report.html --self-contained-html
 ```
+### Run the test in a class
+Mark the test function with `@staticmethod` decorator
+```shell
+class TestIt():
+    @staticmethod  # must be outermost
+    @pytest.mark.parametrize('x', [0, 1])
+    @pytest.mark.parametrize('y', [2, 3])
+    @system(A)
+    def test_add_pytest(x: int, y: int) -> int:
+        return x + y
+```
 
 ### Run the test via the web UI
 Start the web server with
