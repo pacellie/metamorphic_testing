@@ -102,9 +102,7 @@ class Suite:
                 module = inspect.getmodule(frame[0])
                 if module is not None:
                     return module.__name__
-        raise ValueError('Internal Error: no calling module. '
-                         'Test module name should start with "test_*" '
-                         'or end with "*_test.')
+        raise ValueError('Internal Error: no calling module found.')
 
     @staticmethod
     def fixed_generator(transform: Transform, arg: str, value: A) -> Transform:
