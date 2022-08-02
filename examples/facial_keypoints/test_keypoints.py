@@ -169,8 +169,8 @@ class KeypointVisualizer:
 
     def __init__(self) -> None:
         self.transform = transforms.ToTensor()
-        self.first_input: Optional[ndarray] = None
-        self.second_input: Optional[ndarray] = None
+        self.first_input: Optional[Tensor] = None
+        self.second_input: Optional[Tensor] = None
         self.first_is_next: bool = True
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
@@ -192,8 +192,8 @@ class KeypointVisualizer:
         -------
         html string that refers to the saved image
         """
-        image = self.prepare_input_visual(image)
-        path = str(Path("assets") / f"img{uuid.uuid4()}.png")
+        image: Tensor = self.prepare_input_visual(image)
+        path: str = str(Path("assets") / f"img{uuid.uuid4()}.png")
         try:
             plt.imsave(path, image, cmap="gray")
         except Exception as e:
@@ -213,22 +213,22 @@ class KeypointVisualizer:
         -------
         html string that refers to the saved image
         """
-        image = self.prepare_input_visual(image)
-        image_name = f"img{uuid.uuid4()}.png"
-        base_dir = Path("assets/img")  # for web app
+        image: Tensor = self.prepare_input_visual(image)
+        image_name: str = f"img{uuid.uuid4()}.png"
+        base_dir: Path = Path("assets/img")  # for web app
         base_dir.mkdir(parents=True, exist_ok=True)
-        write_path = base_dir / image_name
-        read_path = Path("../img") / image_name
+        write_path: Path = base_dir / image_name
+        read_path: Path = Path("../img") / image_name
         try:
             plt.imsave(write_path, image, cmap="gray")
         except Exception as e:
             return self.logexception_geterrorstring(e)
         return f"<img src='{read_path}' width='100' height='100'>"
 
-    def prepare_input_visual(self, image: ndarray) -> ndarray:
+    def prepare_input_visual(self, image: ndarray) -> Tensor:
         """Convert image into tensor of appropriate size, then store it either in
         the first or second slot."""
-        image = (self.transform(image).clone() * 255).view(96, 96)
+        image: Tensor = (self.transform(image).clone() * 255).view(96, 96)
         if self.first_is_next:
             self.first_input = image
         else:
@@ -251,7 +251,7 @@ class KeypointVisualizer:
         """
         if not self.prepare_output_visual(keypoints):
             return str(keypoints)
-        path = str(Path("assets") / f"img{uuid.uuid4()}.png")
+        path: str = str(Path("assets") / f"img{uuid.uuid4()}.png")
         try:
             plt.savefig(path, bbox_inches="tight", pad_inches=0)
         except Exception as e:
@@ -273,11 +273,11 @@ class KeypointVisualizer:
         """
         if not self.prepare_output_visual(keypoints):
             return str(keypoints)
-        image_name = f"img{uuid.uuid4()}.png"
-        base_dir = Path("assets/img")  # for web app
+        image_name: str = f"img{uuid.uuid4()}.png"
+        base_dir: Path = Path("assets/img")  # for web app
         base_dir.mkdir(parents=True, exist_ok=True)
-        write_path = base_dir / image_name
-        read_path = Path("../img") / image_name
+        write_path: Path = base_dir / image_name
+        read_path: Path = Path("../img") / image_name
         try:
             plt.savefig(write_path, bbox_inches="tight", pad_inches=0)
         except Exception as e:
@@ -308,7 +308,7 @@ class KeypointVisualizer:
         if image is None:
             return False
         plt.imshow(image, cmap="gray")
-        keypoints = keypoints.clone() * 48 + 48
+        keypoints: Tensor = keypoints.clone() * 48 + 48
         plt.scatter(keypoints[:, 0], keypoints[:, 1], s=200, marker=".", c="m")
         plt.axis("off")
         return True

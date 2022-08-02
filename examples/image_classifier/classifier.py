@@ -25,10 +25,10 @@ def read_traffic_signs(rootpath: str = "data/") -> List[ndarray]:
     -------
     list of images
     """
-    images = []  # images
+    images: List[ndarray] = []  # images
 
-    data_dir = Path(__file__).parent / rootpath
-    prefix = data_dir / "GTSRB" / "Final_Test" / "Images"
+    data_dir: Path = Path(__file__).parent / rootpath
+    prefix: Path = data_dir / "GTSRB" / "Final_Test" / "Images"
 
     with open(
         data_dir / "GTSRB_Final_Test_GT" / "GT-final_test.csv", encoding="utf-8"
@@ -132,6 +132,6 @@ class TrafficSignClassifier(nn.Module):
 
     def evaluate_image(self, img: ndarray) -> int:
         """Process the image with the neural network, and return the most likely class."""
-        tensor_img = self.input_preprocessing_pipeline(img)[None, :]
-        logits = self(tensor_img)
+        tensor_img: Tensor = self.input_preprocessing_pipeline(img)[None, :]
+        logits: Tensor = self(tensor_img)
         return fun.softmax(logits, dim=1).max(dim=1)[1].item()
