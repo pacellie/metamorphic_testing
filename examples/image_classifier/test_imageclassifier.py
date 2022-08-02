@@ -51,7 +51,7 @@ trio = metamorphic("drop_down_bright", relation=equality)
 """
 This example demonstrates MR tests of a traffic sign classifier NN:
 - if the images are pertubed slightly, the prediction should not differ by much.
-- if the perturbation causes the semantic information to change, 
+- if the perturbation causes the semantic information to change,
   e.g. from left to right turn, the prediction should reflect this change.
 
 What follows here are 16 image perturbation functions, all with the same signature: receives
