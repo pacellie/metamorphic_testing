@@ -18,8 +18,8 @@ pip install metamorphic-test --extra-index-url https://__token__:<your_personal_
 
 ## Example: testing the sine function
 ### Create a metamorphic test
-- The test file name should be `test_*.py` or `*_test.py`.
-- The test function name should be prefixed by `test`.
+- The test file name should be `test_*.py` or `*_test.py` (except for manual file name specification to pytest).
+- The test function name must be prefixed by `test`.
 
 Create a file named `test_sin.py`:
 ```python
@@ -208,7 +208,7 @@ This way you should see linting and typing errors directly in your editor, which
 
 ## Create a new example
 - Create a new directory in the `examples` directory.
-- Put your test files in there like normal (e.g. `test_example.py`, files to be checked by Pytest need to have their names start with `test_`).
+- Put your test files in there like normal (e.g. `test_example.py`, files to be checked by Pytest need to have their names start with `test_` except if you manually run them).
 - Install development dependencies using `poetry add --D <package name>`.
 - Run `poetry run example <which>` to run the tests locally.
 - Create a new job for your example: Assuming your example is called `hello_world`, add this to the `.gitlab-ci.yml` file in the repository root:

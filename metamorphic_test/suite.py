@@ -1,6 +1,7 @@
 from functools import wraps
 import inspect
 from typing import Dict, TypeVar, Callable, Hashable, Tuple
+from pathlib import Path
 
 from .metamorphic import MetamorphicTest
 from .generator import MetamorphicGenerator
@@ -11,6 +12,10 @@ from .rel import Relation
 A = TypeVar('A')
 
 TestID = Hashable  # only guarantee made for outside use
+
+# This relies on the fact that suite.py is in the root directory
+# of the metamorphic_test package.
+METAMORHIC_TEST_PACKAGE_PATH = Path(__file__).parent
 
 
 class Suite:
@@ -90,8 +95,10 @@ class Suite:
         # inspect.stack() returns a list of frame records for the caller's stack.
         # The first entry in the returned list represents the caller.
         for frame in inspect.stack():
-            test_module_path = str(frame[1]).rsplit('/', maxsplit=1)[-1]
-            if test_module_path.startswith('test_') or test_module_path.endswith('_test.py'):
+            test_module_path = Path(frame[1])
+            if METAMORHIC_TEST_PACKAGE_PATH not in test_module_path.parents:
+                # this file is not from our package
+                # => it is from the user's code
                 module = inspect.getmodule(frame[0])
                 if module is not None:
                     return module.__name__
