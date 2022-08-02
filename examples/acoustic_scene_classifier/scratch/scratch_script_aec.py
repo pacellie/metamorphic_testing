@@ -6,7 +6,10 @@ from audiomentations import Compose, AddGaussianNoise  # type: ignore
 from audiomentations import PitchShift, TimeStretch  # type: ignore
 import librosa  # type: ignore
 import numpy as np
-from examples.audio.models.aec_inference import AudioTagging, labels  # type: ignore
+from examples.acoustic_scene_classifier.models.aec_inference import (  # type:ignore
+    AudioTagging,
+    labels,
+)
 
 warnings.filterwarnings("ignore")
 

@@ -2,8 +2,10 @@ import os
 import torch
 from pathlib import Path
 
-from examples.audio.utils.aec_utils import move_data_to_device  # type: ignore
-from examples.audio.models.aec_core import Cnn14  # type: ignore
+from examples.acoustic_scene_classifier.utils.aec_utils import (  # type: ignore
+    move_data_to_device,  # type: ignore
+)
+from examples.acoustic_scene_classifier.models.aec_core import Cnn14  # type: ignore
 
 
 labels = []
