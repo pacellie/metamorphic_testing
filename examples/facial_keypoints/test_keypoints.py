@@ -169,8 +169,8 @@ class KeypointVisualizer:
 
     def __init__(self) -> None:
         self.transform = transforms.ToTensor()
-        self.first_input: Optional[Tensor] = None
-        self.second_input: Optional[Tensor] = None
+        self.first_input: Optional[ndarray] = None
+        self.second_input: Optional[ndarray] = None
         self.first_is_next: bool = True
         self.logger: logging.Logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
@@ -192,7 +192,7 @@ class KeypointVisualizer:
         -------
         html string that refers to the saved image
         """
-        image: Tensor = self.prepare_input_visual(image)
+        image = self.prepare_input_visual(image)
         path: str = str(Path("assets") / f"img{uuid.uuid4()}.png")
         try:
             plt.imsave(path, image, cmap="gray")
@@ -213,7 +213,7 @@ class KeypointVisualizer:
         -------
         html string that refers to the saved image
         """
-        image: Tensor = self.prepare_input_visual(image)
+        image = self.prepare_input_visual(image)
         image_name: str = f"img{uuid.uuid4()}.png"
         base_dir: Path = Path("assets/img")  # for web app
         base_dir.mkdir(parents=True, exist_ok=True)
@@ -225,10 +225,10 @@ class KeypointVisualizer:
             return self.logexception_geterrorstring(e)
         return f"<img src='{read_path}' width='100' height='100'>"
 
-    def prepare_input_visual(self, image: ndarray) -> Tensor:
+    def prepare_input_visual(self, image: ndarray) -> ndarray:
         """Convert image into tensor of appropriate size, then store it either in
         the first or second slot."""
-        image: Tensor = (self.transform(image).clone() * 255).view(96, 96)
+        image = (self.transform(image).clone() * 255).view(96, 96)
         if self.first_is_next:
             self.first_input = image
         else:
@@ -308,7 +308,7 @@ class KeypointVisualizer:
         if image is None:
             return False
         plt.imshow(image, cmap="gray")
-        keypoints: Tensor = keypoints.clone() * 48 + 48
+        keypoints = keypoints.clone() * 48 + 48
         plt.scatter(keypoints[:, 0], keypoints[:, 1], s=200, marker=".", c="m")
         plt.axis("off")
         return True

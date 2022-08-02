@@ -25,7 +25,8 @@ Danny Benlin Oswan
 - Evaluate 3 old frameworks on chaining, [issue 41](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/41), experimented on 3 branches named `experiment-from*-danny`.
 - Code the examples for image MR (in examples/image_classifier and facial_keypoints) and shortest path algorithm, incl. the logging and docstrings in it (except the visualizer in classifier, that was Paul's).
 - Added basics of [logging](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/72), [exception](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/65), and [docstring](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/issues/67).
-- Prepared demo machine, including [wiki for audio setup](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/How-to-run-audio-examples-(Windows)).
+- Prepared demo machine, including [wiki for audio setup](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/How-to-run-audio-examples-(Windows)), added into readme.
+- Cleanup: logging, annotation, docstring, style for image MR and shortest path example.
 
 Ting-Yu Lu
 ===
