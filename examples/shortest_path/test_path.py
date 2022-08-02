@@ -62,11 +62,11 @@ def vis_output(result) -> int:
 
 
 # setup
-graph1 = Graph(undirected=True)
+graph1: Graph = Graph(undirected=True)
 graph1.add_edge(1, 2, 10)
 graph1.add_edge(2, 3, 15)
 graph1.add_edge(3, 4, 18)
-graph2 = Graph(undirected=True)
+graph2: Graph = Graph(undirected=True)
 graph2.add_edge(1, 2, 10)
 graph2.add_edge(1, 3, 15)
 graph2.add_edge(2, 4, 18)

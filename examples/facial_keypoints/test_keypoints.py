@@ -193,7 +193,7 @@ class KeypointVisualizer:
         html string that refers to the saved image
         """
         image = self.prepare_input_visual(image)
-        path = str(Path("assets") / f"img{uuid.uuid4()}.png")
+        path: str = str(Path("assets") / f"img{uuid.uuid4()}.png")
         try:
             plt.imsave(path, image, cmap="gray")
         except Exception as e:
@@ -214,11 +214,11 @@ class KeypointVisualizer:
         html string that refers to the saved image
         """
         image = self.prepare_input_visual(image)
-        image_name = f"img{uuid.uuid4()}.png"
-        base_dir = Path("assets/img")  # for web app
+        image_name: str = f"img{uuid.uuid4()}.png"
+        base_dir: Path = Path("assets/img")  # for web app
         base_dir.mkdir(parents=True, exist_ok=True)
-        write_path = base_dir / image_name
-        read_path = Path("../img") / image_name
+        write_path: Path = base_dir / image_name
+        read_path: Path = Path("../img") / image_name
         try:
             plt.imsave(write_path, image, cmap="gray")
         except Exception as e:
@@ -251,7 +251,7 @@ class KeypointVisualizer:
         """
         if not self.prepare_output_visual(keypoints):
             return str(keypoints)
-        path = str(Path("assets") / f"img{uuid.uuid4()}.png")
+        path: str = str(Path("assets") / f"img{uuid.uuid4()}.png")
         try:
             plt.savefig(path, bbox_inches="tight", pad_inches=0)
         except Exception as e:
@@ -273,11 +273,11 @@ class KeypointVisualizer:
         """
         if not self.prepare_output_visual(keypoints):
             return str(keypoints)
-        image_name = f"img{uuid.uuid4()}.png"
-        base_dir = Path("assets/img")  # for web app
+        image_name: str = f"img{uuid.uuid4()}.png"
+        base_dir: Path = Path("assets/img")  # for web app
         base_dir.mkdir(parents=True, exist_ok=True)
-        write_path = base_dir / image_name
-        read_path = Path("../img") / image_name
+        write_path: Path = base_dir / image_name
+        read_path: Path = Path("../img") / image_name
         try:
             plt.savefig(write_path, bbox_inches="tight", pad_inches=0)
         except Exception as e:

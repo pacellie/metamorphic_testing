@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 import uuid
 
 import numpy as np
@@ -229,8 +229,8 @@ def album_verticalflip(image: ndarray) -> ndarray:
 
 @relation(horizontal_flip, vertical_flip, pair)
 def flip_sign(x: int, y: int) -> bool:
-    mapping = {16: 10, 10: 16, 38: 39, 39: 38, 33: 34, 34: 33, 25: 27, 27: 25}
-    xhat = mapping.get(x, x)
+    mapping: Dict[int, int] = {16: 10, 10: 16, 38: 39, 39: 38, 33: 34, 34: 33, 25: 27, 27: 25}
+    xhat: int = mapping.get(x, x)
     return equality(xhat, y)
 
 
@@ -238,7 +238,7 @@ class ExceptionLogger:
     """Class to help log exceptions that occur when saving images for visualization."""
 
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
+        self.logger: logging.Logger = logging.getLogger(__name__)
         self.logger.addHandler(logging.StreamHandler())
 
     def logexception_geterrorstring(self, e: Exception) -> str:
@@ -265,7 +265,7 @@ def visualize_input(image: ndarray) -> str:
     -------
     html string that refers to the saved image
     """
-    path = str(Path("assets") / f"img{uuid.uuid4()}.png")
+    path: str = str(Path("assets") / f"img{uuid.uuid4()}.png")
     try:
         plt.imsave(path, image)
     except Exception as e:
@@ -286,11 +286,11 @@ def visualize_input_webapp(image: ndarray) -> str:
     -------
     html string that refers to the saved image
     """
-    image_name = f"img{uuid.uuid4()}.png"
-    base_dir = Path("assets/img")  # for web app
+    image_name: str = f"img{uuid.uuid4()}.png"
+    base_dir: Path = Path("assets/img")  # for web app
     base_dir.mkdir(parents=True, exist_ok=True)
-    write_path = base_dir / image_name
-    read_path = Path("../img") / image_name
+    write_path: Path = base_dir / image_name
+    read_path: Path = Path("../img") / image_name
     try:
         plt.imsave(write_path, image)
     except Exception as e:

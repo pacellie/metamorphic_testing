@@ -91,6 +91,22 @@ Then open the web browser and navigate to the URL `http://localhost:5000/`. Ther
 
 To change the directory of scanned examples, use the `--test_directory` option.
 
+## External dependencies
+
+### Audio examples
+
+Several external dependencies are required to install the packages for the audio tests and to
+run them. During installation / run python may raise an error such as "error: Microsoft Visual 
+C++ 14.0 is required. Get it with 'Microsoft Visual C++ Build Tools'" or that Visual Studio 
+2015 is required. Install those components to proceed.
+Sometimes Microsoft SDK is also required. 
+
+If NoBackendError is raised when running the audio examples, the audio libary requires the
+command line program FFMPEG to load the mp3 sample files. [Download the ffmpeg cli, then add the location of ffmpeg.exe iniside the bin folder to PATH environment variable.](https://stackoverflow.com/questions/59580601/audioread-exceptions-nobackenderror-in-librosa).
+Restart the command line / IDE to reload PATH variable.
+
+[For more information, see this wiki page.](https://gitlab.lrz.de/pypracticum/team-mt-metamorphic-testing-framework/-/wikis/How-to-run-audio-examples-(Windows))
+
 ## Example Upgrade
 
 ### Test with multiple metamorphic relations

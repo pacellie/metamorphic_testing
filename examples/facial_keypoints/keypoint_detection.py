@@ -22,15 +22,15 @@ def read_keypoint_images(csv_name: str = "val.csv") -> List[ndarray]:
     -------
     list of portraits
     """
-    images = []
+    images: List[ndarray] = []
     csv_file = Path(__file__).parent / csv_name
     key_pts_frame = pd.read_csv(csv_file)
     key_pts_frame.dropna(inplace=True)
     key_pts_frame.reset_index(drop=True, inplace=True)
     for idx in range(key_pts_frame.shape[0]):
         img_str = key_pts_frame.loc[idx]["Image"]
-        img = np.array([int(item) for item in img_str.split()]).reshape((96, 96))
-        image = np.expand_dims(img, axis=2).astype(np.uint8)
+        img: ndarray = np.array([int(item) for item in img_str.split()]).reshape((96, 96))
+        image: ndarray = np.expand_dims(img, axis=2).astype(np.uint8)
         images.append(image)
     return images
 
