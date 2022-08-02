@@ -124,12 +124,12 @@ class HTMLReportGenerator(ReportGenerator):
             else:
                 column.append(self.visualize_input(transform_result.output))
         return column
-    
+
     @staticmethod
     def _add_column(to: List[List], fill=""):
         for x in to:
             x.append(fill)
-    
+
     def _transform_error_occurred(self) -> bool:
         return any(
             transform_result.error is not None
@@ -143,7 +143,7 @@ class HTMLReportGenerator(ReportGenerator):
         if self._transform_error_occurred():
             system_name += placeholder_html(" (skipped)")
         rows[-1][1] = f"⇨ {system_name} ⇨"
-    
+
     def _add_outputs(self, rows: List[List[str]]):
         """Add the outputs in the last column of the first & last row."""
         x_err = self.report.output_x.error is not None
@@ -165,7 +165,7 @@ class HTMLReportGenerator(ReportGenerator):
             else:
                 output_y_str = self.visualize_output(self.report.output_y.output)
             rows[-1][-1] = output_y_str
-    
+
     def _add_relation(self, rows: List[List[str]]):
         """Add the relation in the last row in the middle."""
         if self.report.output_x.error is not None:
@@ -182,7 +182,7 @@ class HTMLReportGenerator(ReportGenerator):
         rows[len(rows) // 2][-1] = (
             f"⇵ {_function_html(self.report.relation)} {holds_str}"
         )
-    
+
     @staticmethod
     def _list_to_table(rows: List[List[str]]):
         table_inner = ""
@@ -192,13 +192,13 @@ class HTMLReportGenerator(ReportGenerator):
                 table_inner += f'<td class="metamorphic__td">{entry}</td>'
             table_inner += '</tr>'
         return f'<table class="metamorphic__table">{table_inner}</table>'
-    
+
     def _get_js(self):
         return (Path(__file__).parent / "js" / "report.js").read_text()
-    
+
     def _get_css(self):
         return (Path(__file__).parent / "css" / "report.css").read_text()
-    
+
     def _get_inline_assets(self):
         assets = ""
         if self.include_js:
