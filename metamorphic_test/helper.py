@@ -1,34 +1,8 @@
 import inspect
 import wrapt  # type: ignore
-from typing import Callable
-
-SignatureWrapper = Callable[[Callable], Callable]
 
 
-def change_signature(adapt_func: Callable) -> SignatureWrapper:
-    """
-    Signature changing decorator.
-    Change the original function's signature to adapt_func's.
-
-    Parameters
-    ----------
-    adapt_func : Callable
-        The function which will be used as source of the argument specification.
-
-    Returns
-    -------
-    change : SignatureWrapper
-        Returns a function whose signature has been dynamically
-        changed with annotations based on the adapt_func function.
-
-    Examples
-    --------
-    def prototype(arg1, arg2): pass
-
-    @change_signature(prototype)
-    def function(input):
-        ...
-    """
+def change_signature(adapt_func):
     fullargspec = inspect.getfullargspec(adapt_func)
     fullargspec.args.insert(0, 'name')
 

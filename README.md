@@ -18,6 +18,9 @@ pip install metamorphic-test --extra-index-url https://__token__:<your_personal_
 
 ## Example: testing the sine function
 ### Create a metamorphic test
+- The test file name should be `test_*.py` or `*_test.py`.
+- The test function name should be prefixed by `test`.
+
 Create a file named `test_sin.py`:
 ```python
 # content of test_sin.py
