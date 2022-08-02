@@ -138,9 +138,9 @@ class AudioVisualizer:
                     </tr>
                     <tr>
                         <td>
-                            <audio 
-                                controls 
-                                src={retrieve_path_audio} 
+                            <audio
+                                controls
+                                src={retrieve_path_audio}
                                 style="display: block;width: 150px">
                                 Your browser does not support the <code>audio</code> element.
                             </audio>
