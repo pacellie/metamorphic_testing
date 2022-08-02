@@ -3,7 +3,7 @@ name = "metamorphic_test"
 version = "1.0.0"
 description = ""
 authors = ["Python Practicum TUM 2022"]
-
+ 
 [tool.poetry.scripts]
 cov = "scripts.cov:html_coverage"
 install-hook = "scripts.install_hook:install_hook"
