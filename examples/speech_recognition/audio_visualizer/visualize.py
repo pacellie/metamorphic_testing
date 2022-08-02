@@ -40,6 +40,7 @@ class AudioVisualizer:
         plt.tight_layout()
         plt.specgram(audio, Fs=self.sampling_rate)
         plt.savefig(path, bbox_inches='tight')
+        plt.close()
 
     def save_waveform_plot(self, audio: np.ndarray, path: str) -> None:
         """
@@ -67,6 +68,7 @@ class AudioVisualizer:
         plt.tight_layout()
         plt.plot(time, audio, color="green")
         plt.savefig(path, bbox_inches='tight')
+        plt.close()
 
     def save_audio(self, audio: np.ndarray, path: str) -> None:
         """
