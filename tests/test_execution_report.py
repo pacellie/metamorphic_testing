@@ -24,7 +24,7 @@ def generic_m_report():
 
 @pytest.mark.parametrize("number_of_transforms", range(5))
 def test_transform_results_len(
-    number_of_transforms, 
+    number_of_transforms,
     generic_p_transform,
     generic_m_report
 ):
