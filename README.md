@@ -79,7 +79,7 @@ pytest --html=assets/reports/report.html --self-contained-html
 ```
 ### Run the test in a class
 Mark the test function with `@staticmethod` decorator
-```shell
+```python
 class TestIt():
     @staticmethod  # must be outermost
     @pytest.mark.parametrize('x', [0, 1])
