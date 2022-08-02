@@ -75,6 +75,19 @@ To generate an html report with graphical illustration for tests (should have `p
 pytest --html=assets/reports/report.html --self-contained-html
 ```
 
+### Run the test via the web UI
+Start the web server with
+```shell
+poetry run web-app
+```
+
+Then open the web browser and navigate to the URL `http://localhost:5000/`. There you can
+- Run the tests from the `example` folder
+- Name them
+- View them and view pre-computed results if you have them
+
+To change the directory of scanned examples, use the `--test_directory` option.
+
 ## Example Upgrade
 
 ### Test with multiple metamorphic relations
